@@ -130,7 +130,7 @@ public:
     Vector(const Vector<elemType> &v);
     Vector<elemType> operator=(const Vector<elemType> &v);
     void flush();
-    ~Vector();
+    ~ Vector();
     Vector(unsigned long s);
     Vector(unsigned long s,const elemType e);
     int push_back(const elemType e);
@@ -190,7 +190,7 @@ Stack<elemType>::Stack(const Stack<elemType> &s) {
 /*
  ClASS           : Stack
  MEMBER_FUNCTION : flush()
- DESCRIPTION     : Empties all data, deallocates memrory.
+ DESCRIPTION     : Empties all data, deallocates memory.
  RETURN_TYPE     : void
  PARAMETERS      : (none)
  */
