@@ -1,4 +1,6 @@
 #include "codestring.h"
+
+
 /**
 * Basic functions.
 *	EDITING THESE CHANGES THE FRAMEWORK OF THE TEMPLATE
@@ -110,10 +112,12 @@ String& String::operator+( const char c ){
 	return this->operator+(s);
 }
 
-// substring functions
+
+
+/*** substring functions ***/
 String& String::substr( __SIZETYPE l, __SIZETYPE u = 0 ){
 	if( l < 0 ) l += len;
-	if( u < 0 ) u += len;
+	if( u <= 0 ) u += len;
 	
 	String *ret = new String();
 	if( l >= u || u > len  ) return *ret; // return null string, as bounds are erred
@@ -135,11 +139,12 @@ __SIZETYPE String::indexOf( String& s ){
 	bool isfound ;
 	for( __SIZETYPE i = 0; i < len-tlen ; ++i ){
 		isfound = true;
-		for( __SIZETYPE j = 0; j < tlen ; ++j )
-			if( s.charAt(j) != data[i] ){
+		for( __SIZETYPE j = 0; j < tlen ; ++j ){
+			if( s.charAt(j) != data[i+j] ){
 				isfound = false;
 				break;
 			}
+		}
 		if( isfound ) return i;
 	}
 	return -1;
@@ -147,6 +152,7 @@ __SIZETYPE String::indexOf( String& s ){
 __SIZETYPE String::indexOf( const char *s ){
 	__SIZETYPE tlen = strlen(s);
 	bool isfound ;
+	
 	for( __SIZETYPE i = 0; i < len-tlen ; ++i ){
 		isfound = true;
 		for( __SIZETYPE j = 0; j < tlen ; ++j ){
@@ -165,8 +171,28 @@ __SIZETYPE String::indexOf( const char *s ){
 * Functions : write
 ***********************************/
 
+// replace : replaces all occurences of <find> with <rep>
+String& String::replace( const char *__find , const char *__rep ){
+	String *tmp = new String();
+	String ch(*this), find(__find), rep(__rep);
+	
+	__SIZETYPE repPos = ch.indexOf(find),
+				flen = find.length(), 
+				rlen = rep.length();
+	while( repPos >= 0 ){
+		(*tmp) += ch.substr(0,repPos) + rep;
+		ch = ch.substr(repPos+flen);
+		repPos = ch.indexOf(find);
+	}
+	*tmp += ch;
+	return *tmp;
+}
 
-
+// shorthand operator +=
+String& String::operator +=( const char *s ){
+	(*this) = (*this)+s;
+	return *this;
+}
 /**********************************
 * Functions : read/write
 **********************************/
@@ -207,8 +233,8 @@ istream& operator>>( istream &input, String &D )
 }
 
 /*******************************
-* Compatiblity modules for string constants
-* char *
+* Compatiblity modules 
+* for string constants (char *)
 ********************************/
 String::operator char*(){
 	char *ret = new char[len+1];
@@ -220,8 +246,7 @@ String::operator char(){
 	return data[0];
 }
 
-//-----------------------------------------------------------
-// DEBUG - delete on completing development...
+
 bool String::log(){
 	printToStream( cout );
 }
