@@ -1,14 +1,18 @@
 #include "codevector.h"
 
-template<class T> Vector<T>::Vector(){arr=NULL;len=0;}
-
-template<class T> Vector<T>::Vector(__SIZETYPE init){
-    arr=new T[init];
-    len=init;
+/** constructors **/
+template<typename T>
+Vector<T>::Vector(){
+	arr = NULL;
+	len = 0;
 }
 
-//Size of Vector is changed.
-template<class T> void Vector<T>::resize(__SIZETYPE size){ 
+template<typename T> Vector<T>::Vector(__SIZETYPE init){
+    arr = new T[init];
+    len = init;
+}
+
+template<typename T> void Vector<T>::resize(__SIZETYPE size){ 
     T temp[len];
     for(__SIZETYPE i=0;i<len;i++) temp[i]=arr[i];
     delete[] arr;
@@ -22,7 +26,7 @@ template<class T> void Vector<T>::resize(__SIZETYPE size){
     return;
 }
 
-template<class T> void Vector<T>::push_back(T val){
+template<typename T> void Vector<T>::push_back(T val){
     T temp[len];
     for(__SIZETYPE i=0;i<len;i++) temp[i]=arr[i];
     delete[] arr;
@@ -35,7 +39,7 @@ template<class T> void Vector<T>::push_back(T val){
     return;
 }
 
-template<class T> __SIZETYPE Vector<T>::find(T el){
+template<typename T> __SIZETYPE Vector<T>::find(T el){
 
     for(__SIZETYPE i=0;i<len;i++){
         if(arr[i]==el) return i;
@@ -43,7 +47,7 @@ template<class T> __SIZETYPE Vector<T>::find(T el){
     return -1;//If the desired element doesn't exist in the array, it returns -1
 }
 
-template<class T> T& Vector<T>::operator[](__SIZETYPE index){
+template<typename T> T& Vector<T>::operator[](__SIZETYPE index){
     return arr[index];
 }
 
