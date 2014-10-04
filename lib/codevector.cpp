@@ -1,23 +1,4 @@
-#ifndef VECTOR_H
-#define VECTOR_H
-
-template<class T> class Vector
-{
-
-    T* arr;
-    __SIZETYPE len;
-
-    public:
-
-    Vector();
-    Vector(__SIZETYPE);                          //Constructor to initialize size of Vector
-    void resize(__SIZETYPE);
-    void push_back(T);
-    __SIZETYPE find(T);
-    T& operator[](__SIZETYPE);
-    __SIZETYPE size();
-    ~Vector();
-};
+#include "codevector.h"
 
 template<class T> Vector<T>::Vector(){arr=NULL;len=0;}
 
@@ -26,12 +7,15 @@ template<class T> Vector<T>::Vector(__SIZETYPE init){
     len=init;
 }
 
-template<class T> void Vector<T>::resize(__SIZETYPE size){ //Size of Vector is changed.
+//Size of Vector is changed.
+template<class T> void Vector<T>::resize(__SIZETYPE size){ 
     T temp[len];
     for(__SIZETYPE i=0;i<len;i++) temp[i]=arr[i];
     delete[] arr;
     arr=new T[size];
-    for(__SIZETYPE i=0;i<size;++i){                        //Elements upto the desired size are retained.
+    
+    //Elements upto the desired size are retained.
+    for(__SIZETYPE i=0;i<size;++i){
         arr[i]=temp[i];
     }
     len=size;
@@ -56,7 +40,7 @@ template<class T> __SIZETYPE Vector<T>::find(T el){
     for(__SIZETYPE i=0;i<len;i++){
         if(arr[i]==el) return i;
     }
-    return len;                        //If the desired element doesn't exist in the array, it returns one after the last index
+    return -1;//If the desired element doesn't exist in the array, it returns -1
 }
 
 template<class T> T& Vector<T>::operator[](__SIZETYPE index){
@@ -71,4 +55,3 @@ template<class T> Vector<T>::~Vector(){
 template<class T> __SIZETYPE Vector<T>::size(){
     return len;
 }
-#endif //VECTOR_H
