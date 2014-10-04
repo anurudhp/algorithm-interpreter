@@ -38,7 +38,10 @@ typedef long int  __SIZETYPE; // older compilers dont support long long.
 // Custom Templates
 class String;
 template <typename> class Vector;
+template <typename> class Deque;
+template <typename> class Queue;
 template <typename> class Stack;
+
 
 
 #endif /* CUSTOM_DEPENDENCIES_H */
