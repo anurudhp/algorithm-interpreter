@@ -3,7 +3,8 @@
 
 #include "dependencies.h"
 
-template<class T> class Vector
+template<typename T>
+class Vector
 {
     T* arr;
     __SIZETYPE len;
