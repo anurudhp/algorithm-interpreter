@@ -6,21 +6,31 @@
 template<typename T>
 class Vector
 {
-    T* arr;
+	private:
+    T *arr;
     __SIZETYPE len;
 
     public:
-
+	
+	//constructors and destructor
     Vector();
-    Vector(__SIZETYPE);                          //Constructor to initialize size of Vector
+    Vector( __SIZETYPE );
+    Vector( Vector<T>& );
+    Vector<T>& operator=( Vector<T>& );
     ~Vector();
     
-    T& operator[](__SIZETYPE);
+    // basic data access
     __SIZETYPE size();
-    void push_back(T);
+    T& operator[]( __SIZETYPE );
     
-    void resize(__SIZETYPE);
-    __SIZETYPE find(T);
+    Vector<T>& push_back( T );
+    T pop_back();
+    Vector<T>& resize( __SIZETYPE );
+    
+    // advanced functions
+    __SIZETYPE find( T );
 };
+
+#include "codevector.cpp"
 
 #endif /* CODE_VECTOR_H */
