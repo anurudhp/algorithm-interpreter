@@ -1,5 +1,4 @@
-#ifndef CODE_VECTOR_TCC
-#define CODE_VECTOR_TCC
+#ifdef CODE_VECTOR_H
 
 // Definition of Vector template functions
 // include this file in "codevector.h"
@@ -12,9 +11,18 @@ Vector<T>::Vector(){
 }
 
 template<typename T>
-Vector<T>::Vector( __SIZETYPE init ){
-    arr = new T[init];
-    len = init;
+Vector<T>::Vector( __SIZETYPE s ){
+    arr = new T[s];
+    len = s;
+}
+
+// allocates @s elements, of value @init
+template<typename T>
+Vector<T>::Vector( __SIZETYPE s, T init ){
+    arr = new T[s];
+    len = s;
+    for( __SIZETYPE i=0 ; i<len ; i++ )
+    	arr[i] = init;
 }
 
 template<typename T>
@@ -97,7 +105,7 @@ Vector<T>& Vector<T>::resize( __SIZETYPE size ){
     for( __SIZETYPE i=0 ; i<copylen ; i++ ) 
 		temp[i] = arr[i];
     delete[] arr;
-    arr = new T[size];
+    if( size > 0 ) arr = new T[size];
     for( __SIZETYPE i=0 ; i<copylen ; ++i )
         arr[i]=temp[i];
     
@@ -105,6 +113,12 @@ Vector<T>& Vector<T>::resize( __SIZETYPE size ){
     return *this;
 }
 
+// flush : deletes all elements of the vector
+template<typename T>
+Vector<T>& Vector<T>::flush(){ 
+	this->resize(0);
+	return *this;
+}
 /*** Advanced functions ***/
 
 template<typename T> 
@@ -116,4 +130,4 @@ __SIZETYPE Vector<T>::find( T el ){
     return -1;
 }
 
-#endif /* CODE_VECTOR_TCC */
+#endif /* CODE_VECTOR_H */

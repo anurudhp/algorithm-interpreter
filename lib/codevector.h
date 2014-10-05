@@ -15,6 +15,7 @@ class Vector
 	//constructors and destructor
     Vector();
     Vector( __SIZETYPE );
+    Vector( __SIZETYPE , T );
     Vector( Vector<T>& );
     Vector<T>& operator=( Vector<T>& );
     ~Vector();
@@ -26,11 +27,12 @@ class Vector
     Vector<T>& push_back( T );
     T pop_back();
     Vector<T>& resize( __SIZETYPE );
+    Vector<T>& flush();
     
     // advanced functions
     __SIZETYPE find( T );
 };
 
-#include "codevector.cpp"
+#include "codevector.tcc"
 
 #endif /* CODE_VECTOR_H */
