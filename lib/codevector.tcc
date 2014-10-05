@@ -36,6 +36,7 @@ Vector<T>::Vector( Vector<T>& vec ){
 
 template<typename T>
 Vector<T>& Vector<T>::operator=( Vector<T>& vec ){
+	this->flush();
     len = vec.size();
     arr = new T[len];
     
@@ -116,7 +117,8 @@ Vector<T>& Vector<T>::resize( __SIZETYPE size ){
 // flush : deletes all elements of the vector
 template<typename T>
 Vector<T>& Vector<T>::flush(){ 
-	this->resize(0);
+	delete arr;
+	len = 0;
 	return *this;
 }
 /*** Advanced functions ***/
