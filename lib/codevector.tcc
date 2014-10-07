@@ -114,9 +114,9 @@ Vector<T>& Vector<T>::resize( __SIZETYPE size ){
     return *this;
 }
 
-// flush : deletes all elements of the vector
+// empty : deletes all elements of the vector
 template<typename T>
-Vector<T>& Vector<T>::flush(){ 
+Vector<T>& Vector<T>::empty(){ 
 	delete arr;
 	len = 0;
 	return *this;
