@@ -143,25 +143,11 @@ public:
 
 /* CLASS: Stack - Implementation */
 
-/*
- ClASS           : Stack
- MEMBER_FUNCTION : (Constructor)
- DESCRIPTION     : Initializes top to NULL pointer.
- RETURN_TYPE     : (none)
- PARAMETERS      : (none)
- */
 template <typename elemType>
 Stack<elemType>::Stack() {
     top = 0;
 }
 
-/*
- ClASS           : Stack
- MEMBER_FUNCTION : (Copy Constructor)
- DESCRIPTION     : Copies values from another stack, by allocating new memory locations.
- RETURN_TYPE     : (none)
- PARAMETERS      : (none)
- */
 template <typename elemType>
 Stack<elemType>::Stack(const Stack<elemType> &s) {
     if(s.top) {
@@ -187,38 +173,17 @@ Stack<elemType>::Stack(const Stack<elemType> &s) {
     else top = 0;
 }
 
-/*
- ClASS           : Stack
- MEMBER_FUNCTION : flush()
- DESCRIPTION     : Empties all data, deallocates memory.
- RETURN_TYPE     : void
- PARAMETERS      : (none)
- */
 template <typename elemType>
 void Stack<elemType>::flush() {
     elemType t;
     while(pop(t));
 }
 
-/*
- ClASS           : Stack
- MEMBER_FUNCTION : (Destructor)
- DESCRIPTION     : Deletes all data.
- RETURN_TYPE     : (none)
- PARAMETERS      : (none)
- */
 template <typename elemType>
 Stack<elemType>::~Stack() {
     flush();
 }
 
-/*
- ClASS           : Stack
- MEMBER_FUNCTION : push()
- DESCRIPTION     : Pushes an element to the top of the stack, if space is available.
- RETURN_TYPE     : void
- PARAMETERS      : elemType
- */
 template <typename elemType>
 void Stack<elemType>::push(elemType d) {
     Node *tmp = new Node;
@@ -232,13 +197,6 @@ void Stack<elemType>::push(elemType d) {
     }
 }
 
-/*
- ClASS           : Stack
- MEMBER_FUNCTION : pop()
- DESCRIPTION     : Pops the top element, assings it to parameter, if stack is not empty.
- RETURN_TYPE     : int
- PARAMETERS      : elemType&
- */
 template <typename elemType>
 int Stack<elemType>::pop(elemType &d) {
     if(top) {
@@ -253,13 +211,6 @@ int Stack<elemType>::pop(elemType &d) {
     }
 }
 
-/*
- ClASS           : Stack
- MEMBER_FUNCTION : pop()
- DESCRIPTION     : Pops the top element.
- RETURN_TYPE     : int
- PARAMETERS      : (none)
- */
 template <typename elemType>
 int Stack<elemType>::pop() {
     if(top) {
@@ -273,15 +224,6 @@ int Stack<elemType>::pop() {
     }
 }
 
-
-
-/*
- ClASS           : Stack
- MEMBER_FUNCTION : Top()
- DESCRIPTION     : Assings top element to parameter,if exists.
- RETURN_TYPE     : void
- PARAMETERS      : elemType&
- */
 template <typename elemType>
 elemType& Stack<elemType>::Top() {
     if(top) {
@@ -293,13 +235,6 @@ elemType& Stack<elemType>::Top() {
     }
 }
 
-/*
- ClASS           : Stack
- MEMBER_FUNCTION : operator=()
- DESCRIPTION     : Assings the parameter to the object.
- RETURN_TYPE     : Stack<elemType>
- PARAMETERS      : const Stack<elemType>&
- */
 template <typename elemType>
 Stack<elemType> Stack<elemType>::operator=(const Stack<elemType> &s) {
     flush();
@@ -326,13 +261,6 @@ Stack<elemType> Stack<elemType>::operator=(const Stack<elemType> &s) {
     return s;
 }
 
-/*
- ClASS           : Stack
- MEMBER_FUNCTION : isEmpty()
- DESCRIPTION     : Returns if the stack is empty or not.
- RETURN_TYPE     : int
- PARAMETERS      : (none)
- */
 template <typename elemType>
 int Stack<elemType>::isEmpty() {
     return top == 0;
@@ -340,25 +268,11 @@ int Stack<elemType>::isEmpty() {
 
 /* CLASS: Queue - Implementation */
 
-/*
- ClASS           : Queue
- MEMBER_FUNCTION : (Constructor)
- DESCRIPTION     : Initializes front and rear pointers to NULL.
- RETURN_TYPE     : (none)
- PARAMETERS      : (none)
- */
 template <typename elemType>
 Queue<elemType>::Queue() {
     front = rear = 0;
 }
 
-/*
- ClASS           : Queue
- MEMBER_FUNCTION : (Copy Constructor)
- DESCRIPTION     : Copies values from another queue, by allocating new memory locations.
- RETURN_TYPE     : (none)
- PARAMETERS      : (none)
- */
 template <typename elemType>
 Queue<elemType>::Queue(const Queue<elemType> &q) {
     if(q.front) {
@@ -384,38 +298,17 @@ Queue<elemType>::Queue(const Queue<elemType> &q) {
     else front = rear = 0;
 }
 
-/*
- ClASS           : Queue
- MEMBER_FUNCTION : flush()
- DESCRIPTION     : Empties all data, deallocates memrory.
- RETURN_TYPE     : void
- PARAMETERS      : (none)
- */
 template <typename elemType>
 void Queue<elemType>::flush() {
     elemType t;
     while(qdelete(t));
 }
 
-/*
- ClASS           : Queue
- MEMBER_FUNCTION : (Destructor)
- DESCRIPTION     : Deletes all data.
- RETURN_TYPE     : (none)
- PARAMETERS      : (none)
- */
 template <typename elemType>
 Queue<elemType>::~Queue() {
     flush();
 }
 
-/*
- ClASS           : Queue
- MEMBER_FUNCTION : qinsert()
- DESCRIPTION     : Inserts an element to the rear of the queue.
- RETURN_TYPE     : void
- PARAMETERS      : elemType
- */
 template <typename elemType>
 void Queue<elemType>::qinsert(elemType d) {
     Node *tmp = new Node;
@@ -434,13 +327,6 @@ void Queue<elemType>::qinsert(elemType d) {
     
 }
 
-/*
- ClASS           : Queue
- MEMBER_FUNCTION : qdelete()
- DESCRIPTION     : Deletes an element from the front and assings to reference parameter.
- RETURN_TYPE     : int
- PARAMETERS      : elemType&
- */
 template <typename elemType>
 int Queue<elemType>::qdelete(elemType &d) {
     if(front) {
@@ -457,13 +343,6 @@ int Queue<elemType>::qdelete(elemType &d) {
     
 }
 
-/*
- ClASS           : Queue
- MEMBER_FUNCTION : operator=()
- DESCRIPTION     : Assigns the queue parameter to the object.
- RETURN_TYPE     : Queue<elemType>
- PARAMETERS      : const Queue<elemType>&
- */
 template <typename elemType>
 Queue<elemType> Queue<elemType>::operator=(const Queue<elemType> &q) {
     flush();
@@ -491,13 +370,6 @@ Queue<elemType> Queue<elemType>::operator=(const Queue<elemType> &q) {
     return q;
 }
 
-/*
- ClASS           : Queue
- MEMBER_FUNCTION : Front()
- DESCRIPTION     : Returns a referece to the front most element in the queue.
- RETURN_TYPE     : elemType&
- PARAMETERS      : (none)
- */
 template <typename elemType>
 elemType& Queue<elemType>::Front() {
     if(front) return front->data;
@@ -507,76 +379,36 @@ elemType& Queue<elemType>::Front() {
     }
 }
 
-/*
- ClASS           : Queue
- MEMBER_FUNCTION : isEmpty()
- DESCRIPTION     : Returns a boolean value, stating whether the queue is empty or not.
- RETURN_TYPE     : int
- PARAMETERS      : (none)
- */
 template <typename elemType>
 int Queue<elemType>::isEmpty() {
     return front == 0;
 }
 
-/*
- ClASS           : Vector
- MEMBER_FUNCTION : (constructor)
- DESCRIPTION     : Default Constructor. Initializes size to 0.
- RETURN_TYPE     : (none)
- PARAMETERS      : (none)
- */
+/*** Vector : Implementation ***/
+
 template <typename elemType>
 Vector<elemType>::Vector() {
     _size = 0;
     data = 0;
 }
 
-/*
- ClASS           : Vector
- MEMBER_FUNCTION : flush()
- DESCRIPTION     : Deletes all data.
- RETURN_TYPE     : void
- PARAMETERS      : (none)
- */
 template<typename elemType>
 void Vector<elemType>::flush() {
     if(_size > 0) delete[] data;
     _size = 0;
 }
 
-/*
- ClASS           : Vector
- MEMBER_FUNCTION : (Destructor)
- DESCRIPTION     : Calls flush function, to remove all data.
- RETURN_TYPE     : (none)
- PARAMETERS      : (none)
- */
 template<typename elemType>
 Vector<elemType>::~Vector() {
     flush();
 }
 
-/*
- ClASS           : Vector
- MEMBER_FUNCTION : (Constructor)
- DESCRIPTION     : Creates the vector, with initial size.
- RETURN_TYPE     : (none)
- PARAMETERS      : unsigned long
- */
 template<typename elemType>
 Vector<elemType>::Vector(unsigned long s) {
     _size = s;
     data = new elemType[s];
 }
 
-/*
- ClASS           : Vector
- MEMBER_FUNCTION : (Constructor)
- DESCRIPTION     : Creates the vector, with initial size.
- RETURN_TYPE     : (none)
- PARAMETERS      : (unsigned long, const elemType)
- */
 template<typename elemType>
 Vector<elemType>::Vector(unsigned long s,const elemType e) {
     _size = s;
@@ -586,13 +418,6 @@ Vector<elemType>::Vector(unsigned long s,const elemType e) {
     }
 }
 
-/*
- ClASS           : Vector
- MEMBER_FUNCTION : (Copy Constructor)
- DESCRIPTION     : Copies the parameter to the object.
- RETURN_TYPE     : (none)
- PARAMETERS      : const Vector<elemType> &
- */
 template<typename elemType>
 Vector<elemType>::Vector(const Vector<elemType> &v) {
     _size = v._size;
@@ -602,13 +427,6 @@ Vector<elemType>::Vector(const Vector<elemType> &v) {
     }
 }
 
-/*
- ClASS           : Vector
- MEMBER_FUNCTION : operator=()
- DESCRIPTION     : Creates the vector, with initial size.
- RETURN_TYPE     : (none)
- PARAMETERS      : (unsigned long, const elemType)
- */
 template <typename elemType>
 Vector<elemType> Vector<elemType>::operator=(const Vector<elemType> &v) {
     _size = v._size;
@@ -619,13 +437,6 @@ Vector<elemType> Vector<elemType>::operator=(const Vector<elemType> &v) {
     return v;
 }
 
-/*
- ClASS           : Vector
- MEMBER_FUNCTION : push_back()
- DESCRIPTION     : Pushes an element by increasing the size of the vector by one unit. Pushing is similar to stack.
- RETURN_TYPE     : int
- PARAMETERS      : const elemType
- */
 template<typename elemType>
 int Vector<elemType>::push_back(const elemType e) {
     elemType* temp = new elemType[_size];
@@ -642,13 +453,6 @@ int Vector<elemType>::push_back(const elemType e) {
     return 0;
 }
 
-/*
- ClASS           : Vector
- MEMBER_FUNCTION : operator[]()
- DESCRIPTION     : Returns a reference to the ith element in the vector.
- RETURN_TYPE     : elemType&
- PARAMETERS      : int
- */
 template<typename elemType>
 elemType& Vector<elemType>::operator[](unsigned long i) {
     elemType *t = new elemType;
@@ -660,13 +464,6 @@ elemType& Vector<elemType>::operator[](unsigned long i) {
     return *t;
 }
 
-/*
- ClASS           : Vector
- MEMBER_FUNCTION : size()
- DESCRIPTION     : Returns the current size of the vector.
- RETURN_TYPE     : unsigned long
- PARAMETERS      : (none)
- */
 template<typename elemType>
 unsigned long  Vector<elemType>::size() const {
     return _size;
@@ -676,7 +473,6 @@ unsigned long  Vector<elemType>::size() const {
 
 /* CLASS       : Token
  DESCRIPTION : Stores information about a token, the value,type,subtype.
- (Interface)
  */
 
 int currentLine = 1;
@@ -701,13 +497,6 @@ public:
 
 /* CLASS: Token (IMPLEMENTATION) */
 
-/*
- ClASS           : Token
- MEMBER_FUNCTION : (Constructor)
- DESCRIPTION     : Initializes datamembers to 0/NULL.
- RETURN_TYPE     : (none)
- PARAMETERS      : (none)
- */
 Token::Token() {
     val[0] = 0;
     t = UNKNOWN;
@@ -715,13 +504,6 @@ Token::Token() {
     lineNumber = currentLine;
 }
 
-/*
- ClASS           : Token
- MEMBER_FUNCTION : (Constructor)
- DESCRIPTION     : Sets datamembers to the given parameters.
- RETURN_TYPE     : (none)
- PARAMETERS      : char[],Token_type,sub_type
- */
 Token::Token(char s[],Token_type t = UNKNOWN,sub_type t2 = UNKNOWN) {
     strcpy(val, s);
     this->t = t;
@@ -729,13 +511,6 @@ Token::Token(char s[],Token_type t = UNKNOWN,sub_type t2 = UNKNOWN) {
     lineNumber = currentLine;
 }
 
-/*
- ClASS           : Token
- MEMBER_FUNCTION : (Constructor)
- DESCRIPTION     : Copy Constructor.
- RETURN_TYPE     : (none)
- PARAMETERS      : const Token&
- */
 Token::Token(const Token &tok) {
     strcpy(val,tok.val);
     t = tok.t;
@@ -743,68 +518,24 @@ Token::Token(const Token &tok) {
     lineNumber = tok.lineNumber;
 }
 
-/*
- ClASS           : Token
- MEMBER_FUNCTION : setType()
- DESCRIPTION     : A mutator for the Token_type data member.
- RETURN_TYPE     : void
- PARAMETERS      : Token_type
- */
 void Token::setType(Token_type t) {
     this->t = t;
 }
-
-/*
- ClASS           : Token
- MEMBER_FUNCTION : setSubType()
- DESCRIPTION     : A mutator for the sub_type data member.
- RETURN_TYPE     : void
- PARAMETERS      : sub_type
- */
 void Token::setSubType(sub_type t2) {
     this->t2 = t2;
 }
 
-/*
- ClASS           : Token
- MEMBER_FUNCTION : type()
- DESCRIPTION     : An Accessor for the Token_type variable.
- RETURN_TYPE     : Token_type
- PARAMETERS      : (none)
- */
 Token_type Token::type() {
     return t;
 }
-
-/*
- ClASS           : Token
- MEMBER_FUNCTION : subType()
- DESCRIPTION     : An Accessor for the sub_type variable.
- RETURN_TYPE     : sub_type
- PARAMETERS      : (none)
- */
 sub_type Token::subType() {
     return t2;
 }
 
-/*
- ClASS           : Token
- MEMBER_FUNCTION : value()
- DESCRIPTION     : An Accessor for the string variable.
- RETURN_TYPE     : char*
- PARAMETERS      : (none)
- */
 char* Token::value() {
     return val;
 }
 
-/*
- ClASS           : Token
- MEMBER_FUNCTION : operator=()
- DESCRIPTION     : Assings the parameter to the object,returns the string value.
- RETURN_TYPE     : char*
- PARAMETERS      : (none)
- */
 const Token& Token::operator=(const Token &tok) {
     strcpy(val,tok.val);
     t = tok.t;
@@ -813,13 +544,6 @@ const Token& Token::operator=(const Token &tok) {
     return tok;
 }
 
-/*
- ClASS           : Token
- MEMBER_FUNCTION : getLineNumber()
- DESCRIPTION     : returns the line number assigned to the token.
- RETURN_TYPE     : int
- PARAMETERS      : (none)
- */
 int Token::getLineNumber() {
     return lineNumber;
 }
@@ -828,9 +552,10 @@ int Token::getLineNumber() {
 
 
 
-/* CLASS      : ERROR
+/*****
+ CLASS      : ERROR
  DESCRIPTION: This class is used to keep track of a interpretation error, 2 data members: line number and the flag.
- */
+ ****/
 class Error {
     int lineNumber;
     char flag[101];
@@ -841,48 +566,20 @@ public:
     char* getFlag();
 };
 
-/*
- ClASS           : Error
- MEMBER_FUNCTION : (Constructor)
- DESCRIPTION     : Initializes data members to null/0.
- RETURN_TYPE     : (none)
- PARAMETERS      : (none)
- */
 Error::Error() {
     lineNumber = -1;
     flag[0] = 0;
 }
 
-/*
- ClASS           : Error
- MEMBER_FUNCTION : (Constructor)
- DESCRIPTION     : Initializes data members to parameters.
- RETURN_TYPE     : (none)
- PARAMETERS      : char[],int
- */
 Error::Error(char fg[],int ln) {
     strcpy(flag,fg);
     lineNumber = ln;
 }
 
-/*
- ClASS           : Error
- MEMBER_FUNCTION : getLineNumber()
- DESCRIPTION     : Returns the line number.
- RETURN_TYPE     : int
- PARAMETERS      : (none)
- */
 int Error::getLineNumber() {
     return lineNumber;
 }
 
-/*
- ClASS           : Error
- MEMBER_FUNCTION : getFlag()
- DESCRIPTION     : Returns the flag.
- RETURN_TYPE     : char*
- PARAMETERS      : (none)
- */
 char* Error::getFlag() {
     return flag;
 }
@@ -892,12 +589,7 @@ Vector<Error> errors;
 
 typedef Queue<Token> RPN;
 
-/*
- FUNCTION    : getIndexOfHash()
- DESCRIPTION : returns an integer extracted from the given string of the format "#(int)"
- RETURN_TYPE : int
- PARAMETERS  : char[]
- */
+// returns an integer extracted from the given string of the format "#(int)"
 int getIndexOfHash(char n[]) {
     int a = 0;
     for(int i = 1; n[i];i++) {
@@ -906,23 +598,12 @@ int getIndexOfHash(char n[]) {
     return a;
 }
 
-
-/*
- FUNCTION    : convertToCharacter()
- DESCRIPTION : converts the string given,to a character. (format: "'(char)'")
- RETURN_TYPE : char
- PARAMETERS  : char[]
- */
+//converts the string given,to a character. (format: "'(char)'")
 char convertToCharacter(char s[]) {
     return s[1];
 }
 
-/*
- FUNCTION    : convertToString()
- DESCRIPTION : converts the string given,to an ordniary string,removing the double quotes. (format: ""(string)"")
- RETURN_TYPE : void
- PARAMETERS  : char[],char[]
- */
+//converts the string given,to an ordniary string,removing the double quotes. (format: ""(string)"")
 void convertToString(char s[],char d[]) {
     d[0] = 0;
     for(int i = 1; s[i] != '"';i++) {
@@ -931,33 +612,24 @@ void convertToString(char s[],char d[]) {
     }
 }
 
-/*
- FUNCTION    : convertIntegerToToken()
- DESCRIPTION : converts the integer parameter to a token, by converting to a string first.
- RETURN_TYPE : Token
- PARAMETERS  : int
- */
+//converts the integer parameter to a token, by converting to a string first.
 Token convertIntegerToToken(int a) {
     char str[101];
     sprintf(str,"%d",a);
     return Token(str,LITERAL,INTEGER);
 }
 
-/*
- FUNCTION    : convertNumericToToken()
- DESCRIPTION : converts the double parameter to a token, by converting to a string first.
- RETURN_TYPE : Token
- PARAMETERS  : double
- */
+//converts the double parameter to a token, by converting to a string first.
 Token convertNumericToToken(double a) {
     char n[101];
     sprintf(n,"%f",a);
     return Token(n,LITERAL,NUMERIC);
 }
 
-/* CLASS: Time
-   DESCRIPTION: This struct stores info about a particular time. Supports operations like addition,subtraction and comparisions.
-*/
+/****
+ CLASS: Time
+ DESCRIPTION: This struct stores info about a particular time. Supports operations like addition,subtraction and comparisions.
+****/
 
 //Interface
 struct Time {
@@ -977,12 +649,7 @@ struct Time {
 };
 
 
-/*
- ClASS           : Time
- MEMBER_FUNCTION : (Constructor)
- DESCRIPTION     : Initializes / Assigns data members.
- RETURN_TYPE     : (nonde)
- PARAMETERS      : int,int,int
+/* Time : Implementation */
  */
 Time::Time(int h,int m, int s) {
     hour = h;
@@ -990,35 +657,14 @@ Time::Time(int h,int m, int s) {
     second = s;
 }
 
-/*
- ClASS           : Time
- MEMBER_FUNCTION : operator==
- DESCRIPTION     : returns whether two times are the same.
- RETURN_TYPE     : int
- PARAMETERS      : Time&
- */
 int Time::operator==(Time &t) {
     return hour == t.hour && minute == t.minute && second == t.second;
 }
 
-/*
- ClASS           : Time
- MEMBER_FUNCTION : operator!=()
- DESCRIPTION     : returns the "not" of the above defined operator.
- RETURN_TYPE     : int
- PARAMETERS      : Time&
- */
 int Time::operator!=(Time &t) {
     return !(*this == t);
 }
 
-/*
- ClASS           : Time
- MEMBER_FUNCTION : operator>()
- DESCRIPTION     : Compares two times ( > ).
- RETURN_TYPE     : int
- PARAMETERS      : Time&
- */
 int Time::operator>(Time &t) {
     if(hour > t.hour) return 1;
     else if(hour == t.hour) {
@@ -1034,47 +680,16 @@ int Time::operator>(Time &t) {
         return 0;
     }
 }
-
-/*
- ClASS           : Time
- MEMBER_FUNCTION : operator<=()
- DESCRIPTION     : Compares two times ( <= ).
- RETURN_TYPE     : int
- PARAMETERS      : Time&
- */
 int Time::operator<=(Time &t) {
     return !(*this > t);
 }
-
-/*
- ClASS           : Time
- MEMBER_FUNCTION : operator<()
- DESCRIPTION     : Compares two times ( < ).
- RETURN_TYPE     : int
- PARAMETERS      : Time&
- */
 int Time::operator<(Time &t) {
     return *this <= t && *this != t;
 }
-
-/*
- ClASS           : Time
- MEMBER_FUNCTION : operator>=()
- DESCRIPTION     : Compares two times ( >= ).
- RETURN_TYPE     : int
- PARAMETERS      : Time&
- */
 int Time::operator>=(Time &t) {
     return *this > t || *this == t;
 }
 
-/*
- ClASS           : Time
- MEMBER_FUNCTION : operator+()
- DESCRIPTION     : adds two "time"s.
- RETURN_TYPE     : Time
- PARAMETERS      : Time&
- */
 Time Time::operator+(Time &t) {
     Time temp;
     int seconds = (hour + t.hour) * 3600 + (minute + t.minute) * 60 + second + t.second;
@@ -1084,14 +699,6 @@ Time Time::operator+(Time &t) {
     temp.second = (seconds % 60);
     return temp;
 }
-
-/*
- ClASS           : Time
- MEMBER_FUNCTION : operator-()
- DESCRIPTION     : subtracts 2 "time"s.
- RETURN_TYPE     : int
- PARAMETERS      : Time&
- */
 Time Time::operator-(Time &t) {
     Time temp;
     int seconds = (hour - t.hour) * 3600 + (minute - t.minute) * 60 + second - t.second;
@@ -1104,24 +711,11 @@ Time Time::operator-(Time &t) {
     
 }
 
-/*
- ClASS           : Time
- MEMBER_FUNCTION : display()
- DESCRIPTION     : displays the value of time stored in this object in the format: 'HH:MM:SS'
- RETURN_TYPE     : void
- PARAMETERS      : (none)
- */
 void Time::display() {
     printf("%02d:%02d:%02d",hour,minute,second);
 }
 
-/*
- ClASS           : Time
- MEMBER_FUNCTION : checkFormat()
- DESCRIPTION     : checks whether the string passed as parameter is in the required "time" format ( "HH:MM::SS" ).
- RETURN_TYPE     : int
- PARAMETERS      : char*
- */
+//checks whether the string passed as parameter is in the required "time" format ( "HH:MM::SS" ).
 int Time::checkFormat(char *n) {
     if(strlen(n) == 8 && isdigit(n[0]) && isdigit(n[1]) && isdigit(n[3]) && isdigit(n[4]) && isdigit(n[6]) && isdigit(n[7]) && n[2] == ':' && n[5] == ':') {
         return 1;
@@ -1131,13 +725,6 @@ int Time::checkFormat(char *n) {
     }
 }
 
-/*
- ClASS           : Time
- MEMBER_FUNCTION : assign()
- DESCRIPTION     : assigns the time value in the string (assumed to be in correct format)
- RETURN_TYPE     : void
- PARAMETERS      : char*
- */
 void Time::assign(char *n) {
     hour = (n[0] - '0') * 10;
     hour+=(n[1] - '0');
@@ -1150,12 +737,7 @@ void Time::assign(char *n) {
 //Stores all the time values declared.
 Vector<Time> times;
 
-/*
- FUNCTION    : hashify();
- DESCRIPTION : takes a given integer, creates a string based on the integer of the format "#(int)". Assigns the string to the parameter.
- RETURNS     : void
- PARAMETERS  : int,char[]
- */
+//creates a string of the format "#(int)". Assigns the string to the argument.
 void hashify(int n,char a[]) {
     Stack<int> s;
     while(n != 0) {
@@ -1336,26 +918,12 @@ public:
 
 /** IMPLEMENTATION: CLASS - VARIABLE **/
 
-/*
- ClASS           : Variable
- MEMBER_FUNCTION : (Constructor)
- DESCRIPTION     : Initializes data members to 0/NULL.
- RETURN_TYPE     : (none)
- PARAMETERS      : (none)
- */
 Variable::Variable() {
     identifier[0] = 0;
     _d = UNKNOWN;
     _isArray = 0;
 }
 
-/*
- ClASS           : Variable
- MEMBER_FUNCTION : (Constructor)
- DESCRIPTION     : Initializes data members to the given parameters.
- RETURN_TYPE     : (none)
- PARAMETERS      : char[] Data_type
- */
 Variable::Variable(char n[],Data_type d = UNKNOWN,int isArray = 0,int size = 0) {
     strcpy(identifier,n);
     this->_d = d;
@@ -1365,13 +933,6 @@ Variable::Variable(char n[],Data_type d = UNKNOWN,int isArray = 0,int size = 0) 
     }
 }
 
-/*
- ClASS           : Variable
- MEMBER_FUNCTION : (Constructor)
- DESCRIPTION     : Copy constructor.
- RETURN_TYPE     : (none)
- PARAMETERS      : (none)
- */
 Variable::Variable(const Variable &v) {
     strcpy(identifier, v.identifier);
     _d = v._d;
@@ -1382,13 +943,6 @@ Variable::Variable(const Variable &v) {
     }
 }
 
-/*
- ClASS           : Variable
- MEMBER_FUNCTION : operator=(const Variable &v)
- DESCRIPTION     : Assings parameter to the object.
- RETURN_TYPE     : void
- PARAMETERS      : const Variable&
- */
 void Variable::operator=(const Variable &v) {
     strcpy(identifier, v.identifier);
     _d = v._d;
@@ -1399,13 +953,6 @@ void Variable::operator=(const Variable &v) {
     }
 }
 
-/*
- ClASS           : Variable
- MEMBER_FUNCTION : setValue();
- DESCRIPTION     : A mutator for the Token data member.
- RETURN_TYPE     : void
- PARAMETERS      : Token
- */
 void Variable::setValue(Token v) {
     if(_d == INTEGER) {
         if(v.subType() ==INTEGER || v.subType() == NUMERIC) {
@@ -1486,13 +1033,6 @@ void Variable::setValue(Token v) {
     }
 }
 
-/*
- ClASS           : Variable
- MEMBER_FUNCTION : setValue();
- DESCRIPTION     : A mutator for the Token data member,in case of array.
- RETURN_TYPE     : void
- PARAMETERS      : Token,int
- */
 void Variable::setValue(Token v,unsigned int i) {
     if(i < _values.size()) {
         if(_d == INTEGER) {
@@ -1525,57 +1065,22 @@ void Variable::setValue(Token v,unsigned int i) {
     }
 }
 
-/*
- ClASS           : Variable
- MEMBER_FUNCTION : value()
- DESCRIPTION     : An accessor for the Token data member.
- RETURN_TYPE     : Token
- PARAMETERS      :
- */
 Token Variable::value() {
     return _value;
 }
 
-/*
- ClASS           : Variable
- MEMBER_FUNCTION : value()
- DESCRIPTION     : An accessor for the Token data member.
- RETURN_TYPE     : Token
- PARAMETERS      : (none)
- */
 char* Variable::value_string() {
     return _value.value();
 }
 
-/*
- ClASS           : Variable
- MEMBER_FUNCTION : getID()
- DESCRIPTION     : An accessor for the Token data member.
- RETURN_TYPE     : char*
- PARAMETERS      : (none)
- */
 char* Variable::getID() {
     return identifier;
 }
 
-/*
- ClASS           : Variable
- MEMBER_FUNCTION : getDataType()
- DESCRIPTION     : An accessor for the Data_type data member.
- RETURN_TYPE     : Data_type
- PARAMETERS      : (none)
- */
 Data_type Variable::getDataType() {
     return _d;
 }
 
-/*
- ClASS           : Variable
- MEMBER_FUNCTION : value()
- DESCRIPTION     : An accessor function for an element of the value data member.
- RETURN_TYPE     : void
- PARAMETERS      : unsigned int
- */
 Token Variable::value(unsigned int i) {
     if(_isArray) {
         if(_values.size() > i) return _values[i];
@@ -1583,13 +1088,6 @@ Token Variable::value(unsigned int i) {
     return Token();
 }
 
-/*
- ClASS           : Variable
- MEMBER_FUNCTION : isArray()
- DESCRIPTION     : Returns whether the variable is an array.
- RETURN_TYPE     : void
- PARAMETERS      : int
- */
 int Variable::isArray() {
     return _isArray;
 }
