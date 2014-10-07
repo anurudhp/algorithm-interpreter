@@ -27,7 +27,7 @@ class Vector
     Vector<T>& push_back( T );
     T pop_back();
     Vector<T>& resize( __SIZETYPE );
-    Vector<T>& flush();
+    Vector<T>& empty();
     
     // advanced functions
     __SIZETYPE find( T );
