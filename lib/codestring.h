@@ -72,4 +72,6 @@ class String
 		
 };
 
+#include "codestring.cpp"
+
 #endif /* CODE_STRING_H */
