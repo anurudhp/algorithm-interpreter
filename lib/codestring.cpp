@@ -1,14 +1,15 @@
-#include "codestring.h"
+/****
+* Implementation file for String functions, include this file in string.h
+* DO NOT INCLUDE/COMPILE THIS FILE SEPARATELY.
+****/
 
-
+#ifdef CODE_STRING_H
 /**
-* Basic functions.
-*	EDITING THESE CHANGES THE FRAMEWORK OF THE TEMPLATE
 *	All functions must be overloaded with (char *) ,
 *	as strings in Turbo C++ are c- style, 
 *	whereas GNU GCC/G++ manipulates them as string constants ( refer STL string ).
-*	The overload makes the user beleive that string constants in Turbo are not c-style
-*	 but are actually objects of the String object .
+*	The overload makes the user believe that string constants in Turbo are not c-style
+*	but are actually objects of the String object .
 **/
 
 /*******************************
@@ -223,8 +224,9 @@ bool String::printToStream( ostream &output ){
 // this is the global input buffer for all strings.
 // as string length is not known, 
 // creating a huge buffer during each input operation is not viable.
-// so , just create a global buffer and use it for every string. ( C++ is synchronous :) )
+// so , just create a global buffer and use it for every string. ( C++ is synchronous, so cheers! :) )
 char *stringInputBuffer = new char[ MAX_STRING_LENGTH ];
+
 istream& operator>>( istream &input, String &D )
 { 
 	cin.getline( stringInputBuffer , MAX_STRING_LENGTH );
@@ -250,5 +252,5 @@ String::operator char(){
 bool String::log(){
 	printToStream( cout );
 }
-	
 
+#endif /* CODE_STRING_H */
