@@ -244,10 +244,6 @@ String::operator char*(){
 	ret[len] = '\0';
 	return ret;
 }
-String::operator char(){
-	return data[0];
-}
-
 
 bool String::log(){
 	printToStream( cout );

@@ -33,8 +33,7 @@ class String
 		
 		// this operator helps us treat (String) objects as (const char *) .
 		// so,  any function using a parameter (const char *) , can be called passing a (String) to it.
-		operator char*(); 
-		operator char();
+		operator char*();
 		
 		
 		/** functions : read only **/
@@ -53,16 +52,11 @@ class String
 		// searching
 		__SIZETYPE indexOf( String& );
 		__SIZETYPE indexOf( const char * );
-		//long countOccurences( const char * );
 		
 		// editing
 		String& substr( __SIZETYPE, __SIZETYPE );
-		//String& tolower();
-		//String& toupper();
-		//String& trim();
 		String& replace( const char * , const char * );
 		
-		/** functions : write **/
 		
 		/** Overloads for input/output **/
 		friend istream& operator >> ( istream& , String& );
