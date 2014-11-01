@@ -20,6 +20,9 @@ using namespace std;
 #include <ctype.h>
 #include <iostream.h>
 #include <fstream.h>
+#define bool int
+#define true 1
+#define false 0
 
 #endif
 
