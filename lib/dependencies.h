@@ -12,6 +12,7 @@
 #include <cctype>
 #include <iostream>
 #include <fstream>
+#include <cstdlib>
 using namespace std;
 
 #else
@@ -20,14 +21,13 @@ using namespace std;
 #include <ctype.h>
 #include <iostream.h>
 #include <fstream.h>
+#include <stdlib.h>
+
 #define bool int
 #define true 1
 #define false 0
 
 #endif
-
-#define DEFAULT_STRING_SIZE 80
-#define MAX_STRING_LENGTH 100000
 
 // Custom types
 
@@ -45,6 +45,9 @@ template <typename> class Deque;
 template <typename> class Queue;
 template <typename> class Stack;
 
-
+bool forcequit( char * message , int ecode = 1){
+	cerr<<"FORCE QUIT : "<<message;
+	exit( ecode );	
+}
 
 #endif /* CUSTOM_DEPENDENCIES_H */
