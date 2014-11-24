@@ -31,6 +31,7 @@ public:
 	String& operator = ( char * );
 	String& operator = ( char );
 	~String();
+	bool clear();
 	
 	// Typecast : this operator helps us treat (String) objects as (char *) .
 	operator char*();
