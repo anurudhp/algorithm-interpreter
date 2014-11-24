@@ -9,27 +9,33 @@
 // empty constructor.
 String::String(){
 	_len = 0;
-	_data = NULL;
+	_data = 0;
 }
 
 // copy contructors : assignment is copy
 String::String( const String& s){
 	_len = s.length();
+	_data = 0;
 	_data = new char[_len];
+	if( !data ) forcequit("string|heap exhausted");
 	for(int i=0;i<_len;i++)
 		_data[i] = s.charAt(i);
 }
 
 String::String( char *s){
 	_len = strlen(s);
+	_data = 0;
 	_data = new char[ _len ];
+	if( !data ) forcequit("string|heap exhausted");
 	for( __SIZETYPE i=0;i<_len;i++)
 		_data[i] = s[i];
 }
 
 String::String( char ch){
 	_len = 1;
+	_data = 0;
 	_data = new char[1];
+	if( !data ) forcequit("string|heap exhausted");
 	_data[0] = ch;
 }
 
@@ -37,16 +43,20 @@ String::String( char ch){
 String& String::operator=( const String& s){
 	_len = s.length();
 	delete[] _data;
+	_data = 0;
 	_data = new char[_len];
+	if( !data ) forcequit("string|heap exhausted");
 	for(int i=0;i<_len;i++)
 		_data[i] = s.charAt(i);
 	return *this;
 }
 
-String& String::operator=( char  * s ){
+String& String::operator=( char* s ){
 	_len = strlen(s);
 	delete[] _data;
+	_data = 0;
 	_data = new char[_len];
+	if( !data ) forcequit("string|heap exhausted");
 	for(int i=0;i<_len;i++)
 		_data[i] = s[i];
 	return *this;
@@ -55,15 +65,23 @@ String& String::operator=( char  * s ){
 String& String::operator=( char ch ){
 	_len = 1;
 	delete[] _data;
+	_data = 0;
 	_data = new char[1];
+	if( !data ) forcequit("string|heap exhausted");
 	_data[0] = ch;
 	return *this;
 }
 // Destructor : free some space
 String::~String(){
+	clear();
+}
+
+// clears all data.
+bool String::clear(){
 	_len = 0;
 	delete[] _data;
-	_data = NULL;
+	_data = 0;
+	return 1;
 }
 
 // Typecast to string constant : char *
