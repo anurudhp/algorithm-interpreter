@@ -17,7 +17,7 @@ String::String( const String& s){
 	_len = s.length();
 	_data = 0;
 	_data = new char[_len];
-	if( !data ) forcequit("string|heap exhausted");
+	if( !_data ) forcequit("string|heap exhausted");
 	for(int i=0;i<_len;i++)
 		_data[i] = s.charAt(i);
 }
@@ -26,7 +26,7 @@ String::String( char *s){
 	_len = strlen(s);
 	_data = 0;
 	_data = new char[ _len ];
-	if( !data ) forcequit("string|heap exhausted");
+	if( !_data ) forcequit("string|heap exhausted");
 	for( __SIZETYPE i=0;i<_len;i++)
 		_data[i] = s[i];
 }
@@ -35,17 +35,17 @@ String::String( char ch){
 	_len = 1;
 	_data = 0;
 	_data = new char[1];
-	if( !data ) forcequit("string|heap exhausted");
+	if( !_data ) forcequit("string|heap exhausted");
 	_data[0] = ch;
 }
 
-// operator = 
+// operator =
 String& String::operator=( const String& s){
 	_len = s.length();
 	delete[] _data;
 	_data = 0;
 	_data = new char[_len];
-	if( !data ) forcequit("string|heap exhausted");
+	if( !_data ) forcequit("string|heap exhausted");
 	for(int i=0;i<_len;i++)
 		_data[i] = s.charAt(i);
 	return *this;
@@ -56,7 +56,7 @@ String& String::operator=( char* s ){
 	delete[] _data;
 	_data = 0;
 	_data = new char[_len];
-	if( !data ) forcequit("string|heap exhausted");
+	if( !_data ) forcequit("string|heap exhausted");
 	for(int i=0;i<_len;i++)
 		_data[i] = s[i];
 	return *this;
@@ -67,7 +67,7 @@ String& String::operator=( char ch ){
 	delete[] _data;
 	_data = 0;
 	_data = new char[1];
-	if( !data ) forcequit("string|heap exhausted");
+	if( !_data ) forcequit("string|heap exhausted");
 	_data[0] = ch;
 	return *this;
 }
@@ -134,7 +134,7 @@ String String::operator+( const String& r ) const {
 	for(__SIZETYPE i=0;i<tlen;i++)
 		tmp[i+_len] = r[i];
 	tmp[_len+ tlen]= '\0';
-	
+
 	String c(tmp);
 	return c;
 }
@@ -147,13 +147,13 @@ String String::operator +=( const String& s) {
 // substring : returns the substring from index st , and length len.
 String String::substr( __SIZETYPE st , __SIZETYPE  len = 1 ) const{
 	if( st < 0 ) st += _len;
-	
+
 	String ret;
 	if( st < 0 || st+len > _len  ) return ret; // return null string, as bounds are erred
-	
+
 	char s[ len+1 ];
 	for( __SIZETYPE i=0 ; i<len ; ++i ){
-		s[i] = _data[ st+i ];	
+		s[i] = _data[ st+i ];
 	}
 	s[len] = '\0';
 	ret = s;
@@ -163,9 +163,9 @@ String String::substr( __SIZETYPE st , __SIZETYPE  len = 1 ) const{
 // replace : replaces all occurences of <find> with <rep>
 String String::replace( const String& find , const String& rep ) const {
 	String tmp , ch(*this);
-	
+
 	__SIZETYPE repPos = ch.indexOf(find),
-				flen = find.length(), 
+				flen = find.length(),
 				rlen = rep.length();
 	while( repPos >= 0 ){
 		tmp += ch.substr(0,repPos) + rep;
@@ -199,7 +199,7 @@ String String::trim() const {
 	__SIZETYPE st,en;
 	for( st = 0;  _data[st] == ' ' && st < _len ; st++ );
 	if( st == _len ) return String("");
-	
+
 	for( en = _len-1 ; _data[en] == ' ' && en >= 0 ; en-- );
 	return this->substr( st, en-st+1 );
 }
@@ -208,7 +208,7 @@ String String::trim() const {
 __SIZETYPE String::indexOf( const String& s ) const {
 	__SIZETYPE tlen = s.length();
 	bool isfound ;
-	
+
 	for( __SIZETYPE i = 0; i < _len-tlen ; ++i ){
 		isfound = true;
 		for( __SIZETYPE j = 0; j < tlen ; ++j ){
@@ -256,12 +256,12 @@ bool String::operator==( const String& s ) const {
 	for( __SIZETYPE it = 0; it < _len ; it++ )
 		if( _data[it] != s[it] )
 			return false;
-	return true;	
+	return true;
 }
 
 // operator != : returns true if both strings are not equal
 bool String::operator!=( const String& s ) const {
-	return !( *this == s );	
+	return !( *this == s );
 }
 
 
@@ -269,9 +269,9 @@ bool String::operator!=( const String& s ) const {
 * 5. Stream IO operators : >> <<
 ************************************/
 ostream& operator<<( ostream& output, String& str )
-{ 
+{
  	str.print( output );
- 	return output;            
+ 	return output;
 }
 bool String::print( ostream &output ) const {
 	for( __SIZETYPE i=0;i<_len;++i)
@@ -281,10 +281,10 @@ bool String::print( ostream &output ) const {
 // this is the global input buffer for all strings.
 char * String::stringInputBuffer = new char[ MAX_STRING_LENGTH ];
 istream& operator>>( istream& input, String& str )
-{ 
+{
 	input.getline( String::stringInputBuffer , MAX_STRING_LENGTH );
 	str = String::stringInputBuffer;
- 	return input;            
+ 	return input;
 }
 
 #endif /* CODE_STRING_H */

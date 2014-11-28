@@ -25,6 +25,7 @@ class Vector
 
     Vector<T>& pushback(T);
     Vector<T>& pushfront(T);
+    Vector<T>& insert(T,__SIZETYPE);
 
     T popback();
     T popfront();
@@ -139,10 +140,39 @@ Vector<T>& Vector<T>::pushfront(T val){
 }
 
 template<typename T>
+Vector<T>& Vector<T>::insert(T val, __SIZETYPE index){
+
+    if(index<0||index>length) return *this;
+    length++;
+    node* n=new node;
+    n->value=val;
+    bool check=false;
+    if(index==0){
+        n->link=head;
+        head=n;
+        check=true;
+    }
+    if(index==length-1){
+        tail->link=n;
+        tail=n;
+        tail->link=NULL;
+        check=true;
+    }
+    if(check==true) return *this;
+    node *prev=head,*next;
+    for(int i=0;i<index-1;i++) prev=prev->link;
+    next=prev->link;
+    prev->link=n;
+    n->link=next;
+    return *this;
+
+}
+
+template<typename T>
 T Vector<T>::popback(){
 
     T val;
-    //I'm not sure what I'm supposed to do if an empty vector is popped, cuz then how can I return T? so take a look at that.
+    if(length==0) return 0;
     if(length==1){
         val=head->value;
         delete head;
@@ -167,7 +197,7 @@ template<typename T>
 T Vector<T>::popfront(){
 
     T val;
-    //I'm not sure what I'm supposed to do if an empty vector is popped, cuz then how can I return T? so take a look at that.
+    if(length==0) return 0;
     if(length==1){
         val=head->value;
         delete head;
