@@ -1,45 +1,15 @@
-#include "dependencies.h"
-#include "codestring.h"
+// do not include this file separately
+// include codevector.h instead
 
-template<typename T>
-class Vector
-{
-
-    struct node
-    {
-        T value;
-        node* link;
-    };
-
-    node* head;
-    node* tail;
-    __SIZETYPE length;
-
-    public:
-    T operator[](__SIZETYPE index)const;
-    __SIZETYPE size()const;
-
-    Vector();
-    Vector(const Vector<T>& v);
-    Vector(__SIZETYPE len,T val);
-
-    Vector<T>& pushback(T);
-    Vector<T>& pushfront(T);
-    Vector<T>& insert(T,__SIZETYPE);
-
-    T popback();
-    T popfront();
-
-    ~Vector();
-
-};
-
+/***********************
+* Constructors, destructor and operator =
+************************/
 template<typename T>
 Vector<T>:: Vector(){
 
-    head=NULL;
-    tail=NULL;
-    length=0;
+    head = NULL;
+    tail = NULL;
+    length = 0;
 }
 
 template<typename T>
@@ -97,23 +67,38 @@ Vector<T>::Vector(__SIZETYPE len,T val){
 }
 
 template<typename T>
-__SIZETYPE Vector<T>::size()const{
-
-    return length;
-
-}
-
-template<typename T>
-T Vector<T>::operator[](__SIZETYPE index)const{
-
+Vector<T>::~Vector(){
     node* pointer=head;
-    for(int i=0;i<index;i++){
-        pointer=pointer->link;
+    node* next;
+    for(int i=0;i<length;i++){
+        next=pointer->link;
+        delete pointer;
+        pointer=next;
     }
-    return pointer->value;
-
 }
 
+/*******************************
+* Properties
+******************************/
+
+// size() : returns the size/length of the vector
+template<typename T>
+__SIZETYPE Vector<T>::size()const{
+    return length;
+}
+
+// operator[] : returns reference to value at index
+template<typename T>
+T& Vector<T>::operator[](__SIZETYPE index) const {
+    node* pointer = head;
+    for(int i = 0; i < index; i++ )
+        pointer = pointer->link;
+    return pointer->value;
+}
+
+/************************************
+* Basic manipulations
+*************************************/
 template<typename T>
 Vector<T>& Vector<T>::pushback(T val){
 
@@ -172,7 +157,11 @@ template<typename T>
 T Vector<T>::popback(){
 
     T val;
-    if(length==0) return 0;
+    if(length==0){
+		T a; 
+		return a;
+	}
+	
     if(length==1){
         val=head->value;
         delete head;
@@ -197,7 +186,10 @@ template<typename T>
 T Vector<T>::popfront(){
 
     T val;
-    if(length==0) return 0;
+    if(length==0){
+    	T a;
+    	return a;
+    }
     if(length==1){
         val=head->value;
         delete head;
@@ -214,16 +206,3 @@ T Vector<T>::popfront(){
     head=newhead;
     return val;
 }
-
-template<typename T>
-Vector<T>::~Vector(){
-
-    node* pointer=head;
-    node* next;
-    for(int i=0;i<length;i++){
-        next=pointer->link;
-        delete pointer;
-        pointer=next;
-    }
-}
-//END.
