@@ -6,14 +6,14 @@
 
 // vector template : a resize-able array.
 // implemented as a doubly-linked list
-
 template<typename T>
 class Vector
 {
 	private:
     struct node{
         T value;
-        node* link;
+        node* next;
+        node* prev;
     };
     node* head;
     node* tail;
@@ -25,7 +25,7 @@ class Vector
     Vector(const Vector<T>& v);
     Vector(__SIZETYPE len,T val);
     ~Vector();
-    
+
     // properties
     T& operator[](__SIZETYPE index) const;
     __SIZETYPE size()const;
@@ -33,8 +33,8 @@ class Vector
 	// basic manipulation
     Vector<T>& pushback(T);
     Vector<T>& pushfront(T);
-    T popback();
-    T popfront();
+    void popback();
+    void popfront();
     Vector<T>& insert(T,__SIZETYPE);
 };
 #include "codevector.cpp"

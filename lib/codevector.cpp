@@ -27,14 +27,16 @@ Vector<T>::Vector(const Vector<T>& v){
         head=n;
         tail=n;
         n->value=v[0];
-        n->link=NULL;
+        n->next=NULL;
+        n->prev=NULL;
 
         for(__SIZETYPE i=1;i<v.size();i++){
             n=new node;
-            tail->link=n;
+            tail->next=n;
+            n->prev=tail;
             tail=n;
             n->value=v[i];
-            n->link=NULL;
+            n->next=NULL;
         }
     }
 }
@@ -54,13 +56,15 @@ Vector<T>::Vector(__SIZETYPE len,T val){
         head=n;
         tail=n;
         n->value=val;
-        n->link=NULL;
+        n->next=NULL;
+        n->prev=NULL;
 
         for(int i=1;i<length;i++){
             n=new node;
             n->value=val;
-            n->link=NULL;
-            tail->link=n;
+            n->next=NULL;
+            tail->next=n;
+            n->prev=tail;
             tail=n;
         }
     }
@@ -71,7 +75,7 @@ Vector<T>::~Vector(){
     node* pointer=head;
     node* next;
     for(int i=0;i<length;i++){
-        next=pointer->link;
+        next=pointer->next;
         delete pointer;
         pointer=next;
     }
@@ -92,7 +96,7 @@ template<typename T>
 T& Vector<T>::operator[](__SIZETYPE index) const {
     node* pointer = head;
     for(int i = 0; i < index; i++ )
-        pointer = pointer->link;
+        pointer = pointer->next;
     return pointer->value;
 }
 
@@ -105,8 +109,9 @@ Vector<T>& Vector<T>::pushback(T val){
     length++;
     node* n=new node;
     n->value=val;
-    n->link=NULL;
-    if(tail!=NULL) tail->link=n;
+    n->next=NULL;
+    n->prev=tail;
+    if(tail!=NULL) tail->next=n;
     tail=n;
     if(length==1) head=n;
     return *this;
@@ -118,7 +123,9 @@ Vector<T>& Vector<T>::pushfront(T val){
     length++;
     node* n=new node;
     n->value=val;
-    n->link=head;
+    n->next=head;
+    n->prev=NULL;
+    if(head!=NULL) head->prev=n;
     head=n;
     if(length==1) tail=head;
     return *this;
@@ -133,76 +140,62 @@ Vector<T>& Vector<T>::insert(T val, __SIZETYPE index){
     n->value=val;
     bool check=false;
     if(index==0){
-        n->link=head;
+        n->next=head;
+        n->prev=NULL;
         head=n;
         check=true;
     }
     if(index==length-1){
-        tail->link=n;
+        tail->next=n;
+        n->prev=tail;
         tail=n;
-        tail->link=NULL;
+        tail->next=NULL;
         check=true;
     }
     if(check==true) return *this;
-    node *prev=head,*next;
-    for(int i=0;i<index-1;i++) prev=prev->link;
-    next=prev->link;
-    prev->link=n;
-    n->link=next;
+    node* pointer=head;
+    for(int i=1;i<index;i++) pointer=pointer->next;
+    pointer->next->prev=n;
+    n->next=pointer->next;
+    pointer->next=n;
+    n->prev=pointer;
     return *this;
-
 }
 
 template<typename T>
-T Vector<T>::popback(){
+void Vector<T>::popback(){
 
-    T val;
-    if(length==0){
-		T a; 
-		return a;
-	}
-	
     if(length==1){
-        val=head->value;
         delete head;
         head=NULL;
         tail=NULL;
         length=0;
-        return val;
+        return;
     }
     length--;
-    node* pointer=head;
-    for(int i=1;i<length;i++){
-        pointer=pointer->link;
-    }
-    val=tail->value;
+    node*pointer=tail->prev;
     delete tail;
     tail=pointer;
-    tail->link=NULL;
-    return val;
+    tail->next=NULL;
+    return;
 }
 
 template<typename T>
-T Vector<T>::popfront(){
+void Vector<T>::popfront(){
 
-    T val;
-    if(length==0){
-    	T a;
-    	return a;
-    }
     if(length==1){
-        val=head->value;
         delete head;
         head=NULL;
         tail=NULL;
         length=0;
-        return val;
+        return;
     }
     length--;
     node* newhead;
-    val=head->value;
-    newhead=head->link;
+    newhead=head->next;
     delete head;
     head=newhead;
-    return val;
+    head->prev=NULL;
+    return;
 }
+
