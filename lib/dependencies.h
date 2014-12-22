@@ -13,6 +13,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
+#include <typeinfo>
 using namespace std;
 
 #else
@@ -41,9 +42,6 @@ typedef long int  __SIZETYPE; // older compilers dont support long long.
 // Custom Templates
 class String;
 template <typename> class Vector;
-template <typename> class Deque;
-template <typename> class Queue;
-template <typename> class Stack;
 
 bool forcequit( char * message , int ecode = 1){
 	cerr<<"FORCE QUIT : "<<message;
