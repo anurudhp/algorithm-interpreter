@@ -7,31 +7,31 @@
 *******************************/
 
 // empty constructor.
-String::String(){
+String::String() {
 	_len = 0;
 	_data = 0;
 }
 
 // copy contructors : assignment is copy
-String::String( const String& s){
+String::String(const String& s) {
 	_len = s.length();
 	_data = 0;
 	_data = new char[_len];
 	if( !_data ) forcequit("string|heap exhausted");
-	for(int i=0;i<_len;i++)
+	for(int i=0; i<_len; i++)
 		_data[i] = s.charAt(i);
 }
 
-String::String( char *s){
+String::String(const char *s) {
 	_len = strlen(s);
 	_data = 0;
 	_data = new char[ _len ];
 	if( !_data ) forcequit("string|heap exhausted");
-	for( __SIZETYPE i=0;i<_len;i++)
+	for( __SIZETYPE i=0; i<_len; i++)
 		_data[i] = s[i];
 }
 
-String::String( char ch){
+String::String(char ch) {
 	_len = 1;
 	_data = 0;
 	_data = new char[1];
@@ -40,29 +40,29 @@ String::String( char ch){
 }
 
 // operator =
-String& String::operator=( const String& s){
+String& String::operator= (const String& s) {
 	_len = s.length();
 	delete[] _data;
 	_data = 0;
 	_data = new char[_len];
 	if( !_data ) forcequit("string|heap exhausted");
-	for(int i=0;i<_len;i++)
+	for(int i=0; i<_len; i++)
 		_data[i] = s.charAt(i);
 	return *this;
 }
 
-String& String::operator=( char* s ){
+String& String::operator= (const char* s ) {
 	_len = strlen(s);
 	delete[] _data;
 	_data = 0;
 	_data = new char[_len];
 	if( !_data ) forcequit("string|heap exhausted");
-	for(int i=0;i<_len;i++)
+	for(int i=0; i<_len; i++)
 		_data[i] = s[i];
 	return *this;
 }
 
-String& String::operator=( char ch ){
+String& String::operator=(char ch ) {
 	_len = 1;
 	delete[] _data;
 	_data = 0;
@@ -72,12 +72,11 @@ String& String::operator=( char ch ){
 	return *this;
 }
 // Destructor : free some space
-String::~String(){
+String::~String() {
 	clear();
 }
-
 // clears all data.
-bool String::clear(){
+bool String::clear() {
 	_len = 0;
 	delete[] _data;
 	_data = 0;
@@ -85,9 +84,9 @@ bool String::clear(){
 }
 
 // Typecast to string constant : char *
-String::operator char*(){
+String::operator char* () {
 	char ret[_len+1];
-	for(__SIZETYPE i=0;i<_len;i++) ret[i] = _data[i];
+	for(__SIZETYPE i=0; i<_len; i++) ret[i] = _data[i];
 	ret[_len] = '\0';
 	return ret;
 }
@@ -98,12 +97,12 @@ String::operator char*(){
 **************************/
 
 //size() : returns the size of the string
-__SIZETYPE String::length() const{
+__SIZETYPE String::length() const {
 	return _len;
 }
 
 // return the character at an index
-char String::charAt( __SIZETYPE index) const{
+char String::charAt(__SIZETYPE index) const {
 	if( index < 0 ) index += _len;
 	if( index > _len ) return 0;
 	return _data[index];
@@ -112,7 +111,7 @@ char String::charAt( __SIZETYPE index) const{
 // operator [] : gives reference to char at index .
 char String::zerochar = 0; // returned on erraneous requests(out of bounds)
 
-char& String::operator[]( __SIZETYPE index ) const{
+char& String::operator[] (__SIZETYPE index ) const {
 	if( index < 0 ) index += _len;
 	if( index > _len ){
 		zerochar = 0;
@@ -126,7 +125,7 @@ char& String::operator[]( __SIZETYPE index ) const{
 ********************************/
 
 // Operator +
-String String::operator+( const String& r ) const {
+String String::operator+ (const String& r ) const {
 	int tlen = r.length();
 	char tmp[ _len+ tlen +1];
 	for(__SIZETYPE i=0;i<_len;i++)
@@ -140,16 +139,16 @@ String String::operator+( const String& r ) const {
 }
 
 // shorthand operator +=
-String String::operator +=( const String& s) {
+String String::operator+= (const String& s) {
 	return ( *this = *this + s );
 }
 
 // substring : returns the substring from index st , and length len.
-String String::substr( __SIZETYPE st , __SIZETYPE  len = 1 ) const{
+String String::substr(__SIZETYPE st, __SIZETYPE  len) const {
 	if( st < 0 ) st += _len;
 
 	String ret;
-	if( st < 0 || st+len > _len  ) return ret; // return null string, as bounds are erred
+	if( st < 0 || st+len > _len  ) return ""; // return null string, as bounds are erred
 
 	char s[ len+1 ];
 	for( __SIZETYPE i=0 ; i<len ; ++i ){
@@ -161,7 +160,7 @@ String String::substr( __SIZETYPE st , __SIZETYPE  len = 1 ) const{
 }
 
 // replace : replaces all occurences of <find> with <rep>
-String String::replace( const String& find , const String& rep ) const {
+String String::replace(const String& find, const String& rep) const {
 	String tmp , ch(*this);
 
 	__SIZETYPE repPos = ch.indexOf(find),
@@ -178,8 +177,8 @@ String String::replace( const String& find , const String& rep ) const {
 
 // tolower : converts all alphabet values to lower case.
 String String::tolower() const {
-	String ret( *this );
-	for( __SIZETYPE i=0 ; i<ret.length() ; i++ )
+	String ret(*this );
+	for( __SIZETYPE i=0; i<ret.length(); i++)
 		if( ret[i] >= 'A' && ret[i] <= 'Z' )
 			ret[i] = ret[i] - 'A' + 'a';
 	return ret;
@@ -188,7 +187,7 @@ String String::tolower() const {
 // toupper : converts all alphabet values to upper case.
 String String::toupper() const {
 	String ret( *this );
-	for( __SIZETYPE i=0 ; i<ret.length() ; i++ )
+	for( __SIZETYPE i=0; i<ret.length(); i++)
 		if( ret[i] >= 'a' && ret[i] <= 'z' )
 			ret[i] = ret[i] - 'a' + 'A';
 	return ret;
@@ -197,15 +196,15 @@ String String::toupper() const {
 // trim : removes all preceding and trailing spaces
 String String::trim() const {
 	__SIZETYPE st,en;
-	for( st = 0;  _data[st] == ' ' && st < _len ; st++ );
+	for( st = 0; _data[st] == ' ' && st < _len; st++);
 	if( st == _len ) return String("");
 
-	for( en = _len-1 ; _data[en] == ' ' && en >= 0 ; en-- );
+	for( en = _len-1; _data[en] == ' ' && en >= 0; en--);
 	return this->substr( st, en-st+1 );
 }
 
 // indexOf :  gives index of first occurrance of s
-__SIZETYPE String::indexOf( const String& s ) const {
+__SIZETYPE String::indexOf(const String& s ) const {
 	__SIZETYPE tlen = s.length();
 	bool isfound ;
 
@@ -223,7 +222,7 @@ __SIZETYPE String::indexOf( const String& s ) const {
 }
 
 // numOccurences : gives the number of times s appears in the given string ( without overlaps )
-__SIZETYPE String::countOccurences( const String& find ) const {
+__SIZETYPE String::countOccurences(const String& find ) const {
 	__SIZETYPE tot = 0;
 	int flen = find.length();
 	for( int i = 0; i<_len-flen ; i++ ){
@@ -251,7 +250,7 @@ bool String::operator!() const {
 }
 
 // operator == : returns true if both strings are equal( each char matches )
-bool String::operator==( const String& s ) const {
+bool String::operator==(const String& s ) const {
 	if( _len != s.length() ) return false;
 	for( __SIZETYPE it = 0; it < _len ; it++ )
 		if( _data[it] != s[it] )
@@ -260,7 +259,7 @@ bool String::operator==( const String& s ) const {
 }
 
 // operator != : returns true if both strings are not equal
-bool String::operator!=( const String& s ) const {
+bool String::operator!=(const String& s ) const {
 	return !( *this == s );
 }
 
@@ -268,22 +267,25 @@ bool String::operator!=( const String& s ) const {
 /************************************
 * 5. Stream IO operators : >> <<
 ************************************/
-ostream& operator<<( ostream& output, String& str )
-{
+ostream& operator<<(ostream& output, String& str) {
  	str.print( output );
  	return output;
 }
-bool String::print( ostream &output ) const {
+bool String::print(ostream& output) const {
 	for( __SIZETYPE i=0;i<_len;++i)
 		output<<_data[i];
 }
 
 // this is the global input buffer for all strings.
-char * String::stringInputBuffer = new char[ MAX_STRING_LENGTH ];
-istream& operator>>( istream& input, String& str )
-{
-	input.getline( String::stringInputBuffer , MAX_STRING_LENGTH );
-	str = String::stringInputBuffer;
+char *String::stringInputBuffer = new char[ MAX_STRING_LENGTH ];
+
+bool String::get(istream& input, char delim ) {
+	input.getline( String::stringInputBuffer, MAX_STRING_LENGTH, delim );
+	*this = String::stringInputBuffer;
+	return true;
+} 
+istream& operator>>(istream& input, String& str) {
+	str.get(input, ' ');
  	return input;
 }
 
