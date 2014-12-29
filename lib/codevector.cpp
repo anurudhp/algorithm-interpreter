@@ -250,6 +250,25 @@ bool Vector<T>::iterator::operator-- (int) {
 	return !!ptr;
 }
 
+template <typename T>
+typename Vector<T>::iterator Vector<T>::iterator::operator+ (__SIZETYPE len) {
+	while(len-- && this->operator++());
+	return *this;
+}
+template <typename T>
+typename Vector<T>::iterator Vector<T>::iterator::operator- (__SIZETYPE len) {
+	while(len-- && this->operator--());
+	return *this;
+}
+template <typename T>
+typename Vector<T>::iterator Vector<T>::iterator::operator+= (__SIZETYPE len) {
+	return (*this = *this + len);
+}
+template <typename T>
+typename Vector<T>::iterator Vector<T>::iterator::operator-= (__SIZETYPE len) {
+	return (*this = *this - len);
+}
+
 // relational operators
 template <typename T>
 bool Vector<T>::iterator::operator! () const {

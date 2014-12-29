@@ -36,6 +36,11 @@ class Vector {
 		bool operator-- ();
 		bool operator++ (int );
 		bool operator-- (int );
+		iterator operator+ (__SIZETYPE );
+		iterator operator- (__SIZETYPE );
+		iterator operator+= (__SIZETYPE );
+		iterator operator-= (__SIZETYPE );
+		
 		// relational operators
 		bool operator! () const;
 		bool operator== (const iterator& ) const;
