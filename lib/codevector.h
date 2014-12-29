@@ -77,7 +77,7 @@ class Vector {
 
 	// iterators
 	iterator begin() const;
-	iterator end();
+	iterator end() const;
 };
 
 #include "codevector.cpp"
