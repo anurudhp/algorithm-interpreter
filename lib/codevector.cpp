@@ -21,18 +21,19 @@ Vector<T>::Vector(const Vector<T>& v) {
 }
 template<typename T>
 Vector<T>& Vector<T>::operator= (const Vector<T>& v) {
-	length = v.size();
+	length = 0;
+	Vector<T>::iterator en = v.end();
 	head = tail = NULL;
-	for( __SIZETYPE i = 0; i<length; i++)
-		pushback( v[i] );
+	for( Vector<T>::iterator it = v.begin(); it <= en; it++)
+		pushback( *it );
 	return *this;
 }
 
 template<typename T>
 Vector<T>::Vector(__SIZETYPE len, T val) {
-	length = len;
+	length = 0;
 	head = tail = NULL;
-	for( __SIZETYPE i = 0; i<length; i++)
+	for( __SIZETYPE i = 0; i<len; i++)
 		pushback(val);
 }
 template<typename T>
@@ -62,8 +63,9 @@ bool Vector<T>::isEmpty() const {
 template<typename T>
 T& Vector<T>::operator[] (__SIZETYPE index) const {
 	node *pointer = head;
-	while( index-- )
+	while( index-- && pointer )
 		pointer = pointer->next;
+	if( pointer == NULL ) forcequit("vector|segfault");
 	return pointer->value;
 }
 
@@ -172,13 +174,15 @@ typename Vector<T>::iterator Vector<T>::begin() const {
 	Vector<T>::iterator it;
 	it.ptr = this->head;
 	it.vec = this;
+	it.index = 0;
 	return it;
 }
 template <typename T>
-typename Vector<T>::iterator Vector<T>::end() {
+typename Vector<T>::iterator Vector<T>::end() const {
 	Vector<T>::iterator it;
 	it.ptr = this->tail;
 	it.vec = this;
+	it.index = length-1;
 	return it;
 }
 // end implementation : Vector
