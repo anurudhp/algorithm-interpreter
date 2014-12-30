@@ -268,11 +268,11 @@ bool String::operator!=(const String& s ) const {
 * 5. Stream IO operators : >> <<
 ************************************/
 ostream& operator<<(ostream& output, String& str) {
- 	str.print( output );
+ 	str.print(output);
  	return output;
 }
 bool String::print(ostream& output) const {
-	for( __SIZETYPE i=0;i<_len;++i)
+	for( __SIZETYPE i=0; i<_len; ++i)
 		output<<_data[i];
 }
 
@@ -280,7 +280,7 @@ bool String::print(ostream& output) const {
 char *String::stringInputBuffer = new char[ MAX_STRING_LENGTH ];
 
 bool String::get(istream& input, char delim ) {
-	input.getline( String::stringInputBuffer, MAX_STRING_LENGTH, delim );
+	input.getline(String::stringInputBuffer, MAX_STRING_LENGTH, delim);
 	*this = String::stringInputBuffer;
 	return true;
 } 
