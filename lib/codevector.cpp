@@ -55,7 +55,7 @@ __SIZETYPE Vector<T>::size() const {
 	return length;
 }
 template<typename T>
-bool Vector<T>::isEmpty() const {
+bool Vector<T>::empty() const {
 	return (length == 0);
 }
 
