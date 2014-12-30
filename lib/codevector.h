@@ -65,7 +65,7 @@ class Vector {
 	// properties
 	T& operator[](__SIZETYPE index) const;
 	__SIZETYPE size() const;
-	bool isEmpty() const;
+	bool empty() const;
 
 	// basic manipulation
 	Vector<T>& pushback(const T& );
