@@ -45,7 +45,7 @@ public:
 	String operator + (const String& ) const;
 	String operator += (const String& );
 	
-	String substr(__SIZETYPE, __SIZETYPE = 1) const;
+	String substr(__SIZETYPE, __SIZETYPE = -1) const;
 	String replace(const String& , const String& ) const;
 	String tolower() const;
 	String toupper() const;
