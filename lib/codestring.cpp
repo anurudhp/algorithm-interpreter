@@ -104,16 +104,15 @@ __SIZETYPE String::length() const {
 // return the character at an index
 char String::charAt(__SIZETYPE index) const {
 	if( index < 0 ) index += _len;
-	if( index > _len ) return 0;
+	if( index > _len || index < 0 ) return 0;
 	return _data[index];
 }
 
 // operator [] : gives reference to char at index .
 char String::zerochar = 0; // returned on erraneous requests(out of bounds)
-
 char& String::operator[] (__SIZETYPE index ) const {
 	if( index < 0 ) index += _len;
-	if( index > _len ){
+	if( index > _len || index < 0 ) {
 		zerochar = 0;
 		return zerochar;
 	}
@@ -144,12 +143,13 @@ String String::operator+= (const String& s) {
 }
 
 // substring : returns the substring from index st , and length len.
+// if len is -1 (default), the substring from st till the end is returned.
+// if st is negative, it is counted from the end of the string.
 String String::substr(__SIZETYPE st, __SIZETYPE  len) const {
-	if( st < 0 ) st += _len;
-
 	String ret;
-	if( st < 0 || st+len > _len  ) return ""; // return null string, as bounds are erred
-
+	if( st < 0 ) st += _len;
+	if( st < 0 ) st = 0;
+	if( st + len > _len || len == -1 ) len = _len - st;
 	char s[ len+1 ];
 	for( __SIZETYPE i=0 ; i<len ; ++i ){
 		s[i] = _data[ st+i ];
