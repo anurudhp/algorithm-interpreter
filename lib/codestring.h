@@ -8,7 +8,7 @@
 #include "dependencies.h"
 
 const __SIZETYPE DEFAULT_STRING_SIZE = 80;
-const __SIZETYPE MAX_STRING_LENGTH = 100000;
+const __SIZETYPE MAX_STRING_LENGTH = 10000;
 
 class String
 {

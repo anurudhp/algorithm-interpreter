@@ -85,7 +85,8 @@ bool String::clear() {
 
 // Typecast to string constant : char *
 String::operator char* () {
-	char ret[_len+1];
+	if (_len + 1 > MAX_STRING_LENGTH) forcequit("string|too long"); // only for turbo.
+	char ret[MAX_STRING_LENGTH]; // char ret[_len+1];
 	for(__SIZETYPE i=0; i<_len; i++) ret[i] = _data[i];
 	ret[_len] = '\0';
 	return ret;
@@ -126,11 +127,12 @@ char& String::operator[] (__SIZETYPE index ) const {
 // Operator +
 String String::operator+ (const String& r ) const {
 	int tlen = r.length();
-	char tmp[ _len+ tlen +1];
-	for(__SIZETYPE i=0;i<_len;i++)
+	if (_len + tlen + 1 > MAX_STRING_LENGTH) forcequit("string|too long"); // only for turbo.
+	char tmp[MAX_STRING_LENGTH]; // char tmp[_len+ tlen +1];
+	for(__SIZETYPE i=0; i<_len; i++)
 		tmp[i] = _data[i];
-	for(__SIZETYPE i=0;i<tlen;i++)
-		tmp[i+_len] = r[i];
+	for(__SIZETYPE j=0; j<tlen; j++)
+		tmp[j+_len] = r[j];
 	tmp[_len+ tlen]= '\0';
 
 	String c(tmp);
@@ -150,7 +152,10 @@ String String::substr(__SIZETYPE st, __SIZETYPE  len) const {
 	if( st < 0 ) st += _len;
 	if( st < 0 ) st = 0;
 	if( st + len > _len || len == -1 ) len = _len - st;
-	char s[ len+1 ];
+	
+	if (len + 1 > MAX_STRING_LENGTH) forcequit("string|too long"); // only for turbo.
+	char s[MAX_STRING_LENGTH]; // char s[ len+1 ]; 
+	
 	for( __SIZETYPE i=0 ; i<len ; ++i ){
 		s[i] = _data[ st+i ];
 	}
@@ -164,9 +169,8 @@ String String::replace(const String& find, const String& rep) const {
 	String tmp , ch(*this);
 
 	__SIZETYPE repPos = ch.indexOf(find),
-				flen = find.length(),
-				rlen = rep.length();
-	while( repPos >= 0 ){
+	           flen = find.length();
+	while( repPos >= 0 ) {
 		tmp += ch.substr(0,repPos) + rep;
 		ch = ch.substr(repPos+flen);
 		repPos = ch.indexOf(find);
@@ -274,6 +278,7 @@ ostream& operator<<(ostream& output, String& str) {
 bool String::print(ostream& output) const {
 	for( __SIZETYPE i=0; i<_len; ++i)
 		output<<_data[i];
+	return true;
 }
 
 // this is the global input buffer for all strings.
