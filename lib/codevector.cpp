@@ -22,10 +22,10 @@ Vector<T>::Vector(const Vector<T>& v) {
 template<class T>
 Vector<T>& Vector<T>::operator= (const Vector<T>& v) {
 	length = 0;
-	Vector<T>::iterator en = v.end();
+	__SIZETYPE en = v.size();
 	head = tail = NULL;
-	for( Vector<T>::iterator it = v.begin(); it <= en; it++)
-		pushback( *it );
+	for (__SIZETYPE it = 0; it <= en; it++)
+		pushback(v[it]);
 	return *this;
 }
 
@@ -62,10 +62,13 @@ bool Vector<T>::empty() const {
 // operator[] : returns reference to value at index
 template<class T>
 T& Vector<T>::operator[] (__SIZETYPE index) const {
+	if (index < 0) index += length;
+	if (index < 0 || index >= length) forcequit("vector|segfault");
+	if (index == (length - 1)) return tail->value;
+	
 	node *pointer = head;
-	while( index-- && pointer )
-		pointer = pointer->next;
-	if( pointer == NULL ) forcequit("vector|segfault");
+	while (index-- && pointer) pointer = pointer->next;
+	if (pointer == NULL) forcequit("vector|segfault");
 	return pointer->value;
 }
 
@@ -142,165 +145,27 @@ bool Vector<T>::popfront() {
 
 template<class T>
 Vector<T>& Vector<T>::insert(__SIZETYPE index, const T& val) {
-	if (index<0 || index>length) return *this;
-	iterator it = begin();
-	while( index-- && it++ );
-	return insert( it, val);
-}
-
-// insert using an iterator.
-template<class T>
-Vector<T>& Vector<T>::insert(iterator& it, const T& val) {
-	if( it.ptr->next == NULL ) return pushback(val);
-
-	length++;
-	node *n = new node;
-	if(!n) forcequit("vector|heap exhausted");
-
-	node *oldnext = it.ptr->next;
+	if (index < 0) return *this;
+	if (index >= length) return pushback(val);
+	if (index == 0) return pushfront(val);
+	
+	node *n = NULL;
+	n = new node;
+	if (!n) forcequit("vector|heap exhausted");
+	
 	n->value = val;
-	n->prev = it.ptr;
-	n->next = oldnext;
-
-	it.ptr->next = n;
-	oldnext->prev = n;
-
-	return *this;
-}
-
-// iterator constants for a vector
-template <class T>
-typename Vector<T>::iterator Vector<T>::begin() const {
-	Vector<T>::iterator it;
-	it.ptr = this->head;
-	it.vec = this;
-	it.index = 0;
-	return it;
-}
-template <class T>
-typename Vector<T>::iterator Vector<T>::end() const {
-	Vector<T>::iterator it;
-	it.ptr = this->tail;
-	it.vec = this;
-	it.index = length-1;
-	return it;
-}
-// end implementation : Vector
-
-/******************************************
-** Implementation :                      **
-** template class Vector::iterator       **
-******************************************/
-
-// constructors and operator =
-// there is no need for a custom destructor, as all data in iterator is 'static'
-template <class T>
-Vector<T>::iterator::iterator() {
-	this->ptr = NULL;
-	this->index = -1;
-	this->vec = NULL;
-}
-
-template <class T>
-Vector<T>::iterator::iterator(const iterator& it) {
-	*this = it;
-}
-
-template <class T>
-typename Vector<T>::iterator Vector<T>::iterator::operator= (const iterator& it) {
-	this->ptr = it.ptr;
-	this->index = it.index;
-	this->vec = it.vec;
-}
-
-template <class T>
-Vector<T>::iterator::iterator(const Vector<T>& vec, __SIZETYPE len) {
-	*this = vec.begin();
-	this->index = len;
-	while( len-- && this->operator++() );
-}
-
-// mutators
-template <class T>
-T& Vector<T>::iterator::operator* () const {
-	if( ptr == NULL ){
-		T v;
-		return v;
+	
+	node *right = head, *left;
+	for (int i = 0; i < index; i++) {
+		right = right->next;
 	}
-	return ptr->value;
-}
-template <class T>
-bool Vector<T>::iterator::operator++ () {
-	if( ptr == NULL ) return false;
-	ptr = ptr->next;
-	index++;
-	return !!ptr;
-}
-template <class T>
-bool Vector<T>::iterator::operator-- () {
-	if( ptr == NULL ) return false;
-	ptr = ptr->prev;
-	index--;
-	return !!ptr;
-}
-template <class T>
-bool Vector<T>::iterator::operator++ (int) {
-	operator++();
-	return !!ptr;
-}
-template <class T>
-bool Vector<T>::iterator::operator-- (int) {
-	operator--();
-	return !!ptr;
-}
-
-template <class T>
-typename Vector<T>::iterator Vector<T>::iterator::operator+ (__SIZETYPE len) {
-	while(len-- && this->operator++());
+	left = right->prev;
+	left->next = right->prev = n;
+	n->prev = left;
+	n->next = right;
+	length++;
+	
 	return *this;
 }
-template <class T>
-typename Vector<T>::iterator Vector<T>::iterator::operator- (__SIZETYPE len) {
-	while(len-- && this->operator--());
-	return *this;
-}
-template <class T>
-typename Vector<T>::iterator Vector<T>::iterator::operator+= (__SIZETYPE len) {
-	return (*this = *this + len);
-}
-template <class T>
-typename Vector<T>::iterator Vector<T>::iterator::operator-= (__SIZETYPE len) {
-	return (*this = *this - len);
-}
 
-// relational operators
-template <class T>
-bool Vector<T>::iterator::operator! () const {
-	return ( this->ptr == NULL );
-}
-template <class T>
-bool Vector<T>::iterator::operator== ( const Vector<T>::iterator& it ) const {
-	return ( this->ptr == it.ptr );
-}
-template <class T>
-bool Vector<T>::iterator::operator!= ( const Vector<T>::iterator& it ) const {
-	return ( this->ptr != it.ptr );
-}
-
-template <class T>
-bool Vector<T>::iterator::operator< ( const Vector<T>::iterator& it ) const {
-	return ( index < it.index );
-}
-template <class T>
-bool Vector<T>::iterator::operator> ( const Vector<T>::iterator& it ) const {
-	return ( index > it.index );
-}
-template <class T>
-bool Vector<T>::iterator::operator<= ( const Vector<T>::iterator& it ) const {
-	return ( index <= it.index );
-}
-template <class T>
-bool Vector<T>::iterator::operator>= ( const Vector<T>::iterator& it ) const {
-	return ( index >= it.index );
-}
-
+// end implementation : Vector

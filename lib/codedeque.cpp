@@ -31,11 +31,11 @@ bool Deque<T>::empty() const {
 }
 template<class T>
 T Deque<T>::front() const {
-    return *(data.begin());
+    return data[0];
 }
 template<class T>
 T Deque<T>::rear() const {
-    return *(data.end());
+    return data[data.size()-1];
 }
 
 // Basic manipulations
