@@ -6,7 +6,7 @@
 
 // Deque is a container adapter.
 // It uses the template class Vector to store data.
-template <typename T>
+template <class T>
 class Deque {
 	private:
 	Vector<T> data;
@@ -32,7 +32,7 @@ class Deque {
 };
 
 // Template Class Stack : adapts deque.
-template <typename T>
+template <class T>
 class Stack {
 	private:
 	Deque<T> data;
