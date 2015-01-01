@@ -6,7 +6,7 @@
 
 // vector template : a resize-able array.
 // implemented as a doubly-linked list
-template <typename T>
+template <class T>
 class Vector {
 	private:
 	struct node {

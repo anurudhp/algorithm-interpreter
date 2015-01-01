@@ -2,8 +2,6 @@
 #define CUSTOM_DEPENDENCIES_H
 
 // use all available libraries,
-// coz I cant code everything from scratch.
-
 // check compiler and include files accordingly
 
 #if defined(__GNUC__)
@@ -31,21 +29,23 @@ using namespace std;
 #endif
 
 // Custom types
-
 #if defined(__GNUC__)
 typedef long long int  __SIZETYPE;
 #else
 typedef long int  __SIZETYPE; // older compilers dont support long long.
 #endif
 
-
 // Custom Templates
 class String;
-template <typename> class Vector;
+template <class T> class Vector;
+template <class T> class Deque;
+template <class T> class Stack;
+template <class T> class Queue;
 
 bool forcequit( char * message , int ecode = 1){
 	cerr<<"FORCE QUIT : "<<message;
-	exit( ecode );	
+	exit( ecode );
+	return ecode; // warning in turbo.
 }
 
 #endif /* CUSTOM_DEPENDENCIES_H */
