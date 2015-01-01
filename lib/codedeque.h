@@ -54,7 +54,7 @@ class Stack {
 };
 
 // Template Class Queue : adapts deque
-template <typename T>
+template <class T>
 class Queue {
 	private:
 	Deque<T> data;
