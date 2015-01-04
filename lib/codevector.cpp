@@ -24,7 +24,7 @@ Vector<T>& Vector<T>::operator= (const Vector<T>& v) {
 	length = 0;
 	__SIZETYPE en = v.size();
 	head = tail = NULL;
-	for (__SIZETYPE it = 0; it <= en; it++)
+	for (__SIZETYPE it = 0; it < en; it++)
 		pushback(v[it]);
 	return *this;
 }

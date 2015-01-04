@@ -2,7 +2,6 @@
 #define CODE_VECTOR_H
 
 #include "dependencies.h"
-#include "codestring.h"
 
 // vector template : a resize-able array.
 // implemented as a doubly-linked list
