@@ -61,7 +61,7 @@ public:
 	
 	// 5. Input/output
 	bool print(ostream& ) const;
-	bool get(istream&, char = '\n' );
+	bool get(istream&, const String& = '\n', bool = true);
 	friend istream& operator >> (istream&, String& );
 	friend ostream& operator << (ostream&, String& );
 	

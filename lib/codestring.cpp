@@ -212,7 +212,7 @@ __SIZETYPE String::indexOf(const String& s ) const {
 	__SIZETYPE tlen = s.length();
 	bool isfound ;
 
-	for( __SIZETYPE i = 0; i < _len-tlen ; ++i ){
+	for( __SIZETYPE i = 0; i < _len-tlen+1 ; ++i ){
 		isfound = true;
 		for( __SIZETYPE j = 0; j < tlen ; ++j ){
 			if( s[j] != _data[i+j] ){
@@ -284,13 +284,23 @@ bool String::print(ostream& output) const {
 // this is the global input buffer for all strings.
 char *String::stringInputBuffer = new char[ MAX_STRING_LENGTH ];
 
-bool String::get(istream& input, char delim ) {
-	input.getline(String::stringInputBuffer, MAX_STRING_LENGTH, delim);
+bool String::get(istream& input, const String& delims, bool throwLast) {
+	char tmp;
+	int i = 0;
+	while (input.good()) {
+		tmp = input.peek();
+		if (delims.indexOf(tmp) >= 0) {
+			if (throwLast) input.get();
+			break;
+		}
+		stringInputBuffer[i++] = input.get();
+	}
+	stringInputBuffer[i] = 0;
 	*this = String::stringInputBuffer;
 	return true;
 } 
 istream& operator>>(istream& input, String& str) {
-	str.get(input, ' ');
+	str.get(input, " \n");
  	return input;
 }
 
