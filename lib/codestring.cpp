@@ -84,14 +84,15 @@ bool String::clear() {
 }
 
 // Typecast to string constant : char *
-/*String::operator char* () {
+// String::operator char* () { return c_str(); }
+
+char* String::c_str() {
 	if (_len + 1 > MAX_STRING_LENGTH) forcequit("string|too long"); // only for turbo.
 	char ret[MAX_STRING_LENGTH]; // char ret[_len+1];
 	for(__SIZETYPE i=0; i<_len; i++) ret[i] = _data[i];
 	ret[_len] = '\0';
 	return ret;
 }
-*/
 
 /**************************
 * 2. Read properties/data of a given string
