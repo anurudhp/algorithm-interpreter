@@ -76,8 +76,18 @@ T& Vector<T>::operator[] (__SIZETYPE index) const {
 * Basic manipulations
 ***************************/
 
+template <class T>
+bool Vector<T>::allocate(__SIZETYPE len, const T& val) {
+	clear();
+	length = 0;
+	head = tail = NULL;
+	for( __SIZETYPE i = 0; i<len; i++)
+		pushback(val);
+	return true;
+}
+
 template<class T>
-Vector<T>& Vector<T>::pushback(const T& val) {
+bool Vector<T>::pushback(const T& val) {
 	node *n = NULL;
 	n = new node;
 	if(!n) forcequit("vector|heap exhausted");
@@ -89,11 +99,11 @@ Vector<T>& Vector<T>::pushback(const T& val) {
 	if(tail != NULL) tail->next = n;
 	tail = n;
 	if(length == 1) head = n;
-	return *this;
+	return true;
 }
 
 template<class T>
-Vector<T>& Vector<T>::pushfront( const T& val){
+bool Vector<T>::pushfront( const T& val){
 	node *n = NULL;
 	n = new node;
 	if(!n) forcequit("vector|heap exhausted");
@@ -105,7 +115,7 @@ Vector<T>& Vector<T>::pushfront( const T& val){
 	if(head != NULL) head->prev = n;
 	head = n;
 	if(length == 1) tail = head;
-	return *this;
+	return true;
 }
 
 template<class T>
@@ -144,8 +154,8 @@ bool Vector<T>::popfront() {
 }
 
 template<class T>
-Vector<T>& Vector<T>::insert(__SIZETYPE index, const T& val) {
-	if (index < 0) return *this;
+bool Vector<T>::insert(__SIZETYPE index, const T& val) {
+	if (index < 0) return false;
 	if (index >= length) return pushback(val);
 	if (index == 0) return pushfront(val);
 	
@@ -165,7 +175,7 @@ Vector<T>& Vector<T>::insert(__SIZETYPE index, const T& val) {
 	n->next = right;
 	length++;
 	
-	return *this;
+	return true;
 }
 
 // end implementation : Vector
