@@ -84,14 +84,14 @@ bool String::clear() {
 }
 
 // Typecast to string constant : char *
-String::operator char* () {
+/*String::operator char* () {
 	if (_len + 1 > MAX_STRING_LENGTH) forcequit("string|too long"); // only for turbo.
 	char ret[MAX_STRING_LENGTH]; // char ret[_len+1];
 	for(__SIZETYPE i=0; i<_len; i++) ret[i] = _data[i];
 	ret[_len] = '\0';
 	return ret;
 }
-
+*/
 
 /**************************
 * 2. Read properties/data of a given string
@@ -252,19 +252,21 @@ __SIZETYPE String::countOccurences(const String& find ) const {
 bool String::operator!() const {
 	return !_len;
 }
-
-// operator == : returns true if both strings are equal( each char matches )
-bool String::operator==(const String& s ) const {
+bool String::equals(const String& s) const {
 	if( _len != s.length() ) return false;
 	for( __SIZETYPE it = 0; it < _len ; it++ )
 		if( _data[it] != s[it] )
 			return false;
 	return true;
 }
+// operator == : returns true if both strings are equal( each char matches )
+bool String::operator==(const String& s) const {
+	return equals(s);
+}
 
 // operator != : returns true if both strings are not equal
 bool String::operator!=(const String& s ) const {
-	return !( *this == s );
+	return !(equals(s));
 }
 
 
@@ -284,12 +286,12 @@ bool String::print(ostream& output) const {
 // this is the global input buffer for all strings.
 char *String::stringInputBuffer = new char[ MAX_STRING_LENGTH ];
 
-bool String::get(istream& input, const String& delims, bool throwLast) {
+bool String::get(istream& input, char delim, bool throwLast) {
 	char tmp;
 	int i = 0;
 	while (input.good()) {
 		tmp = input.peek();
-		if (delims.indexOf(tmp) >= 0) {
+		if (tmp == delim) {
 			if (throwLast) input.get();
 			break;
 		}
@@ -300,7 +302,7 @@ bool String::get(istream& input, const String& delims, bool throwLast) {
 	return true;
 } 
 istream& operator>>(istream& input, String& str) {
-	str.get(input, " \n");
+	str.get(input);
  	return input;
 }
 
