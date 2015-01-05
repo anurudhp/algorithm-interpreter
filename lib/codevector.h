@@ -30,11 +30,12 @@ class Vector {
 	bool empty() const;
 
 	// basic manipulation
-	Vector<T>& pushback(const T& );
-	Vector<T>& pushfront(const T& );
+	bool allocate(__SIZETYPE, const T& );
+	bool pushback(const T& );
+	bool pushfront(const T& );
 	bool popback();
 	bool popfront();
-	Vector<T>& insert(__SIZETYPE, const T& );
+	bool insert(__SIZETYPE, const T& );
 };
 
 #include "codevector.cpp"
