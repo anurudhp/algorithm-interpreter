@@ -35,6 +35,7 @@ public:
 	
 	// Typecast : this operator helps us treat (String) objects as (char *) .
 	//operator char*();
+	char* c_str();
 	
 	// 2. functions : to get properties 
 	__SIZETYPE length() const;
