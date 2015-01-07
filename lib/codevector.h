@@ -25,17 +25,21 @@ class Vector {
 	bool clear();
 
 	// properties
-	T& operator[](__SIZETYPE index) const;
+	T& operator[](__SIZETYPE index) const; // O(length)
 	__SIZETYPE size() const;
 	bool empty() const;
 
 	// basic manipulation
 	bool allocate(__SIZETYPE, const T& );
-	bool pushback(const T& );
-	bool pushfront(const T& );
-	bool popback();
-	bool popfront();
-	bool insert(__SIZETYPE, const T& );
+	bool pushback(const T& ); // O(1)
+	bool pushfront(const T& ); // O(1)
+	bool popback(); // O(1)
+	bool popfront(); // O(1)
+	bool insert(__SIZETYPE, const T& ); // O(length)
+	bool remove(__SIZETYPE); // O(length)
+	
+	// advanced manipulation
+	__SIZETYPE indexOf(const T&); // O(length)
 };
 
 #include "codevector.cpp"
