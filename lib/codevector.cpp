@@ -178,4 +178,36 @@ bool Vector<T>::insert(__SIZETYPE index, const T& val) {
 	return true;
 }
 
+template<class T>
+bool Vector<T>::remove(__SIZETYPE index) {
+	if (index < 0) index += length;
+	if (index >= length || index < 0) return false;
+	
+	if (index == 0) return popfront();
+	if (index == length - 1) return popback();
+	
+	node *n = head;
+	while (index-- && n) n = n->next;
+	node *left = n->prev, *right = n->next;
+	left->next = right;
+	right->prev = left;
+	delete n;
+	length--;
+	return true;
+}
+
+// advanced manipulations
+
+template<class T>
+__SIZETYPE Vector<T>::indexOf(const T& val) {
+	if (length == 0) return -1;
+	node *n = head;
+	__SIZETYPE ret = 0;
+	while (n->value != val && n) {
+		n = n->next;
+		ret++;
+	}
+	if (n == NULL) return -1;
+	return ret;
+}
 // end implementation : Vector
