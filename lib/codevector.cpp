@@ -210,4 +210,21 @@ __SIZETYPE Vector<T>::indexOf(const T& val) {
 	if (n == NULL) return -1;
 	return ret;
 }
+
+template<class T>
+bool Vector<T>::append(const Vector<T>& vec, bool isFront = false) {
+	node *st;
+	if (!isFront) {
+		st = vec.head;
+		for (__SIZETYPE i = 0; i < vec.length; i++, st = st->next) {
+			this->pushback(st->value);
+		}
+	} else {
+		st = vec.tail;
+		for (__SIZETYPE i = vec.length - 1; i >= 0; i--, st = st->prev) {
+			this->pushfront(st->value);
+		}
+	}
+	return true;
+}
 // end implementation : Vector
