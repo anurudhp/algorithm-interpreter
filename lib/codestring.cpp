@@ -274,7 +274,7 @@ bool String::operator!=(const String& s ) const {
 /************************************
 * 5. Stream IO operators : >> <<
 ************************************/
-ostream& operator<<(ostream& output, String& str) {
+ostream& operator<<(ostream& output, const String& str) {
  	str.print(output);
  	return output;
 }

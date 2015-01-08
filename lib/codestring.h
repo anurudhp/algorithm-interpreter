@@ -65,7 +65,7 @@ public:
 	bool print(ostream& ) const;
 	bool get(istream&, char = '\n', bool = true);
 	friend istream& operator >> (istream&, String& );
-	friend ostream& operator << (ostream&, String& );
+	friend ostream& operator << (ostream&, const String& );
 	
 };
 
