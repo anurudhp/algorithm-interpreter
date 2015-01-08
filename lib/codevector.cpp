@@ -212,7 +212,7 @@ __SIZETYPE Vector<T>::indexOf(const T& val) const {
 }
 
 template<class T>
-bool Vector<T>::append(const Vector<T>& vec, bool isFront = false) {
+bool Vector<T>::append(const Vector<T>& vec, bool isFront) {
 	node *st;
 	if (!isFront) {
 		st = vec.head;
