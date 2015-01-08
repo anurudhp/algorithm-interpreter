@@ -1,249 +1,338 @@
-#include "dependencies.h"
-#include "codestring.h"
-#include "codevector.h"
+#ifdef COMPONENT_LEXER_H
+// do not include this file directly.
+// use lexer.h instead.
 
-#define END_OF_FILE -2
-#define INVALID -1
-#define OPERATOR 0
-#define KEYWORD 1
-#define IDENTIFIER 3
-#define PUNCTUATOR 2
-#define CONSTANT 4
+/*********************************
+* Implementation: Class Token   **
+*********************************/
 
-Vector< Vector<String> > id;
-
-class token
-{
-
-    public:
-    __SIZETYPE type , subtype , line_number , char_number ;
-
-    String data ;
-
-    token () ;
-
-};
-
-token::token () {
-
-    type = subtype = line_number = char_number = -1 ;
-
-    data = "" ;
+// constructors
+Token::Token(String val, tokenType t, tokenType st, bufferIndex ln, bufferIndex in) {
+	this->data = val;
+	this->type = t;
+	this->subtype = st;
+	this->line = ln;
+	this->indent = in;
+}
+Token::Token(const Token& t) {
+	this->data = t.data;
+	this->type = t.type;
+	this->subtype = t.subtype;
+	this->line = t.line;
+	this->indent = t.indent;
+}
+Token Token::operator= (const Token& t) {
+	this->data = t.data;
+	this->type = t.type;
+	this->subtype = t.subtype;
+	this->line = t.line;
+	this->indent = t.indent;
+	return *this;
+}
+// properties
+tokenType Token::getType() const {
+	return this->type;
+}
+tokenType Token::getSubtype() const {
+	return this->subtype;
+}
+bufferIndex Token::getLineNumber() const {
+	return this->line;
+}
+bufferIndex Token::getIndent() const {
+	return this->indent;
+}
+String Token::value() const {
+	return this->data;
 }
 
-class Lexer_Process
-{
+// mutators
+bool Token::setType(tokenType t) {
+	this->type = t;
+}
+bool Token::setSubtype(tokenType st) {
+	this->subtype = st;
+}
+bool Token::setLineNumber(bufferIndex ln) {
+	this->line = ln;
+}
+bool Token::setIndent(bufferIndex in) {
+	this->indent = in;
+}
+bool Token::setValue(String s) {
+	this->data = s;
+}
+// end implementation: class Token
 
-    int line_number , char_number ;
+/****************************************
+* Implementation: Class LexerProcess   **
+****************************************/
 
-    char residual ;
-
-    public :
-
-    Lexer_Process () ;
-
-    token get_token ( fstream& ) ;
-
-};
-
-Lexer_Process :: Lexer_Process () {
-
-    line_number = 1 ;
-    char_number = 0 ;
-    residual = ' ' ;
-
+// constructors, and dynamic data managers.
+LexerProcess::LexerProcess (ParserProcess* pr) {
+	this->parser = pr;
+	this->line = -1;
+	this->indent = 0;
+}
+bool LexerProcess::setup(String filename) {
+	this->destroy();
+	this->source.open(filename.c_str());
+	if (!this->source) {
+		return false;
+	}
+	this->line = 1;
+	this->indent = 0;
+	return true;
+}
+bool LexerProcess::destroy() {
+	if (this->source) this->source.close();
+	this->line = -1;
+	this->indent = 0;
+}
+LexerProcess::~LexerProcess() {
+	this->destroy();
 }
 
-token Lexer_Process :: get_token ( fstream& f ) {
+/*** static members ***/
 
-    char c ;
-    token t ;
-    int i ;
-
-    if ( residual != ' ' ) {
-        c = residual ;
-        residual = ' ' ;
-        goto LABEL2 ;
-    }
-
-    LABEL1 :
-    if ( f.eof () == true ) {
-
-        t.type = END_OF_FILE ;
-        return t ;
-
-    }
-    f.get ( c ) ;
-    ++ char_number ;
-    LABEL2 :
-    t.char_number = char_number ;
-    t.line_number = line_number ;
-    if ( c == ' ' ) goto LABEL1 ;
-    if( c == '\n' ) {
-
-        line_number ++ ;
-        char_number = 0 ;
-        goto LABEL1 ;
-
-    }
-    if ( c == '\'' ) {
-
-        t.char_number ++ ;
-        t.type = CONSTANT ;
-        f.get( c ) ;
-        ++ char_number ;
-        while ( c != '\'' ) {
-
-            t.data += c ;
-            f.get ( c ) ;
-            ++ char_number ;
-            if ( c == '\n' ) {
-
-                line_number ++ ;
-                char_number = 0 ;
-                t.type = INVALID ;
-                t.data = "" ;
-                return t ;
-
-            }
-
-        }
-
-        return t ;
-    }
-
-    if ( c == '"' ) {
-
-        t.char_number ++ ;
-        t.type = CONSTANT ;
-        f.get ( c ) ;
-        ++ char_number ;
-        while ( c != '"' ) {
-
-            String temp ( c ) ;
-            t.data += temp ;
-            f.get ( c ) ;
-            ++ char_number ;
-            if ( c == '\n' ) {
-
-                line_number ++ ;
-                char_number ++ ;
-                t.type = INVALID ;
-                t.data = "";
-                return t ;
-
-            }
-
-        }
-
-        return t;
-    }
-
-    if ( isalpha ( c ) || c == '_' ) {
-
-        while ( isalnum ( c ) || c == '_' ) {
-
-            t.data += c ;
-            f.get ( c ) ;
-            char_number ++ ;
-            if ( c == '\n' ) {
-
-                line_number ++ ;
-                char_number = 0 ;
-                t.type = INVALID ;
-                t.data = "" ;
-                return t ;
-
-            }
-
-        }
-
-        if ( c != ' ' && c != '\n' ) residual = c ;
-        for ( i = 0 ; i < id[KEYWORD].size () ; i++ ) {
-
-            if ( t.data == id[KEYWORD][i] ) {
-
-                t.type = KEYWORD ;
-                t.subtype = i ;
-                t.data = "" ;
-                return t ;
-
-            }
-
-        }
-
-        t.type=IDENTIFIER;
-        return t;
-
-    }
-
-    if ( isdigit ( c ) ) {
-
-        while ( isdigit ( c ) ) {
-
-            String temp ( c ) ;
-            t.data += temp ;
-            f.get ( c ) ;
-            char_number ++ ;
-            if ( c == '\n' ) {
-
-                line_number ++ ;
-                char_number = 0 ;
-                t.type = INVALID ;
-                t.data = "" ;
-                return t ;
-
-            }
-
-        }
-
-        if ( c != '\n' && c != ' ' ) residual = c ;
-        t.type = CONSTANT ;
-        return t;
-
-    }
-
-    t.data += c ;
-    for ( __SIZETYPE i = 0 ; i < id[PUNCTUATOR].size () ; i ++ ) {
-
-        if ( t.data == id [ PUNCTUATOR ] [ i ] ) {
-
-            t.type = PUNCTUATOR ;
-            t.subtype = i ;
-            t.data = "" ;
-            return t ;
-
-        }
-
-    }
-
-    f.get ( c ) ;
-    ++ char_number ;
-    t.data += c ;
-    LABEL3:
-    for ( i=0 ; i < id[ OPERATOR ].size () ; i ++ ) {
-
-        if ( t.data == id [ OPERATOR ] [ i ] ) {
-
-            t.type = OPERATOR ;
-            t.subtype = i ;
-            t.data = "" ;
-            return t ;
-
-        }
-
-    }
-
-    if ( t.data.length () != 1 ) {
-
-        residual = t.data [ 1 ] ;
-        t.data = t.data [ 0 ] ;
-        goto LABEL3 ;
-
-    }
-
-    t.type = INVALID;
-    t.data = "" ;
-    return t ;
-
+bool LexerProcess::isValidIdentifier(String val) {
+	if (val.length() > MAX_ID_LENGTH) return false;
+	if (!isalpha(val[0]) && val[0] != '_') return false;
+	for (__SIZETYPE i = 0; i < val.length(); i++) if (!isalnum(val[i]) && val[i] != '_') return false;
+	return true;
 }
+// maps a keyword to a corresponding operator.
+// possible only if the keyword can be replaced by the operator in the code,
+// without altering the flow of logic.
+String LexerProcess::mapKeywordToOperator(String val) {
+	if (val == "and") return "&&";
+	if (val == "or") return "||";
+	if (val == "not") return "!";
+	if (val == "xor") return "^";
+	if (val == "equals") return "==";
+	return val;
+}
+
+// Converts a string into a token,
+// assumes string to be somewhat valid.
+Token LexerProcess::toToken(String val) {
+	if (!val) return nullToken;
+	if (val[0] == -1) return nullToken;
+	
+	// string literal:
+	if (val[0] == '\"' || val[0] == '\'') {
+		return Token(val, LITERAL, STRING);
+	}
+	// numeric literal
+	if (val[0] >= '0' && val[0] <= '9') {
+		return Token(val, LITERAL, NUMBER);
+	}
+	// punctuator
+	if (Punctuators.indexOf(val) >= 0) {
+		return Token(val, PUNCTUATOR);
+	}
+	
+	val = mapKeywordToOperator(val);
+	// keywords and inbuilt functions
+	if (Keywords.indexOf(val) >= 0) {
+		if (Constants.indexOf(val) >= 0) {
+			if (val == "true" || val == "false") return Token(val, LITERAL, BOOLEAN);
+			return Token(val, KEYWORD, CONSTANT);
+		}
+		if (IOfunctions.indexOf(val) >= 0) return Token(val, KEYWORD, IOFUNCTION);
+		return Token(val, KEYWORD);
+	}
+	
+	// operators. assumes that the operator has been extracted properly.
+	if (binaryOperators.indexOf(val) >= 0) {
+		return Token(val, OPERATOR, BINARYOP);
+	}
+	if (unaryOperators.indexOf(val) >= 0) {
+		return Token(val, OPERATOR, UNARYOP);
+	}
+	
+	// identifier
+	if (isValidIdentifier(val)) {
+		return Token(val, IDENTIFIER);
+	}
+	
+	return Token(val);
+}
+
+/*** Member functions: actual lexing procedures. ***/
+// removes all leading spaces, and discard comments.
+int LexerProcess::trim() {
+	if (this->source.eof()) return -1;
+	
+	int sp = 0;
+	while (this->source.peek() == ' ') {
+		this->source.get();
+		sp++;
+	}
+	if (this->source.peek() == '#') {
+		while (this->source.get() != '\n' && !this->source.eof()) // ignore the rest of the line.
+		this->endLine();
+		return this->trim();
+	}
+	if (this->source.eof()) return -1;
+	return sp;
+}
+
+// Increases the line number, and sets up the next line
+// extracts the tabs from next line, sets the indent, and returns the number.
+// assumes that the \n is already read from the buffer.
+int LexerProcess::endLine() {
+	if (this->source.eof()) return -1;
+	this->line++;
+	// extract the indentation.
+	int num = 0;
+	while (this->source.peek() == '\t') {
+		this->source.get();
+		num++;
+	}
+	this->indent = num;
+	return (num);
+}
+
+// extracts a string: as '...' or "..."
+String LexerProcess::readString() {
+	char st = this->source.get(),
+		 tmp = 0;
+	String ret = st;
+	while (tmp != st) {
+		tmp = this->source.get();
+		if (tmp == '\n') { // error. string not terminated properly.
+			// this->parser.send("e", Error("l1", this->line));
+			this->endLine();
+			// return a null string.
+			return "";
+		}
+		
+		ret += tmp;
+		if (tmp == '\\') {
+			// escape: get the next character.
+			tmp = this->source.get();
+			if (tmp != '\n') ret += tmp;
+		}
+	}
+	return ret;
+}
+
+// reads a numeric value: can contain utmost one decimal point.
+String LexerProcess::readNumber() {
+	String num;
+	bool isDeci = false;
+	char ch = this->source.get();
+	while ((ch >= '0' && ch <= '9') || ch == '.') {
+		if (ch == '.') {
+			if (!isDeci) {
+				isDeci = true;
+			} else {
+				return ""; // error- too many decimal points
+			}
+		}
+		num += ch;
+		ch = this->source.get();
+	}
+	if (ch == '\n') {
+		this->endLine();
+	} else {
+		if (!this->source.eof()) this->source.putback(ch);
+	}
+	return num;
+}
+
+// reads an identifier/keyword, 
+// assuming the starting character in the buffer is a alpha or underscore.
+// does `not` check whether it is valid.
+String LexerProcess::readIdentifier() {
+	String ret;
+	int len = 0;
+	char ch = this->source.get();
+	while (isalnum(ch) || ch == '_') {
+		ret += ch;
+		len++;
+		ch = this->source.get();
+	}
+	if (!this->source.eof()) this->source.putback(ch);
+	return ret;
+}
+
+// reads an operator, without touching any adjacent characters.
+// this does not do a full check for all operators.
+// note: some operators are 'decided' by the parser, because they depend on situation.
+String LexerProcess::readOperator() {
+	char ch = this->source.peek();
+	if (Opstarts.indexOf(ch) == -1) return "";
+	
+	this->source.get();
+	String ret = ch;
+	
+	// check whether can be followed by =
+	static const idList eq(strsplit("+-*/%=!<>"));
+	if (eq.indexOf(ch) >= 0 && this->source.peek() == '=') {
+		ret += (this->source.get());
+		// a second =
+		if ((ch == '=' || ch == '!') && (this->source.peek() == '=')) {
+			ret += this->source.get();
+		}
+	} else if (ch == '+' || ch == '-' || ch == '&' || ch == '|') { // operators ++ -- && ||
+		if (this->source.peek() == ch) ret += (this->source.get());
+	}
+	
+	return ret;
+}
+
+Token LexerProcess::getToken() {
+	this->trim();
+	char ch = this->source.peek();
+	if (this->source.eof()) return eofToken;
+	
+	String val;
+	bufferIndex tline = this->line, tindent = this->indent;
+	
+	if (ch == '\n') {
+		this->source.get();
+		this->endLine();
+		return this->getToken();
+	}
+	
+	if (ch == '\'' || ch == '\"') {
+		val = this->readString(); // string literal
+	} else if (isalpha(ch) || ch == '_') {
+		val = this->readIdentifier(); // identifier/keyword
+	} else if (isdigit(ch)) {
+		val = this->readNumber(); // numeric constant
+	} else if (Punctuators.indexOf(ch) >= 0) {
+		val = ch; // punctuator. keep it as it is.";
+		this->source.get();
+	} else if (Opstarts.indexOf(ch) >= 0) {
+		val = this->readOperator();
+	} else { // just ignore the character, as of now. This should flag an unknown character error.
+		val = ch;
+		this->source.get();
+	}
+	
+	Token tok = toToken(val);
+	tok.setLineNumber(tline);
+	tok.setIndent(tindent);
+	return tok;
+}
+
+bool LexerProcess::eof() { return this->source.eof(); }
+
+bool importLexerData() {
+	Keywords = strsplit("var let typeof String Number Boolean and or not equals delete", ' ');
+	IOfunctions = strsplit("print input readNumber readString", ' ');
+	Constants = strsplit("undefined null infinity true false", ' ');
+	Keywords.append(IOfunctions);
+	Keywords.append(Constants);
+	Punctuators = strsplit("()[]{},:;");
+	// operators.
+	binaryOperators = strsplit("+ - * / % = += -= *= /= %= > < >= <= && || == === != !== ?", ' ');
+	unaryOperators = strsplit("! ++ --", ' ');
+	Opstarts = strsplit("+-*/%=?&|<>!");
+	return true;
+}
+
+#endif
