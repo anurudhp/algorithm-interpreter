@@ -40,7 +40,7 @@ class Vector {
 	
 	// advanced manipulation
 	__SIZETYPE indexOf(const T&) const; // O(length)
-	bool append(const Vector<T>&, bool);
+	bool append(const Vector<T>&, bool = false);
 };
 
 #include "codevector.cpp"
