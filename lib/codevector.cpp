@@ -199,11 +199,11 @@ bool Vector<T>::remove(__SIZETYPE index) {
 // advanced manipulations
 
 template<class T>
-__SIZETYPE Vector<T>::indexOf(const T& val) {
+__SIZETYPE Vector<T>::indexOf(const T& val) const {
 	if (length == 0) return -1;
 	node *n = head;
 	__SIZETYPE ret = 0;
-	while (n->value != val && n) {
+	while (n && n->value != val) {
 		n = n->next;
 		ret++;
 	}
