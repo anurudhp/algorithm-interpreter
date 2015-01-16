@@ -60,6 +60,17 @@ bool Deque<T>::popfront() {
 	return data.popfront();
 }
 template<class T>
+bool Deque<T>::popback(T& ref){
+	ref = this->rear();
+	return data.popback();
+}
+template<class T>
+bool Deque<T>::popfront(T& ref) {
+	ref = this->front();
+	return data.popfront();
+}
+
+template<class T>
 bool Deque<T>::clear() {
     while (popback());
     return true;
@@ -115,6 +126,11 @@ bool Stack<T>::pop(){
 	return data.popback();
 }
 template<class T>
+bool Stack<T>::pop(T& ref){
+	ref = this->top();
+	return data.popback();
+}
+template<class T>
 bool Stack<T>::clear() {
     while (pop());
     return true;
@@ -166,6 +182,11 @@ Queue<T>& Queue<T>::push(const T& val) {
 }
 template<class T>
 bool Queue<T>::pop(){
+	return data.popfront();
+}
+template<class T>
+bool Queue<T>::pop(T& ref){
+	ref = this->front();
 	return data.popfront();
 }
 template<class T>

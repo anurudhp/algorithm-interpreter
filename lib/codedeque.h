@@ -28,6 +28,8 @@ class Deque {
 	Deque<T>& pushfront(const T& );
 	bool popback();
 	bool popfront();
+	bool popback(T&);
+	bool popfront(T&);
 	bool clear();
 };
 
@@ -51,6 +53,7 @@ class Stack {
 	T top() const;
 	Stack<T>& push(const T& );
 	bool pop();
+	bool pop(T&);
 };
 
 // Template Class Queue : adapts deque
@@ -73,6 +76,7 @@ class Queue {
 	T front() const;
 	Queue<T>& push(const T& );
 	bool pop();
+	bool pop(T&);
 };
 
 #include "codedeque.cpp"
