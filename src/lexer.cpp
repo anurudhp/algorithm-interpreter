@@ -65,16 +65,16 @@ bool Token::setValue(String s) {
 // end implementation: class Token
 
 /****************************************
-* Implementation: Class LexerProcess   **
+* Implementation: Class Lexer   **
 ****************************************/
 
 // constructors, and dynamic data managers.
-LexerProcess::LexerProcess (ParserProcess* pr) {
+Lexer::Lexer (Parser* pr) {
 	this->parser = pr;
 	this->line = -1;
 	this->indent = 0;
 }
-bool LexerProcess::setup(String filename) {
+bool Lexer::setup(String filename) {
 	this->destroy();
 	this->source.open(filename.c_str());
 	if (!this->source) {
@@ -84,18 +84,18 @@ bool LexerProcess::setup(String filename) {
 	this->indent = 0;
 	return true;
 }
-bool LexerProcess::destroy() {
+bool Lexer::destroy() {
 	if (this->source) this->source.close();
 	this->line = -1;
 	this->indent = 0;
 }
-LexerProcess::~LexerProcess() {
+Lexer::~Lexer() {
 	this->destroy();
 }
 
 /*** static members ***/
 
-bool LexerProcess::isValidIdentifier(String val) {
+bool Lexer::isValidIdentifier(String val) {
 	if (val.length() > MAX_ID_LENGTH) return false;
 	if (!isalpha(val[0]) && val[0] != '_') return false;
 	for (__SIZETYPE i = 0; i < val.length(); i++) if (!isalnum(val[i]) && val[i] != '_') return false;
@@ -104,18 +104,17 @@ bool LexerProcess::isValidIdentifier(String val) {
 // maps a keyword to a corresponding operator.
 // possible only if the keyword can be replaced by the operator in the code,
 // without altering the flow of logic.
-String LexerProcess::mapKeywordToOperator(String val) {
+String Lexer::mapKeywordToOperator(String val) {
 	if (val == "and") return "&&";
 	if (val == "or") return "||";
 	if (val == "not") return "!";
-	if (val == "xor") return "^";
 	if (val == "equals") return "==";
 	return val;
 }
 
 // Converts a string into a token,
 // assumes string to be somewhat valid.
-Token LexerProcess::toToken(String val) {
+Token Lexer::toToken(String val) {
 	if (!val) return nullToken;
 	if (val[0] == -1) return nullToken;
 	
@@ -161,7 +160,7 @@ Token LexerProcess::toToken(String val) {
 
 /*** Member functions: actual lexing procedures. ***/
 // removes all leading spaces, and discard comments.
-int LexerProcess::trim() {
+int Lexer::trim() {
 	if (this->source.eof()) return -1;
 	
 	int sp = 0;
@@ -181,7 +180,8 @@ int LexerProcess::trim() {
 // Increases the line number, and sets up the next line
 // extracts the tabs from next line, sets the indent, and returns the number.
 // assumes that the \n is already read from the buffer.
-int LexerProcess::endLine() {
+int Lexer::endLine() {
+	this->innerBuffer.pushback(Token(";", PUNCTUATOR, UNKNOWN, this->line, this->indent));
 	if (this->source.eof()) return -1;
 	this->line++;
 	// extract the indentation.
@@ -195,14 +195,15 @@ int LexerProcess::endLine() {
 }
 
 // extracts a string: as '...' or "..."
-String LexerProcess::readString() {
+String Lexer::readString() {
 	char st = this->source.get(),
 		 tmp = 0;
 	String ret = st;
 	while (tmp != st) {
 		tmp = this->source.get();
-		if (tmp == '\n') { // error. string not terminated properly.
-			// this->parser.send("e", Error("l1", this->line));
+		if (tmp == '\n') { 
+			// error. string not terminated properly.
+			this->parser.send("e", Error("l1", "", this->line));
 			this->endLine();
 			// return a null string.
 			return "";
@@ -213,13 +214,14 @@ String LexerProcess::readString() {
 			// escape: get the next character.
 			tmp = this->source.get();
 			if (tmp != '\n') ret += tmp;
+			else this->endLine();
 		}
 	}
 	return ret;
 }
 
 // reads a numeric value: can contain utmost one decimal point.
-String LexerProcess::readNumber() {
+String Lexer::readNumber() {
 	String num;
 	bool isDeci = false;
 	char ch = this->source.get();
@@ -228,7 +230,9 @@ String LexerProcess::readNumber() {
 			if (!isDeci) {
 				isDeci = true;
 			} else {
-				return ""; // error- too many decimal points
+				// error- too many decimal points
+				this->parser.send("e", Error("l2", "", this->line)); 
+				return "";
 			}
 		}
 		num += ch;
@@ -245,7 +249,7 @@ String LexerProcess::readNumber() {
 // reads an identifier/keyword, 
 // assuming the starting character in the buffer is a alpha or underscore.
 // does `not` check whether it is valid.
-String LexerProcess::readIdentifier() {
+String Lexer::readIdentifier() {
 	String ret;
 	int len = 0;
 	char ch = this->source.get();
@@ -261,7 +265,7 @@ String LexerProcess::readIdentifier() {
 // reads an operator, without touching any adjacent characters.
 // this does not do a full check for all operators.
 // note: some operators are 'decided' by the parser, because they depend on situation.
-String LexerProcess::readOperator() {
+String Lexer::readOperator() {
 	char ch = this->source.peek();
 	if (Opstarts.indexOf(ch) == -1) return "";
 	
@@ -283,7 +287,14 @@ String LexerProcess::readOperator() {
 	return ret;
 }
 
-Token LexerProcess::getToken() {
+Token Lexer::getToken() {
+	// check for a previously buffered token.
+	if (!this->innerBuffer.empty()) {
+		Token tmp;
+		this->innerBuffer.popfront(tmp);
+		return tmp;
+	}
+
 	this->trim();
 	char ch = this->source.peek();
 	if (this->source.eof()) return eofToken;
@@ -316,22 +327,27 @@ Token LexerProcess::getToken() {
 	Token tok = toToken(val);
 	tok.setLineNumber(tline);
 	tok.setIndent(tindent);
+
+	this->innerBuffer.pushback(tok);
+	this->innerBuffer.popfront(tok);
 	return tok;
 }
 
-bool LexerProcess::eof() { return this->source.eof(); }
+bool Lexer::putbackToken(Token a) { return this->innerBuffer.pushfront(a); }
+
+bool Lexer::eof() { return (this->source.eof() && this->innerBuffer.empty()); }
 
 bool importLexerData() {
-	Keywords = strsplit("var let typeof String Number Boolean and or not equals delete", ' ');
+	Keywords = strsplit("var let typeof String Number Boolean Array and or not equals delete", ' ');
 	IOfunctions = strsplit("print input readNumber readString", ' ');
 	Constants = strsplit("undefined null infinity true false", ' ');
 	Keywords.append(IOfunctions);
 	Keywords.append(Constants);
 	Punctuators = strsplit("()[]{},:;");
 	// operators.
-	binaryOperators = strsplit("+ - * / % = += -= *= /= %= > < >= <= && || == === != !== ?", ' ');
+	binaryOperators = strsplit("+ += - -= * *= / /= % %= = == === != !== > >= < <= && || ? . []", ' ');
 	unaryOperators = strsplit("! ++ --", ' ');
-	Opstarts = strsplit("+-*/%=?&|<>!");
+	Opstarts = strsplit("+-*/%=?&|<>!.");
 	return true;
 }
 

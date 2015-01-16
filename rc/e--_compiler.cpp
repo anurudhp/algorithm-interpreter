@@ -3756,7 +3756,6 @@ int isValidFile(char n[]) {
 	return 0;
 }
 
-
 int main() {
     cout<<"Enter the file: ";
     char n[101];
@@ -3768,4 +3767,3 @@ int main() {
 	}
     fileRead(n);
 }
-

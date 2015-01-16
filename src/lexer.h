@@ -1,8 +1,6 @@
 #ifndef COMPONENT_LEXER_H
 #define COMPONENT_LEXER_H
 
-#include "../lib/codelib.h"
-
 // Token types:
 #define INVALID -1
 #define UNKNOWN 0
@@ -21,6 +19,7 @@
 	#define STRING 51
 	#define NUMBER 52
 	#define BOOLEAN 53
+#define HASHED 6
 	
 #define TABLEN 4
 #define MAX_ID_LENGTH 18
@@ -40,10 +39,10 @@ idList Keywords,
 
 class Token
 {
-    private:
-    tokenType type, subtype;
+	private:
+	tokenType type, subtype;
 	bufferIndex line, indent;
-    String data;
+	String data;
 	public:
 	// constructors
 	Token (const Token&);
@@ -70,12 +69,13 @@ const Token eofToken("eof", INVALID),
 // install the reserved words, and other lexer data
 bool importLexerData();
 
-class LexerProcess
+class Lexer
 {
 	private:
-    bufferIndex line, indent;
+	bufferIndex line, indent;
 	ifstream source;
-	ParserProcess *parser;
+	Parser *parser;
+	Deque<Token> innerBuffer;
 	
 	private:
 	int trim();
@@ -85,13 +85,14 @@ class LexerProcess
 	String readIdentifier();
 	String readOperator();
 	
-    public :
-    LexerProcess(ParserProcess*);
+	public :
+	Lexer(Parser*);
 	bool setup(String);
 	bool destroy();
-	~LexerProcess();
+	~Lexer();
 	
-    Token getToken();
+	Token getToken();
+	bool putbackToken(Token);
 	Vector<Token> getStatement();
 	bool eof();
 	
