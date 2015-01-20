@@ -42,9 +42,9 @@ idList Keywords,
 class Token
 {
 	private:
-	tokenType type, subtype;
-	bufferIndex line, indent;
-	String data;
+	tokenType _type, _subtype;
+	bufferIndex _line, _indent;
+	String _value;
 	public:
 	// constructors
 	Token (const Token&);
@@ -52,10 +52,10 @@ class Token
 	Token operator= (const Token&);
 	
 	// properties
-	tokenType getType() const;
-	tokenType getSubtype() const;
-	bufferIndex getLineNumber() const;
-	bufferIndex getIndent() const;
+	tokenType type() const;
+	tokenType subtype() const;
+	bufferIndex lineNumber() const;
+	bufferIndex indent() const;
 	String value() const;
 	//mutators
 	bool setType(tokenType);
