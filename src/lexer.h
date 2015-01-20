@@ -2,7 +2,7 @@
 #define COMPONENT_LEXER_H
 
 // Token types:
-#define INVALID -1
+#define DIRECTIVE -1
 #define UNKNOWN 0
 #define KEYWORD 1
 	#define CONSTANT 11
@@ -15,6 +15,8 @@
 	#define VARIABLE 41
 	#define FUNCTION 42
 	#define CLASS    43
+	#define ARRAY    44
+	#define OBJECT   45
 #define LITERAL 5
 	#define STRING 51
 	#define NUMBER 52
@@ -64,10 +66,13 @@ class Token
 };
 
 // Token constants:
-const Token eofToken("eof", INVALID),
-            nullToken("", INVALID);
-// install the reserved words, and other lexer data
+const Token eofToken("$eof", DIRECTIVE),
+            nullToken("$null", DIRECTIVE),
+			newlineToken("\n", DIRECTIVE);
+// module to install the reserved words, and other lexer data
 bool importLexerData();
+
+typedef Queue<Token> Infix;
 
 class Lexer
 {
@@ -93,13 +98,15 @@ class Lexer
 	
 	Token getToken();
 	bool putbackToken(Token);
-	Vector<Token> getStatement();
+	Infix getTokensTill(String);
+	Infix getStatement();
 	bool eof();
 	
 	// static members:
 	static Token toToken(String);
 	static bool isValidIdentifier(String);
-	static String mapKeywordToOperator(String);
+	static String entityMap(String);
+	static String matchBracket(String);
 };
 
 #endif /* COMPONENT_LEXER_H */
