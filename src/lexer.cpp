@@ -8,59 +8,59 @@
 
 // constructors
 Token::Token(String val, tokenType t, tokenType st, bufferIndex ln, bufferIndex in) {
-	this->data = val;
-	this->type = t;
-	this->subtype = st;
-	this->line = ln;
-	this->indent = in;
+	this->_value = val;
+	this->_type = t;
+	this->_subtype = st;
+	this->_line = ln;
+	this->_indent = in;
 }
 Token::Token(const Token& t) {
-	this->data = t.data;
-	this->type = t.type;
-	this->subtype = t.subtype;
-	this->line = t.line;
-	this->indent = t.indent;
+	this->_value = t._value;
+	this->_type = t._type;
+	this->_subtype = t._subtype;
+	this->_line = t._line;
+	this->_indent = t._indent;
 }
 Token Token::operator= (const Token& t) {
-	this->data = t.data;
-	this->type = t.type;
-	this->subtype = t.subtype;
-	this->line = t.line;
-	this->indent = t.indent;
+	this->_value = t._value;
+	this->_type = t._type;
+	this->_subtype = t._subtype;
+	this->_line = t._line;
+	this->_indent = t._indent;
 	return *this;
 }
 // properties
-tokenType Token::getType() const {
-	return this->type;
+tokenType Token::type() const {
+	return this->_type;
 }
-tokenType Token::getSubtype() const {
-	return this->subtype;
+tokenType Token::subtype() const {
+	return this->_subtype;
 }
-bufferIndex Token::getLineNumber() const {
-	return this->line;
+bufferIndex Token::lineNumber() const {
+	return this->_line;
 }
-bufferIndex Token::getIndent() const {
-	return this->indent;
+bufferIndex Token::indent() const {
+	return this->_indent;
 }
 String Token::value() const {
-	return this->data;
+	return this->_value;
 }
 
 // mutators
 bool Token::setType(tokenType t) {
-	this->type = t;
+	this->_type = t;
 }
 bool Token::setSubtype(tokenType st) {
-	this->subtype = st;
+	this->_subtype = st;
 }
 bool Token::setLineNumber(bufferIndex ln) {
-	this->line = ln;
+	this->_line = ln;
 }
 bool Token::setIndent(bufferIndex in) {
-	this->indent = in;
+	this->_indent = in;
 }
 bool Token::setValue(String s) {
-	this->data = s;
+	this->_value = s;
 }
 // end implementation: class Token
 
@@ -357,7 +357,7 @@ bool Lexer::eof() { return (this->source.eof() && this->innerBuffer.empty()); }
 
 bool importLexerData() {
 	Keywords = strsplit("var let typeof String Number Boolean Array and or not equals delete", ' ');
-	IOfunctions = strsplit("print printLine input readNumber readString readLine", ' ');
+	IOfunctions = strsplit("print input readNumber readString readLine get", ' ');
 	Constants = strsplit("null infinity true false", ' ');
 	Keywords.append(IOfunctions);
 	Keywords.append(Constants);
