@@ -104,7 +104,7 @@ bool Lexer::isValidIdentifier(String val) {
 // maps a keyword to a corresponding operator.
 // possible only if the keyword can be replaced by the operator in the code,
 // without altering the flow of logic.
-String Lexer::mapKeywordToOperator(String val) {
+String Lexer::entityMap(String val) {
 	if (val == "and") return "&&";
 	if (val == "or") return "||";
 	if (val == "not") return "!";
@@ -118,6 +118,7 @@ Token Lexer::toToken(String val) {
 	if (!val) return nullToken;
 	if (val[0] == -1) return nullToken;
 	
+	val = entityMap(val);
 	// string literal:
 	if (val[0] == '\"' || val[0] == '\'') {
 		return Token(val, LITERAL, STRING);
@@ -131,7 +132,6 @@ Token Lexer::toToken(String val) {
 		return Token(val, PUNCTUATOR);
 	}
 	
-	val = mapKeywordToOperator(val);
 	// keywords and inbuilt functions
 	if (Keywords.indexOf(val) >= 0) {
 		if (Constants.indexOf(val) >= 0) {
@@ -181,7 +181,7 @@ int Lexer::trim() {
 // extracts the tabs from next line, sets the indent, and returns the number.
 // assumes that the \n is already read from the buffer.
 int Lexer::endLine() {
-	this->innerBuffer.pushback(Token(";", PUNCTUATOR, UNKNOWN, this->line, this->indent));
+	this->innerBuffer.pushback(newlineToken);
 	if (this->source.eof()) return -1;
 	this->line++;
 	// extract the indentation.
@@ -203,7 +203,7 @@ String Lexer::readString() {
 		tmp = this->source.get();
 		if (tmp == '\n') { 
 			// error. string not terminated properly.
-			this->parser.send("e", Error("l1", "", this->line));
+			this->parser.sendError(Error("l1", "", this->line));
 			this->endLine();
 			// return a null string.
 			return "";
@@ -231,7 +231,7 @@ String Lexer::readNumber() {
 				isDeci = true;
 			} else {
 				// error- too many decimal points
-				this->parser.send("e", Error("l2", "", this->line)); 
+				this->parser.sendError(Error("l2", "", this->line)); 
 				return "";
 			}
 		}
@@ -335,12 +335,30 @@ Token Lexer::getToken() {
 
 bool Lexer::putbackToken(Token a) { return this->innerBuffer.pushfront(a); }
 
+// extracts a single statement, from the current state of the lexer.
+// Considers `newline` as the delimiter, unless found in paranthesis.
+// returns a balanced expression.
+
+Infix Lexer::getTokensTill(String delim) {
+	Infix ret;
+	Token tmp;
+	while (!this->eof()) {
+		tmp = this->getToken();
+		if (tmp.type() == DIRECTIVE && tmp.value() == "@eof") return ret;
+		if (tmp.value() == delim) return ret;
+	}
+}
+
+Infix Lexer::getStatement() {
+	this->getTokensTill("\n");
+}
+
 bool Lexer::eof() { return (this->source.eof() && this->innerBuffer.empty()); }
 
 bool importLexerData() {
 	Keywords = strsplit("var let typeof String Number Boolean Array and or not equals delete", ' ');
-	IOfunctions = strsplit("print input readNumber readString", ' ');
-	Constants = strsplit("undefined null infinity true false", ' ');
+	IOfunctions = strsplit("print printLine input readNumber readString readLine", ' ');
+	Constants = strsplit("null infinity true false", ' ');
 	Keywords.append(IOfunctions);
 	Keywords.append(Constants);
 	Punctuators = strsplit("()[]{},:;");
