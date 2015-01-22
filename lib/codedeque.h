@@ -10,14 +10,14 @@ template <class T>
 class Deque {
 	private:
 	Vector<T> data;
-	
+
 	public:
 	// constructors,destructor and operator =
 	Deque();
 	Deque(const Deque<T>& );
 	Deque<T>& operator= (const Deque<T>& );
 	~Deque();
-	
+
 	// properties
 	bool empty() const;
 	T front() const;
@@ -38,7 +38,7 @@ template <class T>
 class Stack {
 	private:
 	Deque<T> data;
-	
+
 	public:
 	// constructors,destructor and operator =
 	Stack();
@@ -47,7 +47,7 @@ class Stack {
 	Stack<T>& operator= (const Deque<T>& );
 	~Stack();
 	bool clear();
-	
+
 	// members
 	bool empty() const;
 	T top() const;
@@ -61,7 +61,7 @@ template <class T>
 class Queue {
 	private:
 	Deque<T> data;
-	
+
 	public:
 	// constructors,destructor and operator =
 	Queue();
@@ -70,7 +70,7 @@ class Queue {
 	Queue<T>& operator= (const Deque<T>& );
 	~Queue();
 	bool clear();
-	
+
 	// members
 	bool empty() const;
 	T front() const;

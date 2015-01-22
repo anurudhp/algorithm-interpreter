@@ -37,7 +37,7 @@ class Vector {
 	bool popfront(); // O(1)
 	bool insert(__SIZETYPE, const T& ); // O(length)
 	bool remove(__SIZETYPE); // O(length)
-	
+
 	// advanced manipulation
 	__SIZETYPE indexOf(const T&) const; // O(length)
 	bool append(const Vector<T>&, bool = false);
