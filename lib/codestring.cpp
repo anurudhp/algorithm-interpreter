@@ -153,10 +153,10 @@ String String::substr(__SIZETYPE st, __SIZETYPE  len) const {
 	if( st < 0 ) st += _len;
 	if( st < 0 ) st = 0;
 	if( st + len > _len || len == -1 ) len = _len - st;
-	
+
 	if (len + 1 > MAX_STRING_LENGTH) forcequit("string|too long"); // only for turbo.
 	char s[MAX_STRING_LENGTH]; // char s[ len+1 ]; 
-	
+
 	for( __SIZETYPE i=0 ; i<len ; ++i ){
 		s[i] = _data[ st+i ];
 	}
@@ -275,12 +275,11 @@ bool String::operator!=(const String& s ) const {
 * 5. Stream IO operators : >> <<
 ************************************/
 ostream& operator<<(ostream& output, const String& str) {
- 	str.print(output);
- 	return output;
+	str.print(output);
+	return output;
 }
 bool String::print(ostream& output) const {
-	for( __SIZETYPE i=0; i<_len; ++i)
-		output<<_data[i];
+	for( __SIZETYPE i=0; i<_len; ++i) output<<_data[i];
 	return true;
 }
 
@@ -304,7 +303,7 @@ bool String::get(istream& input, char delim, bool throwLast) {
 } 
 istream& operator>>(istream& input, String& str) {
 	str.get(input);
- 	return input;
+	return input;
 }
 
 #endif /* CODE_STRING_H */

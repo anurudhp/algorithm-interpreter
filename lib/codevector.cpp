@@ -65,7 +65,7 @@ T& Vector<T>::operator[] (__SIZETYPE index) const {
 	if (index < 0) index += length;
 	if (index < 0 || index >= length) forcequit("vector|segfault");
 	if (index == (length - 1)) return tail->value;
-	
+
 	node *pointer = head;
 	while (index-- && pointer) pointer = pointer->next;
 	if (pointer == NULL) forcequit("vector|segfault");
@@ -158,13 +158,13 @@ bool Vector<T>::insert(__SIZETYPE index, const T& val) {
 	if (index < 0) return false;
 	if (index >= length) return pushback(val);
 	if (index == 0) return pushfront(val);
-	
+
 	node *n = NULL;
 	n = new node;
 	if (!n) forcequit("vector|heap exhausted");
-	
+
 	n->value = val;
-	
+
 	node *right = head, *left;
 	for (int i = 0; i < index; i++) {
 		right = right->next;
@@ -174,7 +174,7 @@ bool Vector<T>::insert(__SIZETYPE index, const T& val) {
 	n->prev = left;
 	n->next = right;
 	length++;
-	
+
 	return true;
 }
 
@@ -182,10 +182,10 @@ template<class T>
 bool Vector<T>::remove(__SIZETYPE index) {
 	if (index < 0) index += length;
 	if (index >= length || index < 0) return false;
-	
+
 	if (index == 0) return popfront();
 	if (index == length - 1) return popback();
-	
+
 	node *n = head;
 	while (index-- && n) n = n->next;
 	node *left = n->prev, *right = n->next;
