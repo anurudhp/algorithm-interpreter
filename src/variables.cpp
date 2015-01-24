@@ -1,8 +1,11 @@
 #ifdef COMPONENT_PARSER_H
 
+// included in "parser.cpp"
+
 /*********************************
 * Implementation: Class Variable
 *********************************/
+
 Variable::Variable() {
 	_id = "";
 	_value = Token();
@@ -11,7 +14,6 @@ Variable::Variable(Token val) {
 	_id = val.value();
 	_value = val;
 }
-
 Variable::Variable(const Variable& v) {
 	_id = v._id;
 	this->setValue(v);
@@ -48,9 +50,13 @@ bool Variable::setValueAt(Token, Variable) {
 	return false;
 }
 
-/*** End variable ***/
+/*******************************
+* End Implementation: Variable 
+********************************/
 
-/** Var Scope **/
+/*********************************
+* Implementation: Class Variable
+*********************************/
 
 VariableScope::VariableScope() {
 	this->varstack.clear();
@@ -59,22 +65,30 @@ VariableScope::VariableScope(const VariableScope& sc) {
 	this->varstack = sc.varstack;
 }
 
+// adds an empty vector of variables to the top.
 bool VariableScope::stackVariables() {
 	this->varstack.pushback(Vector<Variable>());
 }
+// adds the passed vector to the top.
 bool VariableScope::stackVariables(Vector<Variable>& vars) {
 	this->varstack.pushback(vars);
 }
+
+// adds a variable to the top-most vector of the scope
 bool VariableScope::addVariable(Variable& var) {
 	this->varstack[-1].pushback(var);
 }
+// deletes the topmost variable vector.
 bool VariableScope::popVariables() {
 	return this->varstack.popback();
 }
+// deletes the topmost variable vector, and assigns it to the reference
 bool VariableScope::popVariables(Vector<Variable>& vars) {
 	return this->varstack.popback(vars);
 }
 
+// finds a variable of identifier `id` and returns it.
+// returns a null variable, if not found.
 Variable VariableScope::resolve(String id) {
 	__SIZETYPE i, j, d = this->depth();
 	for (i = d - 1; i >= 0; i--) {
@@ -85,6 +99,8 @@ Variable VariableScope::resolve(String id) {
 	}
 	return Variable();
 }
+
+// checks whether a variable of identifier `id` exists in the scope.
 __SIZETYPE VariableScope::exists(String id) {
 	__SIZETYPE i, j, d = this->depth();
 	for (i = d - 1; i >= 0; i--) {
@@ -96,9 +112,17 @@ __SIZETYPE VariableScope::exists(String id) {
 	}
 	return false;
 }
+
+// scope depth.
 __SIZETYPE VariableScope::depth() const { return this->varstack.size(); }
 
-// function
+/*******************************
+* End Implementation: VariableScope 
+********************************/
+
+/*********************************
+* Implementation: Class Function
+*********************************/
 
 Function::Function() {
 	this->_id = "";
@@ -131,5 +155,8 @@ bool validate() {
 Token Function::evaluate(Vector<Token>, Evaluator&) {
 	return Token();
 }
+/*******************************
+* End Implementation: Function 
+********************************/
 
 #endif /* COMPONENT_PARSER_H */

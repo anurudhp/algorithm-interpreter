@@ -62,7 +62,8 @@ bool loadErrorCodes() {
 	}
 }
 
-// include the implementation of classes Variable and VariableScope
+// include the implementation of classes:
+//     Variable, VariableScope, Function
 #include "variables.cpp"
 
 /*************************************
