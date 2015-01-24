@@ -31,10 +31,12 @@ bool Deque<T>::empty() const {
 }
 template<class T>
 T Deque<T>::front() const {
+	if (data.empty()) forcequit("deque|underflow");
 	return data[0];
 }
 template<class T>
 T Deque<T>::rear() const {
+	if (data.empty()) forcequit("deque|underflow");
 	return data[data.size()-1];
 }
 
@@ -61,12 +63,12 @@ bool Deque<T>::popfront() {
 }
 template<class T>
 bool Deque<T>::popback(T& ref){
-	ref = this->rear();
+	if (!data.empty()) ref = this->rear();
 	return data.popback();
 }
 template<class T>
 bool Deque<T>::popfront(T& ref) {
-	ref = this->front();
+	if (!data.empty()) ref = this->front();
 	return data.popfront();
 }
 
@@ -127,7 +129,7 @@ bool Stack<T>::pop(){
 }
 template<class T>
 bool Stack<T>::pop(T& ref){
-	ref = this->top();
+	if (!this->empty()) ref = this->top();
 	return data.popback();
 }
 template<class T>
@@ -186,7 +188,7 @@ bool Queue<T>::pop(){
 }
 template<class T>
 bool Queue<T>::pop(T& ref){
-	ref = this->front();
+	if (!this->empty()) ref = this->front();
 	return data.popfront();
 }
 template<class T>
