@@ -35,6 +35,8 @@ class Vector {
 	bool pushfront(const T& ); // O(1)
 	bool popback(); // O(1)
 	bool popfront(); // O(1)
+	bool popback(T&); // O(1)
+	bool popfront(T&); // O(1)
 	bool insert(__SIZETYPE, const T& ); // O(length)
 	bool remove(__SIZETYPE); // O(length)
 

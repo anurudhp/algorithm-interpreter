@@ -152,6 +152,18 @@ bool Vector<T>::popfront() {
 	length--;
 	return true;
 }
+template<class T>
+bool Vector<T>::popback(T& ref) {
+	if(length == 0) return false;
+	ref = tail->value;
+	return popback();
+}
+template<class T>
+bool Vector<T>::popfront(T& ref) {
+	if(length == 0) return false;
+	ref = head->value;
+	return popfront();
+}
 
 template<class T>
 bool Vector<T>::insert(__SIZETYPE index, const T& val) {
