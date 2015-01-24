@@ -30,38 +30,18 @@ Token Token::operator= (const Token& t) {
 	return *this;
 }
 // properties
-tokenType Token::type() const {
-	return this->_type;
-}
-tokenType Token::subtype() const {
-	return this->_subtype;
-}
-bufferIndex Token::lineNumber() const {
-	return this->_line;
-}
-bufferIndex Token::indent() const {
-	return this->_indent;
-}
-String Token::value() const {
-	return this->_value;
-}
+tokenType Token::type() const { return this->_type; }
+tokenType Token::subtype() const { return this->_subtype; }
+bufferIndex Token::lineNumber() const { return this->_line; }
+bufferIndex Token::indent() const { return this->_indent; }
+String Token::value() const { return this->_value; }
 
 // mutators
-bool Token::setType(tokenType t) {
-	this->_type = t;
-}
-bool Token::setSubtype(tokenType st) {
-	this->_subtype = st;
-}
-bool Token::setLineNumber(bufferIndex ln) {
-	this->_line = ln;
-}
-bool Token::setIndent(bufferIndex in) {
-	this->_indent = in;
-}
-bool Token::setValue(String s) {
-	this->_value = s;
-}
+bool Token::setType(tokenType t) { this->_type = t; }
+bool Token::setSubtype(tokenType st) { this->_subtype = st; }
+bool Token::setLineNumber(bufferIndex ln) { this->_line = ln; }
+bool Token::setIndent(bufferIndex in) { this->_indent = in; }
+bool Token::setValue(String s) { this->_value = s; }
 // end implementation: class Token
 
 /****************************************
@@ -69,28 +49,15 @@ bool Token::setValue(String s) {
 ****************************************/
 
 // constructors, and dynamic data managers.
-Lexer::Lexer (Parser* pr) {
-	this->parser = pr;
-	this->line = -1;
-	this->indent = 0;
-}
-bool Lexer::setup(String filename) {
-	this->destroy();
-	this->source.open(filename.c_str());
-	if (!this->source) {
-		return false;
-	}
+Lexer::Lexer (String data) {
+	this->source.open(data.c_str());
 	this->line = 1;
-	this->indent = 0;
-	return true;
-}
-bool Lexer::destroy() {
-	if (this->source) this->source.close();
-	this->line = -1;
 	this->indent = 0;
 }
 Lexer::~Lexer() {
-	this->destroy();
+	if (this->source) this->source.close();
+	errors.clear();
+	innerBuffer.clear();
 }
 
 /*** static members ***/
@@ -117,7 +84,7 @@ String Lexer::entityMap(String val) {
 Token Lexer::toToken(String val) {
 	if (!val) return nullToken;
 	if (val[0] == -1) return nullToken;
-	
+
 	val = entityMap(val);
 	// string literal:
 	if (val[0] == '\"' || val[0] == '\'') {
@@ -131,17 +98,20 @@ Token Lexer::toToken(String val) {
 	if (Punctuators.indexOf(val) >= 0) {
 		return Token(val, PUNCTUATOR);
 	}
-	
-	// keywords and inbuilt functions
+
+	// keywords 
 	if (Keywords.indexOf(val) >= 0) {
 		if (Constants.indexOf(val) >= 0) {
 			if (val == "true" || val == "false") return Token(val, LITERAL, BOOLEAN);
 			return Token(val, KEYWORD, CONSTANT);
 		}
-		if (IOfunctions.indexOf(val) >= 0) return Token(val, KEYWORD, IOFUNCTION);
+
 		return Token(val, KEYWORD);
 	}
-	
+
+	// inbuilt functions
+	if (InbuiltFunctions.indexOf(val) >= 0) return Token(val, IDENTIFIER, FUNCTION);
+
 	// operators. assumes that the operator has been extracted properly.
 	if (binaryOperators.indexOf(val) >= 0) {
 		return Token(val, OPERATOR, BINARYOP);
@@ -149,12 +119,12 @@ Token Lexer::toToken(String val) {
 	if (unaryOperators.indexOf(val) >= 0) {
 		return Token(val, OPERATOR, UNARYOP);
 	}
-	
+
 	// identifier
 	if (isValidIdentifier(val)) {
 		return Token(val, IDENTIFIER);
 	}
-	
+
 	return Token(val);
 }
 
@@ -162,7 +132,7 @@ Token Lexer::toToken(String val) {
 // removes all leading spaces, and discard comments.
 int Lexer::trim() {
 	if (this->source.eof()) return -1;
-	
+
 	int sp = 0;
 	while (this->source.peek() == ' ') {
 		this->source.get();
@@ -203,12 +173,12 @@ String Lexer::readString() {
 		tmp = this->source.get();
 		if (tmp == '\n') { 
 			// error. string not terminated properly.
-			this->parser.sendError(Error("l1", "", this->line));
+			this->errors.pushback(Error("l1", "", this->line));
 			this->endLine();
 			// return a null string.
 			return "";
 		}
-		
+
 		ret += tmp;
 		if (tmp == '\\') {
 			// escape: get the next character.
@@ -231,7 +201,7 @@ String Lexer::readNumber() {
 				isDeci = true;
 			} else {
 				// error- too many decimal points
-				this->parser.sendError(Error("l2", "", this->line)); 
+				this->errors.pushback(Error("l2", "", this->line)); 
 				return "";
 			}
 		}
@@ -268,10 +238,10 @@ String Lexer::readIdentifier() {
 String Lexer::readOperator() {
 	char ch = this->source.peek();
 	if (Opstarts.indexOf(ch) == -1) return "";
-	
+
 	this->source.get();
 	String ret = ch;
-	
+
 	// check whether can be followed by =
 	static const idList eq(strsplit("+-*/%=!<>"));
 	if (eq.indexOf(ch) >= 0 && this->source.peek() == '=') {
@@ -283,7 +253,7 @@ String Lexer::readOperator() {
 	} else if (ch == '+' || ch == '-' || ch == '&' || ch == '|') { // operators ++ -- && ||
 		if (this->source.peek() == ch) ret += (this->source.get());
 	}
-	
+
 	return ret;
 }
 
@@ -298,16 +268,16 @@ Token Lexer::getToken() {
 	this->trim();
 	char ch = this->source.peek();
 	if (this->source.eof()) return eofToken;
-	
+
 	String val;
 	bufferIndex tline = this->line, tindent = this->indent;
-	
+
 	if (ch == '\n') {
 		this->source.get();
 		this->endLine();
 		return this->getToken();
 	}
-	
+
 	if (ch == '\'' || ch == '\"') {
 		val = this->readString(); // string literal
 	} else if (isalpha(ch) || ch == '_') {
@@ -323,7 +293,7 @@ Token Lexer::getToken() {
 		val = ch;
 		this->source.get();
 	}
-	
+
 	Token tok = toToken(val);
 	tok.setLineNumber(tline);
 	tok.setIndent(tindent);
@@ -333,7 +303,7 @@ Token Lexer::getToken() {
 	return tok;
 }
 
-bool Lexer::putbackToken(Token a) { return this->innerBuffer.pushfront(a); }
+bool Lexer::putbackToken(Token a) { this->innerBuffer.pushfront(a); return true; }
 
 // extracts a single statement, from the current state of the lexer.
 // Considers `newline` as the delimiter, unless found in paranthesis.
@@ -342,24 +312,23 @@ bool Lexer::putbackToken(Token a) { return this->innerBuffer.pushfront(a); }
 Infix Lexer::getTokensTill(String delim) {
 	Infix ret;
 	Token tmp;
-	while (!this->eof()) {
+	while (!this->ended()) {
 		tmp = this->getToken();
 		if (tmp.type() == DIRECTIVE && tmp.value() == "@eof") return ret;
 		if (tmp.value() == delim) return ret;
 	}
 }
 
-Infix Lexer::getStatement() {
-	this->getTokensTill("\n");
-}
+Vector<Error> Lexer::getErrors() const { return this->errors; }
 
-bool Lexer::eof() { return (this->source.eof() && this->innerBuffer.empty()); }
+bool Lexer::ended() { 
+	return (this->source && this->source.eof() && this->innerBuffer.empty()); 
+}
 
 bool importLexerData() {
 	Keywords = strsplit("var let typeof String Number Boolean Array and or not equals delete", ' ');
-	IOfunctions = strsplit("print input readNumber readString readLine get", ' ');
+	InbuiltFunctions = strsplit("print input readNumber readString readLine get", ' ');
 	Constants = strsplit("null infinity true false", ' ');
-	Keywords.append(IOfunctions);
 	Keywords.append(Constants);
 	Punctuators = strsplit("()[]{},:;");
 	// operators.
