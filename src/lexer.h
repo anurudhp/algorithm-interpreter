@@ -6,10 +6,10 @@
 #define UNKNOWN 0
 #define KEYWORD 1
 	#define CONSTANT 11
-	#define IOFUNCTION 12
 #define OPERATOR 2
 	#define UNARYOP  21
 	#define BINARYOP 22
+	#define MULTINARYOP 23
 #define PUNCTUATOR 3
 #define IDENTIFIER 4
 	#define VARIABLE 41
@@ -33,7 +33,7 @@ typedef Vector<String> idList;
 // global to store all reserved words, and symbols.
 idList Keywords,
        Constants, // stores all predefined literal constant keywords
-       IOfunctions, // stores all inbuilt input/output functions. 
+       InbuiltFunctions, // stores all inbuilt functions. 
        Punctuators, // all symbols which separate lexer input.
        Opstarts,
        unaryOperators, 
@@ -50,7 +50,7 @@ class Token
 	Token (const Token&);
 	Token (String = "", tokenType = UNKNOWN, tokenType = UNKNOWN, bufferIndex = -1, bufferIndex = 0);
 	Token operator= (const Token&);
-	
+
 	// properties
 	tokenType type() const;
 	tokenType subtype() const;
@@ -68,7 +68,7 @@ class Token
 // Token constants:
 const Token eofToken("$eof", DIRECTIVE),
             nullToken("$null", DIRECTIVE),
-			newlineToken("\n", DIRECTIVE);
+            newlineToken("\n", DIRECTIVE);
 // module to install the reserved words, and other lexer data
 bool importLexerData();
 
@@ -79,9 +79,9 @@ class Lexer
 	private:
 	bufferIndex line, indent;
 	ifstream source;
-	Parser *parser;
+	Vector<Error> errors;
 	Deque<Token> innerBuffer;
-	
+
 	private:
 	int trim();
 	int endLine();
@@ -89,19 +89,17 @@ class Lexer
 	String readNumber();
 	String readIdentifier();
 	String readOperator();
-	
+
 	public :
-	Lexer(Parser*);
-	bool setup(String);
-	bool destroy();
+	Lexer(String);
 	~Lexer();
-	
+
+	Vector<Error> getErrors() const;
 	Token getToken();
 	bool putbackToken(Token);
 	Infix getTokensTill(String);
-	Infix getStatement();
-	bool eof();
-	
+	bool ended();
+
 	// static members:
 	static Token toToken(String);
 	static bool isValidIdentifier(String);
