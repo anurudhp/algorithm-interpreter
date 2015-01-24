@@ -51,6 +51,7 @@ bool Token::setValue(String s) { this->_value = s; }
 // constructors, and dynamic data managers.
 Lexer::Lexer (String data) {
 	this->source.open(data.c_str());
+	if (!this->source) this->errors.pushback(Error("l0", data));
 	this->line = 1;
 	this->indent = 0;
 }
