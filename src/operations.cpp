@@ -4,19 +4,23 @@
 
 namespace Operations {
 	const Token nullval("null", KEYWORD, CONSTANT);
-	
+
 	Token add(Token, Token);
 	Token subtract(Token, Token);
 	Token multiply(Token, Token);
 	Token divide(Token, Token);
 	Token modulo(Token, Token);
 	Token mathOperator(String, Token, Token);
-	
+
 	Token compare(String, Token, Token);
 	Token logical(String, Token, Token);
-	
+
 	int priority(String);
 	int comparePriority(String, String);
+
+	float toNumber(Token);
+	String toString(Token);
+	int toInteger(Token);
 };
 
 Token Operations::mathOperator(String op, Token a, Token b) {/*
