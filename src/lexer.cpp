@@ -100,7 +100,7 @@ Token Lexer::toToken(String val) {
 		return Token(val, PUNCTUATOR);
 	}
 
-	// keywords 
+	// keywords
 	if (Keywords.indexOf(val) >= 0) {
 		if (Constants.indexOf(val) >= 0) {
 			if (val == "true" || val == "false") return Token(val, LITERAL, BOOLEAN);
@@ -140,7 +140,7 @@ int Lexer::trim() {
 		sp++;
 	}
 	if (this->source.peek() == '#') {
-		while (this->source.get() != '\n' && !this->source.eof()) // ignore the rest of the line.
+		while (this->source.get() != '\n' && !this->source.eof()); // ignore the rest of the line.
 		this->endLine();
 		return this->trim();
 	}
@@ -172,7 +172,7 @@ String Lexer::readString() {
 	String ret = st;
 	while (tmp != st) {
 		tmp = this->source.get();
-		if (tmp == '\n') { 
+		if (tmp == '\n') {
 			// error. string not terminated properly.
 			this->errors.pushback(Error("l1", "", this->line));
 			this->endLine();
@@ -202,7 +202,7 @@ String Lexer::readNumber() {
 				isDeci = true;
 			} else {
 				// error- too many decimal points
-				this->errors.pushback(Error("l2", "", this->line)); 
+				this->errors.pushback(Error("l2", "", this->line));
 				return "";
 			}
 		}
@@ -217,7 +217,7 @@ String Lexer::readNumber() {
 	return num;
 }
 
-// reads an identifier/keyword, 
+// reads an identifier/keyword,
 // assuming the starting character in the buffer is a alpha or underscore.
 // does `not` check whether it is valid.
 String Lexer::readIdentifier() {
@@ -322,8 +322,8 @@ Infix Lexer::getTokensTill(String delim) {
 
 Vector<Error> Lexer::getErrors() const { return this->errors; }
 
-bool Lexer::ended() { 
-	return (this->source && this->source.eof() && this->innerBuffer.empty()); 
+bool Lexer::ended() {
+	return (this->source && this->source.eof() && this->innerBuffer.empty());
 }
 
 bool importLexerData() {
