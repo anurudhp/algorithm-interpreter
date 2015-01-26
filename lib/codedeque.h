@@ -20,8 +20,8 @@ class Deque {
 
 	// properties
 	bool empty() const;
-	T front() const;
-	T rear() const;
+	T& front() const;
+	T& rear() const;
 
 	// basic manipulation
 	Deque<T>& pushback(const T& );
@@ -50,7 +50,7 @@ class Stack {
 
 	// members
 	bool empty() const;
-	T top() const;
+	T& top() const;
 	Stack<T>& push(const T& );
 	bool pop();
 	bool pop(T&);
@@ -73,7 +73,7 @@ class Queue {
 
 	// members
 	bool empty() const;
-	T front() const;
+	T& front() const;
 	Queue<T>& push(const T& );
 	bool pop();
 	bool pop(T&);
