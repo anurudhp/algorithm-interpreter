@@ -1,4 +1,4 @@
-#ifdef COMPONENT_PARSER_H
+ifdef COMPONENT_PARSER_H
 #ifndef COMPONENT_PARSER_OPERATION_H
 #define COMPONENT_PARSER_OPERATION_H
 
@@ -47,7 +47,7 @@ int Operations::comparePriority(Token a, Token b) {
 Token Operations::add(Token t1, Token t2) {
     if(t1.subtype() != t2.subtype() ) return nullToken;
     if(t1.subtype() == NUMBER) {
-        long a1 = t1.value().toNumber(),a2 = t2.value().toNumber();
+        double a1 = t1.value().toNumber(),a2 = t2.value().toNumber();
         return Lexer::toToken(numberToString(a1 + a2));
     }
     if(t1.subtype() == STRING) {
@@ -58,27 +58,30 @@ Token Operations::add(Token t1, Token t2) {
 
 Token Operations::subtract(Token t1, Token t2) {
     if(t1.subtype() != NUMBER && t2.subtype() != NUMBER) return nullToken;
-    long a1 = t1.value().toNumber(),a2 = t2.value().toNumber();
+    double a1 = t1.value().toNumber(),a2 = t2.value().toNumber();
     return Lexer::toToken(numberToString(a1 - a2));
 }
 
 Token Operations::multiply(Token t1, Token t2) {
     if(t1.subtype() != NUMBER && t2.subtype() != NUMBER) return nullToken;
-    long a1 = t1.value().toNumber(),a2 = t2.value().toNumber();
+    double a1 = t1.value().toNumber(),a2 = t2.value().toNumber();
     return Lexer::toToken(numberToString(a1 * a2));
 }
 
 Token Operations::divide(Token t1, Token t2) {
     if(t1.subtype() != NUMBER && t2.subtype() != NUMBER) return nullToken;
-    long a1 = t1.value().toNumber(),a2 = t2.value().toNumber();
+    double a1 = t1.value().toNumber(),a2 = t2.value().toNumber();
+    if(a2==0.0) return nullToken;
     return Lexer::toToken(numberToString(a1 / a2));
 }
 
 Token Operations::modulo(Token t1, Token t2) {
     if((!t1.value().isInteger()) && (!t2.value().isInteger())) return nullToken;
-    long a1 = t1.value().toNumber(),a2 = t2.value().toNumber();
-    return Lexer::toToken(integerToString(a1 / a2));
+    long a1 = t1.value().toInteger(),a2 = t2.value().toInteger();
+    if(a2==0) return nullToken;
+    return Lexer::toToken(integerToString(a1 % a2));
 }
+
 
 
 #endif /* COMPONENT_PARSER_OPERATION_H */
