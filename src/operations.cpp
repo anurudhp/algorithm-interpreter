@@ -18,9 +18,11 @@ namespace Operations {
 	int priority(String);
 	int comparePriority(String, String);
 
-	float toNumber(Token);
+    bool isInteger(Token);
+	double toNumber(Token);
 	String toString(Token);
-	int toInteger(Token);
+	long toInteger(Token);
+
 };
 
 Token Operations::mathOperator(String op, Token a, Token b) {/*
@@ -46,5 +48,46 @@ int Operations::priority(String op) {
 int Operations::comparePriority(String a, String b) {
 	return priority(a) - priority(b);
 }
+
+bool Operations::isInteger(Token t) {
+    if(t.value().indexOf(".") == -1) return true;
+    return false;
+}
+
+double Operations::toNumber(Token t) {
+    if(t.subtype() != NUMBER) return 0.0;
+    double val = 0.0,beginning = 0;
+    if(t.value()[0] == '-') beginning = 1;
+    if(isInteger(t)){
+        for(int i = t.value().length()-1, j = 1;i >= beginning;i--, j *= 10) {
+            val += double((t.value()[i] - '0') * j);
+        }
+        if(beginning == 1) val *= -1.0;
+        return val;
+    }
+    else{
+        long long pos=t.value().indexOf(".");
+        for(int i = pos-1, j = 1;i >= beginning;i--, j *= 10) {
+            val += double((t.value()[i] - '0') * j);
+        }
+        double j = 0.1;
+        for(int i = pos+1;i < t.value().length();i++, j /= 10.0){
+            val += double(t.value()[i]-'0') * j;
+        }
+        if(beginning == 1) val *= -1.0;
+        return val;
+    }
+}
+
+long Operations::toInteger(Token t) {
+    if(!isInteger(t)) return 0;
+    return int(toNumber(t));
+}
+
+String Operations::toString(Token t) {
+    if(t.subtype() != STRING) return "";
+    return t.value().substr(1, t.value().length() - 2);
+}
+
 #endif /* COMPONENT_PARSER_OPERATION_H */
 #endif /* COMPONENT_PARSER_H */
