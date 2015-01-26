@@ -54,6 +54,12 @@ public:
 
 	__SIZETYPE indexOf(const String& ) const;
 	__SIZETYPE countOccurences(const String& ) const;
+	
+	// 3.2. advanced type checks and conversion
+	bool isNumber() const;
+	bool isInteger() const;
+	double toNumber() const;
+	long toInteger() const;
 
 	// 4. Relational operators
 	bool operator!() const;
