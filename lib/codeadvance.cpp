@@ -4,6 +4,8 @@
 // forward declarations:
 Vector<String> strsplit(String, String);
 String strjoin(Vector<String>, String);
+String integerToString(long);
+String numberToString(double);
 
 /** Implementation **/
 // splits a string into parts, by spl.
@@ -41,4 +43,16 @@ String strjoin(Vector<String> vs, String join = "") {
 		ret += vs[i];
 	}
 	return ret;
+}
+
+// conversions to string: stringify
+String integerToString(long val) {
+	char str[100];
+	sprintf(str, "%ld", val);
+	return String(str);
+}
+String numberToString(double val) {
+	char str[100];
+	sprintf(str, "%f", val);
+	return String(str);
 }

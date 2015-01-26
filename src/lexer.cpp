@@ -80,6 +80,14 @@ String Lexer::entityMap(String val) {
 	return val;
 }
 
+// extracts the string value from a literal token.
+String Lexer::tokenToString(Token t) {
+	if (t.type() != LITERAL && t.subtype() != STRING) return "";
+	String val = t.value().substr(1);
+	val = val.substr(0, val.length() - 1);
+	return val;
+}
+
 // Converts a string into a token,
 // assumes string to be somewhat valid.
 Token Lexer::toToken(String val) {
