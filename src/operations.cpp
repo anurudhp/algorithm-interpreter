@@ -44,5 +44,42 @@ int Operations::comparePriority(Token a, Token b) {
 	return priority(a.value()) - priority(b.value());
 }
 
+Token Operations::add(Token t1, Token t2) {
+    if(t1.subtype() != t2.subtype() ) return nullToken;
+    if(t1.subtype() == NUMBER) {
+        long a1 = t1.value().toNumber(),a2 = t2.value().toNumber();
+        return Lexer::toToken(numberToString(a1 + a2));
+    }
+    if(t1.subtype() == STRING) {
+        String s1 = Lexer::tokenToString(t1),s2 = Lexer::tokenToString(t2);
+        return Lexer::toToken(s1 + s2);
+    }
+}
+
+Token Operations::subtract(Token t1, Token t2) {
+    if(t1.subtype() != NUMBER && t2.subtype() != NUMBER) return nullToken;
+    long a1 = t1.value().toNumber(),a2 = t2.value().toNumber();
+    return Lexer::toToken(numberToString(a1 - a2));
+}
+
+Token Operations::multiply(Token t1, Token t2) {
+    if(t1.subtype() != NUMBER && t2.subtype() != NUMBER) return nullToken;
+    long a1 = t1.value().toNumber(),a2 = t2.value().toNumber();
+    return Lexer::toToken(numberToString(a1 * a2));
+}
+
+Token Operations::divide(Token t1, Token t2) {
+    if(t1.subtype() != NUMBER && t2.subtype() != NUMBER) return nullToken;
+    long a1 = t1.value().toNumber(),a2 = t2.value().toNumber();
+    return Lexer::toToken(numberToString(a1 / a2));
+}
+
+Token Operations::modulo(Token t1, Token t2) {
+    if((!t1.value().isInteger()) && (!t2.value().isInteger())) return nullToken;
+    long a1 = t1.value().toNumber(),a2 = t2.value().toNumber();
+    return Lexer::toToken(integerToString(a1 / a2));
+}
+
+
 #endif /* COMPONENT_PARSER_OPERATION_H */
 #endif /* COMPONENT_PARSER_H */
