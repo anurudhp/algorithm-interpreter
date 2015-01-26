@@ -1,0 +1,17 @@
+####################
+# lexer errors     #
+####################
+l0: Unable to read source
+l1: String not terminated properly, expected 
+l2: Too many decimal points in numeric value 
+
+####################
+# parser errors    #
+####################
+
+p1: unbalanced 
+p2: unexpected
+
+# function errors:
+p3.1: expected ( after function name
+p3.2: parser error- unable to detect number of function arguments
