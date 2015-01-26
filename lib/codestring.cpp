@@ -245,6 +245,76 @@ __SIZETYPE String::countOccurences(const String& find ) const {
 	return tot;
 }
 
+/**********************************
+* 3.2. Advanced type checks and
+*      conversions
+**********************************/
+
+bool String::isInteger() const {
+	__SIZETYPE i;
+	for (i = 0; i < _len; i++) {
+		if (_data[i] == '-') {
+			if (i != 0) return false;
+			else continue;
+		}
+		else if (!(_data[i] >= '0' && _data[i] <= '9')) return false;
+	}
+	return true;
+}
+bool String::isNumber() const {
+	__SIZETYPE i;
+	bool isDeci = false;
+	for (i = 0; i < _len; i++) {
+		if (_data[i] == '-') {
+			if (i != 0) return false;
+			else continue;
+		}
+		if (_data[i] == '.') {
+			if (isDeci) return false;
+			isDeci = true;
+		}
+		else if (!(_data[i] >= '0' && _data[i] <= '9')) return false;
+	}
+	return true;
+}
+
+long String::toInteger() const {
+	if (!isInteger()) return 0;
+	if (_data[0] == '-') return (-(this->substr(1).toInteger()));
+
+	__SIZETYPE i;
+	long val = 0;
+	for (i = 0; i < _len; i++) {
+		val *= 10;
+		val += (_data[i] - '0');
+	}
+	return val;
+}
+double String::toNumber() const {
+	if (!isNumber()) return 0.0;
+	if (_data[0] == '-') return (-(this->substr(1).toNumber()));
+
+	__SIZETYPE i;
+	double val = 0;
+	bool isDeci = false;
+	double div = 1;
+	for (i = 0; i < _len; i++) {
+		if (_data[i] == '.') {
+			isDeci = true;
+			continue;
+		}
+
+		if (!isDeci) {
+			val *= 10;
+			val += (_data[i] - '0');
+		} else {
+			div *= 10;
+			val += (double((_data[i] - '0') / div));
+		}
+	}
+	return val;
+}
+
 /***********************************
 * 4. Relational Operators
 ************************************/
