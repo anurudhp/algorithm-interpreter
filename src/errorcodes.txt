@@ -15,3 +15,6 @@ p2: unexpected
 # function errors:
 p3.1: expected ( after function name
 p3.2: parser error- unable to detect number of function arguments
+
+# no support:
+ns: Not Supported 
