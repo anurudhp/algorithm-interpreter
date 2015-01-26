@@ -51,7 +51,7 @@ bool Token::setValue(String s) { this->_value = s; }
 // constructors, and dynamic data managers.
 Lexer::Lexer (String data) {
 	this->source.open(data.c_str());
-	if (!this->source) this->errors.pushback(Error("l0", data));
+	if (!this->source) this->errors.pushback(Error("l0", data, -1, FATAL));
 	this->line = 1;
 	this->indent = 0;
 }
@@ -174,7 +174,7 @@ String Lexer::readString() {
 		tmp = this->source.get();
 		if (tmp == '\n') { 
 			// error. string not terminated properly.
-			this->errors.pushback(Error("l1", "", this->line));
+			this->errors.pushback(Error("l1", st, this->line));
 			this->endLine();
 			// return a null string.
 			return "";
@@ -202,8 +202,8 @@ String Lexer::readNumber() {
 				isDeci = true;
 			} else {
 				// error- too many decimal points
-				this->errors.pushback(Error("l2", "", this->line)); 
-				return "";
+				this->errors.pushback(Error("l2", "", this->line));
+				return "0.0";
 			}
 		}
 		num += ch;
@@ -315,7 +315,7 @@ Infix Lexer::getTokensTill(String delim) {
 	Token tmp;
 	while (!this->ended()) {
 		tmp = this->getToken();
-		if (tmp.type() == DIRECTIVE && tmp.value() == "@eof") return ret;
+		if (tmp.type() == DIRECTIVE && tmp.value() == "$eof") return ret;
 		if (tmp.value() == delim) return ret;
 	}
 }
