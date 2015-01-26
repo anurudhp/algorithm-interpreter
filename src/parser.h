@@ -27,7 +27,7 @@ class Error
 };
 
 idList errorCodes, errorDesc;
-bool importErrorCodes();
+bool importErrorCodes(ifstream&);
 
 typedef Queue<Token> RPN;
 
@@ -58,19 +58,23 @@ class Parser
 	// interface
 	bool sendError(Error);
 	Function getFunction(String);
+	Vector<Error> getErrors();
 
 	// parsing procedures:
 	bool parseSource();
 
 	RPN parseBlock(bufferIndex = 0);
-	RPN parseStatement(Infix);
-	RPN parseDeclaration(Infix, tokenType);
+	RPN parseStatement();
+	RPN parseDeclaration(tokenType);
+	
+	// assumes that the tokens have already been read.
+	RPN expressionToRPN(Infix);
 
 	/* static parsing procedures: */
-	// assumes that the tokens have already been read.
-	static RPN expressionToRPN(Infix, Vector<Error>&, VariableScope&, Function (*)(String));
 	// checks whether the RPN is valid.
 	static bool validateRPN(RPN);
+	
+	static Token toArgsToken(__SIZETYPE);
 
 };
 
