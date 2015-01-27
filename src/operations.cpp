@@ -19,6 +19,28 @@ namespace Operations {
 	int comparePriority(Token, Token);
 };
 
+Token Operations::logical(String S, Token t1, Token t2) {
+    if(t1.subtype() != NUMBER && t1.subtype() != BOOLEAN) return nullToken;
+    if(t2.subtype() != NUMBER && t2.subtype() != BOOLEAN) return nullToken;
+    if(t1.subtype() == BOOLEAN) {
+        if(t1.value() == "false") {t1.setSubtype(NUMBER);t1.setValue("0.0");}
+        if(t1.value() == "true") {t1.setSubtype(NUMBER);t1.setValue("1.0");}
+    }
+    if(t2.subtype() == BOOLEAN) {
+        if(t2.value() == "false") {t2.setSubtype(NUMBER);t2.setValue("0.0");}
+        if(t2.value() == "true") {t2.setSubtype(NUMBER);t2.setValue("1.0");}
+    }
+    if(S == "||") {
+        if(t1.value().toNumber() == 0.0 && t2.value().toNumber() == 0.0) return Lexer::toToken("false");
+        return Lexer::toToken("true");
+    }
+    if(S == "&&") {
+        if(t1.value().toNumber() == 0.0 || t2.value().toNumber() == 0.0) return Lexer::toToken("false");
+        return Lexer::toToken("true");
+    }
+    return nullToken;
+}
+
 Token Operations::mathOperator(String op, Token a, Token b) {
 	if (op == "+") return add(a, b);
 	if (op == "-") return subtract(a, b);
