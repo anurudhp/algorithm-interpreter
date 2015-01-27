@@ -357,7 +357,7 @@ bool String::print(ostream& output) const {
 char *String::stringInputBuffer = new char[ MAX_STRING_LENGTH ];
 
 bool String::get(istream& input, char delim, bool throwLast) {
-	input.get(stringInputBuffer, MAX_STRING_LENGTH, delim);
+	input.getline(stringInputBuffer, MAX_STRING_LENGTH, delim);
 	*this = stringInputBuffer;
 	return true;
 } 
