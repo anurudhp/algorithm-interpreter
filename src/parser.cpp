@@ -56,7 +56,7 @@ bool importErrorCodes(ifstream& ecreader) {
 
 	errorCodes.clear(); errorDesc.clear();
 	while (!ecreader.eof()) {
-		buff.get(ecreader, '\n');
+		ecreader >> buff;
 		if (buff.substr(0, 1) != "#" && buff.indexOf(":") > 0) {
 			vs = strsplit(buff, ":");
 			errorCodes.pushback(vs[0].trim());
@@ -257,6 +257,12 @@ RPN Parser::expressionToRPN(Infix args) {
 			}
 		}
 		if (current.type() == OPERATOR) {
+			if (current.value() == "-") { // check for unary minus
+				if (!prevtok.value() || prevtok.value() == "(" || prevtok.value() == ";") {
+					current.setSubtype(UNARYOP);
+				}
+			}
+
 			if (current.value() == "++" || current.value() == "--") {
 				// this is kindof problematic, coz `a[i]++` is a valid expression.
 				// support for these operators will be added later. as of now ignore them.
