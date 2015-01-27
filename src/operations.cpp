@@ -132,6 +132,11 @@ Token Operations::unaryOperator(String op, Token tok) {
 		if (tok.value() == "true") return falseTok;
 		return falseTok;
 	}
+	if (op == "-") {
+		tok = typecastToken(tok, NUMBER);
+		double num = -(tok.value().toNumber());
+		return Lexer::toToken(numberToString(num));
+	}
 
 	return nullvalTok;
 }
