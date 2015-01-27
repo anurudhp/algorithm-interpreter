@@ -188,13 +188,20 @@ String Lexer::readString() {
 			return "";
 		}
 
-		ret += tmp;
 		if (tmp == '\\') {
 			// escape: get the next character.
 			tmp = this->source.get();
-			if (tmp != '\n') ret += tmp;
+			if (tmp != '\n') {
+				switch (tmp) {
+				case 'n': tmp = '\n'; break;
+				case 't': tmp = '\t'; break;
+				case 'a': tmp = '\a'; break;
+				case 'r': tmp = '\r'; break;
+				}
+			}
 			else this->endLine();
 		}
+		ret += tmp;
 	}
 	return ret;
 }
