@@ -68,7 +68,7 @@ class Token
 // Token constants:
 const Token eofToken("$eof", DIRECTIVE),
             nullToken("$null", DIRECTIVE),
-            newlineToken("\n", DIRECTIVE);
+            newlineToken("$endline", DIRECTIVE);
 // module to install the reserved words, and other lexer data
 bool importLexerData();
 

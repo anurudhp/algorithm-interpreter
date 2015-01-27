@@ -2,9 +2,9 @@
 #define COMPONENT_PARSER_H
 
 // error codes.
-#define WARNING 31
-#define ERROR 32
-#define FATAL 33
+#define ERROR_WARNING 31
+#define ERROR_ERROR 32
+#define ERROR_FATAL 33
 
 class Error
 {
@@ -13,7 +13,7 @@ class Error
 	int _severity;
 
 	public:
-	Error(String = "", String = "", bufferIndex = -1, int = ERROR);
+	Error(String = "", String = "", bufferIndex = -1, int = ERROR_ERROR);
 	Error(const Error&);
 	Error& operator= (const Error&);
 
@@ -34,10 +34,10 @@ typedef Queue<Token> RPN;
 #include "variables.h"
 
 // parser status.
-#define SUCCESS 41
-#define PENDING 42
-#define STARTED 43
-#define FAILED 44
+#define PARSE_SUCCESS 41
+#define PARSE_PENDING 42
+#define PARSE_STARTED 43
+#define PARSE_FAILED 44
 
 class Parser
 {
@@ -57,23 +57,24 @@ class Parser
 
 	// interface
 	bool sendError(Error);
-	Function getFunction(String);
 	Vector<Error> getErrors();
+	bool showErrors(ostream&, bool = false);
+	Function getFunction(String);
 
 	// parsing procedures:
 	bool parseSource();
 
 	RPN parseBlock(bufferIndex = 0);
-	RPN parseStatement();
 	RPN parseDeclaration(tokenType);
-	
+	RPN parseFunction();
+
 	// assumes that the tokens have already been read.
 	RPN expressionToRPN(Infix);
 
 	/* static parsing procedures: */
 	// checks whether the RPN is valid.
 	static bool validateRPN(RPN);
-	
+
 	static Token toArgsToken(__SIZETYPE);
 
 };
