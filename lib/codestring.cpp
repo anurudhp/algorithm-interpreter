@@ -357,18 +357,8 @@ bool String::print(ostream& output) const {
 char *String::stringInputBuffer = new char[ MAX_STRING_LENGTH ];
 
 bool String::get(istream& input, char delim, bool throwLast) {
-	char tmp;
-	int i = 0;
-	while (input.good()) {
-		tmp = input.peek();
-		if (tmp == delim || tmp == '\n') {
-			if (throwLast) input.get();
-			break;
-		}
-		stringInputBuffer[i++] = input.get();
-	}
-	stringInputBuffer[i] = 0;
-	*this = String::stringInputBuffer;
+	input.get(stringInputBuffer, MAX_STRING_LENGTH, delim);
+	*this = stringInputBuffer;
 	return true;
 } 
 istream& operator>>(istream& input, String& str) {
