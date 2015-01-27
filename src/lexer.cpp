@@ -51,7 +51,7 @@ bool Token::setValue(String s) { this->_value = s; }
 // constructors, and dynamic data managers.
 Lexer::Lexer (String data) {
 	this->source.open(data.c_str());
-	if (!this->source) this->errors.pushback(Error("l0", data, -1, FATAL));
+	if (!this->source) this->errors.pushback(Error("l0", data, -1, ERROR_FATAL));
 	this->line = 1;
 	this->indent = 0;
 }
@@ -306,25 +306,20 @@ Token Lexer::getToken() {
 	Token tok = toToken(val);
 	tok.setLineNumber(tline);
 	tok.setIndent(tindent);
-
-	this->innerBuffer.pushback(tok);
-	this->innerBuffer.popfront(tok);
 	return tok;
 }
 
 bool Lexer::putbackToken(Token a) { this->innerBuffer.pushfront(a); return true; }
 
-// extracts a single statement, from the current state of the lexer.
-// Considers `newline` as the delimiter, unless found in paranthesis.
-// returns a balanced expression.
-
+// extracts tokens till the delimiter.
+// NOTE: does not return the delimiter token.
 Infix Lexer::getTokensTill(String delim) {
 	Infix ret;
 	Token tmp;
 	while (!this->ended()) {
 		tmp = this->getToken();
-		if (tmp.type() == DIRECTIVE && tmp.value() == "$eof") return ret;
-		if (tmp.value() == delim) return ret;
+		if (tmp.value() == "$eof" || tmp.value() == delim) return ret;
+		ret.push(tmp);
 	}
 }
 

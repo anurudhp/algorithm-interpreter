@@ -36,9 +36,9 @@ String Error::message() const {
 	String ret;
 	ret = ret + "Line " + integerToString(this->_line) + ": ";
 
-	if (this->_severity == FATAL) ret += "FATAL Error: ";
-	else if (this->_severity == ERROR) ret += "Error: ";
-	else if (this->_severity == WARNING) ret += "Warning: ";
+	if (this->_severity == ERROR_FATAL) ret += "FATAL Error: ";
+	else if (this->_severity == ERROR_ERROR) ret += "Error: ";
+	else if (this->_severity == ERROR_WARNING) ret += "Warning: ";
 
 	i = errorCodes.indexOf(this->_code);
 	if (i >= 0) ret += errorDesc[i];
@@ -78,7 +78,7 @@ bool importErrorCodes(ifstream& ecreader) {
 // Construction, and setup.
 Parser::Parser(Lexer *ref, String args) {
 	this->lexer = ref;
-	this->status = PENDING;
+	this->status = PARSE_PENDING;
 }
 
 Parser::~Parser() {
@@ -90,11 +90,22 @@ Parser::~Parser() {
 /*** Parser Interface ***/
 bool Parser::sendError(Error e) {
 	this->errors.pushback(e);
-	if (e.severity() == FATAL) {
+	if (e.severity() == ERROR_FATAL) {
 		// a fatal error, so stop parsing further.
-		this->status = FAILED;
+		this->status = PARSE_FAILED;
 	}
 	return true;
+}
+
+bool Parser::showErrors(ostream& out, bool clearAfterDisplay) {
+	if (this->errors.size() > 0) {
+		for (__SIZETYPE i = 0; i < errors.size(); i++) {
+			out << errors[i].message() << endl;
+		}
+		if (clearAfterDisplay) errors.clear();
+		return true;
+	}
+	return false;
 }
 
 Function Parser::getFunction(String id) {
@@ -111,12 +122,17 @@ bool Parser::parseSource() {
 	// some error checks before proceeding:
 	
 }
+
+RPN Parser::parseBlock(bufferIndex depth) {
+	// parses a block of the given depth.
+	return RPN();
+}
 RPN Parser::parseDeclaration(tokenType type) {
 	// procedure to parse array and hash table primitives.
 	// errors can be directly caught. carefully call converting to RPN.
 	return RPN();
 }
-RPN Parser::parseStatement() {
+RPN Parser::parseFunction() {
 	return RPN();
 	
 }
@@ -135,15 +151,15 @@ RPN Parser::expressionToRPN(Infix args) {
 	             pluseqTok = Lexer::toToken("+="),
 	             minuseqTok = Lexer::toToken("-="),
 	             oneTok = Lexer::toToken("1");
-	
+
 	static Token funcInvoke = Token("@invoke", DIRECTIVE, FUNCTION);
 
 	args.push(statementEnd);
 	Stack<__SIZETYPE> funcarglist;
-	
-	while (args.pop(current)) {
 
-		if (current.value() == "\n" || current.value() == ";") {
+	while (args.pop(current)) {
+		// DEBUG(current.value())
+		if (current.value() == "$endline" || current.value() == ";") {
 			while (operstack.pop(current)) {
 				// check for unbalanced ( and [
 				if (current.value() == "(" || current.value() == "[") this->sendError(Error("p1", current.value(), current.lineNumber()));
@@ -251,7 +267,7 @@ RPN Parser::expressionToRPN(Infix args) {
 				while (!operstack.empty()) {
 					tval = operstack.top();
 					if (tval.value() == "(" || tval.value() == "[") break;
-					if (Operations::comparePriority(current, tval) >= 0) {
+					if (Operations::comparePriority(tval, current) >= 0) {
 						operstack.pop(oper);
 						output.push(oper);
 					}
