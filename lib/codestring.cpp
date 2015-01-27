@@ -279,40 +279,12 @@ bool String::isNumber() const {
 }
 
 long String::toInteger() const {
-	if (!isInteger()) return 0;
-	if (_data[0] == '-') return (-(this->substr(1).toInteger()));
-
-	__SIZETYPE i;
-	long val = 0;
-	for (i = 0; i < _len; i++) {
-		val *= 10;
-		val += (_data[i] - '0');
-	}
-	return val;
+	String tmp(*this);
+	return atol(tmp.c_str());
 }
 double String::toNumber() const {
-	if (!isNumber()) return 0.0;
-	if (_data[0] == '-') return (-(this->substr(1).toNumber()));
-
-	__SIZETYPE i;
-	double val = 0;
-	bool isDeci = false;
-	double div = 1;
-	for (i = 0; i < _len; i++) {
-		if (_data[i] == '.') {
-			isDeci = true;
-			continue;
-		}
-
-		if (!isDeci) {
-			val *= 10;
-			val += (_data[i] - '0');
-		} else {
-			div *= 10;
-			val += (double((_data[i] - '0') / div));
-		}
-	}
-	return val;
+	String tmp(*this);
+	return atof(tmp.c_str());
 }
 
 /***********************************
