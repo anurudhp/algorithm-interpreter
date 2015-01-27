@@ -361,7 +361,7 @@ bool String::get(istream& input, char delim, bool throwLast) {
 	int i = 0;
 	while (input.good()) {
 		tmp = input.peek();
-		if (tmp == delim) {
+		if (tmp == delim || tmp == '\n') {
 			if (throwLast) input.get();
 			break;
 		}
