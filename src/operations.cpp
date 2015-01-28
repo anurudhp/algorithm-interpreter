@@ -2,27 +2,29 @@
 #ifndef COMPONENT_PARSER_OPERATION_H
 #define COMPONENT_PARSER_OPERATION_H
 
-namespace Operations {
-	const Token nullvalTok("null", KEYWORD, CONSTANT),
-				trueTok("true", LITERAL, BOOLEAN),
-				falseTok("false", LITERAL, BOOLEAN);
+struct Operations {
+	static Token nullvalTok, trueTok, falseTok;
 
-	Token typecastToken(Token, tokenType = STRING);
+	static Token typecastToken(Token, tokenType = STRING);
 
-	Token add(Token, Token);
-	Token subtract(Token, Token);
-	Token multiply(Token, Token);
-	Token divide(Token, Token);
-	Token modulo(Token, Token);
-	Token mathOperator(String, Token, Token);
+	static Token add(Token, Token);
+	static Token subtract(Token, Token);
+	static Token multiply(Token, Token);
+	static Token divide(Token, Token);
+	static Token modulo(Token, Token);
+	static Token mathOperator(String, Token, Token);
 
-	Token compare(String, Token, Token);
-	Token logical(String, Token, Token);
-	Token unaryOperator(String, Token);
+	static Token compare(String, Token, Token);
+	static Token logical(String, Token, Token);
+	static Token unaryOperator(String, Token);
 
-	int priority(String);
-	int comparePriority(Token, Token);
+	static int priority(String);
+	static int comparePriority(Token, Token);
 };
+
+Token Operations::nullvalTok("null", KEYWORD, CONSTANT);
+Token Operations::trueTok("true", LITERAL, BOOLEAN);
+Token Operations::falseTok("false", LITERAL, BOOLEAN);
 
 Token Operations::typecastToken(Token tok, tokenType type) {
 	if (tok.subtype() == type) return tok;
