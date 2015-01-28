@@ -63,12 +63,12 @@ bool Vector<T>::empty() const {
 template<class T>
 T& Vector<T>::operator[] (__SIZETYPE index) const {
 	if (index < 0) index += length;
-	if (index < 0 || index >= length) forcequit("vector|segfault");
+	if (index < 0 || index >= length) forcequit(21);
 	if (index == (length - 1)) return tail->value;
 
 	node *pointer = head;
 	while (index-- && pointer) pointer = pointer->next;
-	if (pointer == NULL) forcequit("vector|segfault");
+	if (pointer == NULL) forcequit(21);
 	return pointer->value;
 }
 
@@ -90,7 +90,7 @@ template<class T>
 bool Vector<T>::pushback(const T& val) {
 	node *n = NULL;
 	n = new node;
-	if(!n) forcequit("vector|heap exhausted");
+	if(!n) forcequit(20);
 
 	length++;
 	n->value = val;
@@ -106,7 +106,7 @@ template<class T>
 bool Vector<T>::pushfront( const T& val){
 	node *n = NULL;
 	n = new node;
-	if(!n) forcequit("vector|heap exhausted");
+	if(!n) forcequit(20);
 
 	length++;
 	n->value = val;
@@ -173,7 +173,7 @@ bool Vector<T>::insert(__SIZETYPE index, const T& val) {
 
 	node *n = NULL;
 	n = new node;
-	if (!n) forcequit("vector|heap exhausted");
+	if (!n) forcequit(20);
 
 	n->value = val;
 

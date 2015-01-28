@@ -17,7 +17,7 @@ String::String(const String& s) {
 	_len = s.length();
 	_data = 0;
 	_data = new char[_len];
-	if( !_data ) forcequit("string|heap exhausted");
+	if( !_data ) forcequit(10);
 	for(int i=0; i<_len; i++)
 		_data[i] = s.charAt(i);
 }
@@ -26,7 +26,7 @@ String::String(const char *s) {
 	_len = strlen(s);
 	_data = 0;
 	_data = new char[ _len ];
-	if( !_data ) forcequit("string|heap exhausted");
+	if( !_data ) forcequit(10);
 	for( __SIZETYPE i=0; i<_len; i++)
 		_data[i] = s[i];
 }
@@ -35,7 +35,7 @@ String::String(char ch) {
 	_len = 1;
 	_data = 0;
 	_data = new char[1];
-	if( !_data ) forcequit("string|heap exhausted");
+	if( !_data ) forcequit(10);
 	_data[0] = ch;
 }
 
@@ -45,7 +45,7 @@ String& String::operator= (const String& s) {
 	delete[] _data;
 	_data = 0;
 	_data = new char[_len];
-	if( !_data ) forcequit("string|heap exhausted");
+	if( !_data ) forcequit(10);
 	for(int i=0; i<_len; i++)
 		_data[i] = s.charAt(i);
 	return *this;
@@ -56,7 +56,7 @@ String& String::operator= (const char* s ) {
 	delete[] _data;
 	_data = 0;
 	_data = new char[_len];
-	if( !_data ) forcequit("string|heap exhausted");
+	if( !_data ) forcequit(10);
 	for(int i=0; i<_len; i++)
 		_data[i] = s[i];
 	return *this;
@@ -67,7 +67,7 @@ String& String::operator=(char ch ) {
 	delete[] _data;
 	_data = 0;
 	_data = new char[1];
-	if( !_data ) forcequit("string|heap exhausted");
+	if( !_data ) forcequit(10);
 	_data[0] = ch;
 	return *this;
 }
@@ -124,7 +124,7 @@ char& String::operator[] (__SIZETYPE index ) const {
 // Operator +
 String String::operator+ (const String& r ) const {
 	int tlen = r.length();
-	if (_len + tlen + 1 > MAX_STRING_LENGTH) forcequit("string|too long"); // only for turbo.
+	if (_len + tlen + 1 > MAX_STRING_LENGTH) forcequit(11); // only for turbo.
 	char tmp[MAX_STRING_LENGTH]; // char tmp[_len+ tlen +1];
 	for(__SIZETYPE i=0; i<_len; i++)
 		tmp[i] = _data[i];
@@ -150,7 +150,7 @@ String String::substr(__SIZETYPE st, __SIZETYPE  len) const {
 	if( st < 0 ) st = 0;
 	if( st + len > _len || len == -1 ) len = _len - st;
 
-	if (len + 1 > MAX_STRING_LENGTH) forcequit("string|too long"); // only for turbo.
+	if (len + 1 > MAX_STRING_LENGTH) forcequit(11); // only for turbo.
 	char s[MAX_STRING_LENGTH]; // char s[ len+1 ]; 
 
 	for( __SIZETYPE i=0 ; i<len ; ++i ){
@@ -198,7 +198,7 @@ String String::toupper() const {
 String String::trim() const {
 	__SIZETYPE st,en;
 	for( st = 0; _data[st] == ' ' && st < _len; st++);
-	if( st == _len ) return String("");
+	if( st == _len ) return String();
 
 	for( en = _len-1; _data[en] == ' ' && en >= 0; en--);
 	return this->substr( st, en-st+1 );
@@ -328,7 +328,7 @@ bool String::print(ostream& output) const {
 // this is the global input buffer for all strings.
 char *String::stringInputBuffer = new char[ MAX_STRING_LENGTH ];
 
-bool String::get(istream& input, char delim, bool throwLast) {
+bool String::get(istream& input, char delim) {
 	input.getline(stringInputBuffer, MAX_STRING_LENGTH, delim);
 	*this = stringInputBuffer;
 	return true;
