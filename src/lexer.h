@@ -56,7 +56,6 @@ class Error
 };
 
 idList errorCodes, errorDesc;
-bool importErrorCodes(ifstream&);
 
 // global to store all reserved words, and symbols.
 idList Keywords,
@@ -93,12 +92,13 @@ class Token
 	void setValue(String);
 };
 
-// Token constants:
-const Token eofToken("$eof", DIRECTIVE),
-            nullToken("$null", DIRECTIVE),
-            newlineToken("$endline", DIRECTIVE);
+// Directive Tokens
+Token eofToken, nullToken, newlineToken;
+// Literal tokens
+Token trueToken, falseToken, nullvalToken;
 // module to install the reserved words, and other lexer data
-bool importLexerData();
+bool importLexerData(ifstream&);
+bool importErrorCodes(ifstream&);
 
 typedef Queue<Token> Infix;
 
