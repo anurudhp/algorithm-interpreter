@@ -33,9 +33,8 @@ public:
 	~String();
 	bool clear();
 
-	// Typecast : this operator helps us treat (String) objects as (char *) .
-	//operator char*();
-	char* c_str();
+	// Typecast : this operator helps us treat (String) objects as (char *).
+	void c_str(char *);
 
 	// 2. functions : to get properties 
 	__SIZETYPE length() const;
