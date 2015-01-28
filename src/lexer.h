@@ -30,6 +30,34 @@ typedef int tokenType;
 typedef __SIZETYPE bufferIndex;
 typedef Vector<String> idList;
 
+// error codes.
+#define ERROR_WARNING 31
+#define ERROR_ERROR 32
+#define ERROR_FATAL 33
+
+class Error
+{
+	String _code, _flag;
+	bufferIndex _line;
+	int _severity;
+
+	public:
+	Error(String = "", String = "", bufferIndex = -1, int = ERROR_ERROR);
+	Error(const Error&);
+	Error& operator= (const Error&);
+
+	String code() const;
+	String flag() const;
+	String message() const;
+	bufferIndex lineNumber() const;
+	int severity() const;
+
+	void setLineNumber(bufferIndex);
+};
+
+idList errorCodes, errorDesc;
+bool importErrorCodes(ifstream&);
+
 // global to store all reserved words, and symbols.
 idList Keywords,
        Constants, // stores all predefined literal constant keywords
@@ -58,11 +86,11 @@ class Token
 	bufferIndex indent() const;
 	String value() const;
 	//mutators
-	bool setType(tokenType);
-	bool setSubtype(tokenType);
-	bool setLineNumber(bufferIndex);
-	bool setIndent(bufferIndex);
-	bool setValue(String);
+	void setType(tokenType);
+	void setSubtype(tokenType);
+	void setLineNumber(bufferIndex);
+	void setIndent(bufferIndex);
+	void setValue(String);
 };
 
 // Token constants:

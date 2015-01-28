@@ -2,6 +2,72 @@
 // do not include this file directly.
 // use lexer.h instead.
 
+/************************************
+* Implementation: class Error      **
+*************************************/
+
+Error::Error(String cd, String fg, bufferIndex ln, int s) {
+	this->_code = cd;
+	this->_flag = fg;
+	this->_line = ln;
+	this->_severity = s;
+}
+Error::Error(const Error& e) {
+	this->_code = e._code;
+	this->_flag = e._flag;
+	this->_line = e._line;
+	this->_severity = e._severity;
+}
+Error& Error::operator= (const Error& e) {
+	this->_code = e._code;
+	this->_flag = e._flag;
+	this->_line = e._line;
+	this->_severity = e._severity;
+	return *this;
+}
+
+String Error::code() const { return this->_code; }
+String Error::flag() const { return this->_flag; }
+bufferIndex Error::lineNumber() const { return this->_line; }
+int Error::severity() const { return this->_severity; }
+
+String Error::message() const {
+	__SIZETYPE i;
+	String ret;
+	ret = ret + "Line " + integerToString(this->_line) + ": ";
+
+	if (this->_severity == ERROR_FATAL) ret += "FATAL Error: ";
+	else if (this->_severity == ERROR_ERROR) ret += "Error: ";
+	else if (this->_severity == ERROR_WARNING) ret += "Warning: ";
+
+	i = errorCodes.indexOf(this->_code, stringEquals);
+	if (i >= 0) ret += errorDesc[i];
+	ret += this->_flag;
+
+	return ret;
+}
+
+void Error::setLineNumber(bufferIndex ln) { this->_line = ln; }
+/*** END implementation: class Error ***/
+
+bool importErrorCodes(ifstream& ecreader) {
+	if (!ecreader) return false;
+	String buff; Vector<String> vs;
+
+	errorCodes.clear(); errorDesc.clear();
+	while (!ecreader.eof()) {
+		ecreader >> buff;
+		if (buff.substr(0, 1) != "#" && buff.indexOf(":") > 0) {
+			vs = strsplit(buff, ":");
+			errorCodes.pushback(vs[0].trim());
+			errorDesc.pushback(vs[1]);
+		}
+	}
+	ecreader.close();
+	return true;
+}
+
+
 /*********************************
 * Implementation: Class Token   **
 *********************************/
@@ -37,11 +103,11 @@ bufferIndex Token::indent() const { return this->_indent; }
 String Token::value() const { return this->_value; }
 
 // mutators
-bool Token::setType(tokenType t) { this->_type = t; }
-bool Token::setSubtype(tokenType st) { this->_subtype = st; }
-bool Token::setLineNumber(bufferIndex ln) { this->_line = ln; }
-bool Token::setIndent(bufferIndex in) { this->_indent = in; }
-bool Token::setValue(String s) { this->_value = s; }
+void Token::setType(tokenType t) { this->_type = t; }
+void Token::setSubtype(tokenType st) { this->_subtype = st; }
+void Token::setLineNumber(bufferIndex ln) { this->_line = ln; }
+void Token::setIndent(bufferIndex in) { this->_indent = in; }
+void Token::setValue(String s) { this->_value = s; }
 // end implementation: class Token
 
 /****************************************
