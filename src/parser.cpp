@@ -51,11 +51,35 @@ Function Parser::getFunction(String id) {
 	}
 	return f;
 }
+RPN getOutput() { return this->output; }
 
 /**** Parsing Procedures ****/
 bool Parser::parseSource() {
 	// some error checks before proceeding:
-	
+	Vector<Error> lexerErrors = this->lexer->getErrors();
+	for (__SIZETYPE i = 0; i < lexerErrors.size(); i++) this->sendError(lexerErrors[i]);
+	if (this->showErrors(cerr)) {
+		this->status = PARSE_FAILED;
+		return false;
+	}
+
+	// Actual parsing:
+	Token tok = this->lexer->getToken();
+	if (tok.value() == "$eof") {
+		// no code??
+		this->status = PARSE_SUCCESS;
+		return true;
+	}
+	this->lexer->putbackToken(tok);
+
+	this->output = expressionToRPN(this->lexer->getTokensTill("$eof"));
+	if (this->showErrors(cerr)) {
+		this->status = PARSE_FAILED;
+		return false;
+	}
+
+	this->status = PARSE_SUCCESS;
+	return true;
 }
 
 RPN Parser::parseBlock(bufferIndex depth) {
