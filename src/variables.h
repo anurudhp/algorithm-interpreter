@@ -8,8 +8,9 @@ class Variable
 {
 	String _id;
 	Token _value;
-	Vector<Token> _keys;
-	Vector<Variable> _values;
+	Vector<String> _keys;
+	Vector<Variable*> _values;
+	Object *_object;
 
 	public:
 	Variable();
@@ -20,9 +21,17 @@ class Variable
 	String id() const;
 	tokenType type();
 	Token value() const;
-	Variable& valueAt(Token);
+
+	// value access:
 	bool setValue(const Variable&);
+	bool hasValueAt(String);
+	Variable& valueAt(Token);
 	bool setValueAt(Token, Variable);
+	
+	// member function access:
+	tokenType hasMember(Token);
+	Function getMemberFunction(String);
+	Variable getDataMember(String);
 };
 
 class VariableScope
@@ -32,7 +41,7 @@ class VariableScope
 	public:
 	VariableScope();
 	VariableScope(const VariableScope&);
-	
+
 	bool stackVariables();
 	bool stackVariables(Vector<Variable>&);
 	bool addVariable(Variable&);
@@ -63,6 +72,18 @@ class Function
 	bool setStatements(RPN);
 	bool validate();
 	Token evaluate(Vector<Token>, Evaluator&);
+};
+
+class Object
+{
+	Function constructor;
+	Vector<Function> prototypes;
+	
+	public:
+	Function getConstructor();
+	bool hasPrototype(String);
+	Function getPrototype(String);
+	Variable construct(Vector<Variable>);
 };
 
 #endif /* COMPONENT_PARSER_VARIABLES_H */
