@@ -160,5 +160,57 @@ int Operations::comparePriority(Token a, Token b) {
 	return (pa - pb);
 }
 
+Token Operations::compare(String S, Token t1, Token t2) {
+    if(t1.subtype() != NUMBER && t1.subtype() != BOOLEAN) return nullToken;
+    if(t2.subtype() != NUMBER && t2.subtype() != BOOLEAN) return nullToken;
+    if(S == "<") {
+        if(t1.subtype() != t2.subtype()) return nullToken;
+        if(Operations::typecastToken(t1,NUMBER).value().toNumber() < Operations::typecastToken(t2,NUMBER).value().toNumber()) return Lexer::toToken("true");
+        else return Lexer::toToken("false");
+    }
+    if(S == ">"){
+        if(t1.subtype() != t2.subtype()) return nullToken;
+        if(Operations::typecastToken(t1,NUMBER).value().toNumber() > Operations::typecastToken(t2,NUMBER).value().toNumber()) return Lexer::toToken("true");
+        else return Lexer::toToken("false");
+    }
+    if(S == "<="){
+        if(t1.subtype() != t2.subtype()) return nullToken;
+        if(Operations::typecastToken(t1,NUMBER).value().toNumber() <= Operations::typecastToken(t2,NUMBER).value().toNumber()) return Lexer::toToken("true");
+        else return Lexer::toToken("false");
+    }
+    if(S == ">="){
+        if(t1.subtype() != t2.subtype()) return nullToken;
+        if(Operations::typecastToken(t1,NUMBER).value().toNumber() >= Operations::typecastToken(t2,NUMBER).value().toNumber()) return Lexer::toToken("true");
+        else return Lexer::toToken("false");
+    }
+    if(S == "=="){
+        if(t1.subtype() == t2.subtype()) {
+            if(Operations::typecastToken(t1,NUMBER).value().toNumber() == Operations::typecastToken(t2,NUMBER).value().toNumber()) return Lexer::toToken("true");
+            else return Lexer::toToken("false");
+        }
+        if(Operations::typecastToken(t1,BOOLEAN).value() == Operations::typecastToken(t2,BOOLEAN).value()) return Lexer::toToken("true");
+        else return Lexer::toToken("false");
+    }
+    if(S == "!="){
+        if(t1.subtype() == t2.subtype()) {
+            if(Operations::typecastToken(t1,NUMBER).value().toNumber() != Operations::typecastToken(t2,NUMBER).value().toNumber()) return Lexer::toToken("true");
+            else return Lexer::toToken("false");
+        }
+        if(Operations::typecastToken(t1,BOOLEAN).value() != Operations::typecastToken(t2,BOOLEAN).value()) return Lexer::toToken("true");
+        else return Lexer::toToken("false");
+    }
+    if(S == "==="){
+        if(t1.subtype() != t2.subtype()) Lexer::toToken("false");
+        if(Operations::typecastToken(t1,NUMBER).value().toNumber() == Operations::typecastToken(t2,NUMBER).value().toNumber()) return Lexer::toToken("true");
+        else return Lexer::toToken("false");
+    }
+    if(S == "!=="){
+        if(t1.subtype() != t2.subtype()) return Lexer::toToken("false");
+        if(Operations::typecastToken(t1,NUMBER).value().toNumber() != Operations::typecastToken(t2,NUMBER).value().toNumber()) return Lexer::toToken("true");
+        else return Lexer::toToken("false");
+    }
+}
+
+
 #endif /* COMPONENT_PARSER_OPERATION_H */
 #endif /* COMPONENT_PARSER_H */
