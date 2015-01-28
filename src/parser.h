@@ -1,34 +1,6 @@
 #ifndef COMPONENT_PARSER_H
 #define COMPONENT_PARSER_H
 
-// error codes.
-#define ERROR_WARNING 31
-#define ERROR_ERROR 32
-#define ERROR_FATAL 33
-
-class Error
-{
-	String _code, _flag;
-	bufferIndex _line;
-	int _severity;
-
-	public:
-	Error(String = "", String = "", bufferIndex = -1, int = ERROR_ERROR);
-	Error(const Error&);
-	Error& operator= (const Error&);
-
-	String code() const;
-	String flag() const;
-	String message() const;
-	bufferIndex lineNumber() const;
-	int severity() const;
-
-	bool setLineNumber(bufferIndex);
-};
-
-idList errorCodes, errorDesc;
-bool importErrorCodes(ifstream&);
-
 typedef Queue<Token> RPN;
 
 #include "variables.h"
