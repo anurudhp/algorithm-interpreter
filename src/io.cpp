@@ -2,12 +2,12 @@
 #ifndef COMPONENT_PARSER_IO_H
 #define COMPONENT_PARSER_IO_H
 
-namespace IOhandler {
-	Token write(Token);
+struct IOhandler {
+	static Token write(Token);
 
-	Token read(tokenType);
-	Token get();
-	Token readLine();
+	static Token read(tokenType);
+	static Token get();
+	static Token readLine();
 };
 
 Token IOhandler::write(Token t1) {
