@@ -41,7 +41,7 @@ class Vector {
 	bool remove(__SIZETYPE); // O(length)
 
 	// advanced manipulation
-	__SIZETYPE indexOf(const T&) const; // O(length)
+	__SIZETYPE indexOf(const T&, bool (*)(T, T)) const; // O(length)
 	bool append(const Vector<T>&, bool = false);
 };
 
