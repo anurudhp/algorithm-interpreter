@@ -31,12 +31,12 @@ bool Deque<T>::empty() const {
 }
 template<class T>
 T& Deque<T>::front() const {
-	if (data.empty()) forcequit("deque|underflow");
+	if (data.empty()) forcequit(30);
 	return data[0];
 }
 template<class T>
 T& Deque<T>::rear() const {
-	if (data.empty()) forcequit("deque|underflow");
+	if (data.empty()) forcequit(30);
 	return data[data.size()-1];
 }
 
