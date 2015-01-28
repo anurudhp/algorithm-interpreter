@@ -51,7 +51,7 @@ Function Parser::getFunction(String id) {
 	}
 	return f;
 }
-RPN getOutput() { return this->output; }
+RPN Parser::getOutput() { return this->output; }
 
 /**** Parsing Procedures ****/
 bool Parser::parseSource() {
