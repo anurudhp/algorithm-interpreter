@@ -36,7 +36,26 @@ tokenType Variable::type() {
 
 Token Variable::value() const { return this->_value; }
 
-Variable& Variable::valueAt (Token) {
+// Member/embedded value accessors
+
+tokenType Variable::hasMember(Token ref) {
+	if (ref.type() != LITERAL) return false;
+	if (this->type() == ARRAY) {
+		if (ref.subtype() == NUMBER && ref.value().isInteger()) {
+			long index = ref.value().toInteger();
+			if (index >= 0 && index <= this->_values.size()) return true;
+			return false;
+		}
+		return false;
+	}
+	else if (this->type() == OBJECT) {
+		if (this->_keys.indexOf(ref.value(), stringEquals) >= 0) return true;
+		return false;
+	}
+	return false;
+}
+
+Variable& Variable::valueAt(Token) {
 	return *this;
 }
 
