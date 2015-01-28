@@ -10,11 +10,12 @@ struct Operations {
 	static Token multiply(Token, Token);
 	static Token divide(Token, Token);
 	static Token modulo(Token, Token);
-	static Token mathOperator(String, Token, Token);
 
 	static Token compare(String, Token, Token);
 	static Token logical(String, Token, Token);
+
 	static Token unaryOperator(String, Token);
+	static Token binaryOperator(String, Token, Token);
 
 	static int priority(String);
 	static int comparePriority(Token, Token);
@@ -50,12 +51,16 @@ Token Operations::typecastToken(Token tok, tokenType type) {
 	return nullvalToken;
 }
 
-Token Operations::mathOperator(String op, Token a, Token b) {
+Token Operations::binaryOperator(String op, Token a, Token b) {
 	if (op == "+") return add(a, b);
 	if (op == "-") return subtract(a, b);
 	if (op == "*") return multiply(a, b);
 	if (op == "/") return divide(a, b);
 	if (op == "%") return modulo(a, b);
+
+	if (op == "&&" || op == "||") return logical(a, b);
+	if (op[0] == '>' || op[0] == '<' || op.substr(0, 2) == "==" || op.substr(0, 2) == "!=") return compare(a, b);
+
 	return nullvalToken;
 }
 
