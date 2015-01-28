@@ -215,7 +215,7 @@ __SIZETYPE Vector<T>::indexOf(const T& val, bool (*equals)(T, T)) const {
 	if (length == 0) return -1;
 	node *n = head;
 	__SIZETYPE ret = 0;
-	while (n && equals(n->value, val)) {
+	while (n && !equals(n->value, val)) {
 		n = n->next;
 		ret++;
 	}
