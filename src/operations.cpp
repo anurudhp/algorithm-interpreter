@@ -40,8 +40,7 @@ Token Operations::typecastToken(Token tok, tokenType type) {
 		}
 	}
 	else if (type == STRING) {
-		String val = "\"";
-		val += tok.value() + "\"";
+		String val = Lexer::stringToLiteral(tok.value());
 		return Lexer::toToken(val);
 	}
 	else if (type == BOOLEAN) {
@@ -77,7 +76,7 @@ Token Operations::add(Token t1, Token t2) {
 		t2 = typecastToken(t2, STRING);
 		String s1 = Lexer::tokenToString(t1),
 			   s2 = Lexer::tokenToString(t2);
-		return Lexer::toToken(s1 + s2);
+		return Lexer::toToken(Lexer::stringToLiteral(s1 + s2));
 	}
 }
 

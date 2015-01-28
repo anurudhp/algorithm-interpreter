@@ -134,6 +134,7 @@ class Lexer
 	static String entityMap(String);
 	static String matchBracket(String);
 	static String tokenToString(Token);
+	static String stringToLiteral(String);
 };
 
 #endif /* COMPONENT_LEXER_H */

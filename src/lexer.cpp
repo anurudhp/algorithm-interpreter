@@ -156,6 +156,14 @@ String Lexer::tokenToString(Token t) {
 	return val;
 }
 
+// converts a c++ string to a string literal:
+// encloses it in ""
+String Lexer::stringToLiteral(String val) {
+	String ret = "\"";
+	ret = ret + val + ret;
+	return ret;
+}
+
 // Converts a string into a token,
 // assumes string to be somewhat valid.
 Token Lexer::toToken(String val) {
