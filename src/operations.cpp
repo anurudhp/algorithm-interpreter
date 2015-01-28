@@ -58,8 +58,8 @@ Token Operations::binaryOperator(String op, Token a, Token b) {
 	if (op == "/") return divide(a, b);
 	if (op == "%") return modulo(a, b);
 
-	if (op == "&&" || op == "||") return logical(a, b);
-	if (op[0] == '>' || op[0] == '<' || op.substr(0, 2) == "==" || op.substr(0, 2) == "!=") return compare(a, b);
+	if (op == "&&" || op == "||") return logical(op, a, b);
+	if (op[0] == '>' || op[0] == '<' || op.substr(0, 2) == "==" || op.substr(0, 2) == "!=") return compare(op, a, b);
 
 	return nullvalToken;
 }
