@@ -1,0 +1,7 @@
+var let typeof String Number Boolean Array and or not equals delete
+print input readNumber readString readLine get
+null infinity true false
+()[]{},:;
++ += - -= * *= / /= % %= = == === != !== > >= < <= && || ? . []
+! ++ --
++-*/%=?&|<>!.
