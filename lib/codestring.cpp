@@ -84,14 +84,10 @@ bool String::clear() {
 }
 
 // Typecast to string constant : char *
-// String::operator char* () { return c_str(); }
-
-char* String::c_str() {
-	if (_len + 1 > MAX_STRING_LENGTH) forcequit("string|too long"); // only for turbo.
-	char ret[MAX_STRING_LENGTH]; // char ret[_len+1];
-	for(__SIZETYPE i=0; i<_len; i++) ret[i] = _data[i];
-	ret[_len] = '\0';
-	return ret;
+void String::c_str(char * ref) {
+	for(__SIZETYPE i=0; i<_len; i++) ref[i] = _data[i];
+	ref[_len] = '\0';
+	return;
 }
 
 /**************************
@@ -280,11 +276,15 @@ bool String::isNumber() const {
 
 long String::toInteger() const {
 	String tmp(*this);
-	return atol(tmp.c_str());
+	char str[MAX_STRING_LENGTH];
+	tmp.c_str(str);
+	return atol(str);
 }
 double String::toNumber() const {
 	String tmp(*this);
-	return atof(tmp.c_str());
+	char str[MAX_STRING_LENGTH];
+	tmp.c_str(str);
+	return atof(str);
 }
 
 /***********************************
