@@ -32,6 +32,7 @@ class Parser
 	Vector<Error> getErrors();
 	bool showErrors(ostream&, bool = false);
 	Function getFunction(String);
+	RPN getOutput();
 
 	// parsing procedures:
 	bool parseSource();
