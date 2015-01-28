@@ -50,24 +50,6 @@ String Error::message() const {
 void Error::setLineNumber(bufferIndex ln) { this->_line = ln; }
 /*** END implementation: class Error ***/
 
-bool importErrorCodes(ifstream& ecreader) {
-	if (!ecreader) return false;
-	String buff; Vector<String> vs;
-
-	errorCodes.clear(); errorDesc.clear();
-	while (!ecreader.eof()) {
-		ecreader >> buff;
-		if (buff.substr(0, 1) != "#" && buff.indexOf(":") > 0) {
-			vs = strsplit(buff, ":");
-			errorCodes.pushback(vs[0].trim());
-			errorDesc.pushback(vs[1]);
-		}
-	}
-	ecreader.close();
-	return true;
-}
-
-
 /*********************************
 * Implementation: Class Token   **
 *********************************/
@@ -187,7 +169,7 @@ Token Lexer::toToken(String val) {
 	// keywords
 	if (Keywords.indexOf(val, stringEquals) >= 0) {
 		if (Constants.indexOf(val, stringEquals) >= 0) {
-			if (val == "true" || val == "false") return Token(val, LITERAL, BOOLEAN);
+			if (val == trueToken.value() || val == falseToken.value()) return Token(val, LITERAL, BOOLEAN);
 			return Token(val, KEYWORD, CONSTANT);
 		}
 
@@ -335,7 +317,7 @@ String Lexer::readOperator() {
 	String ret = ch;
 
 	// check whether can be followed by =
-	static const idList eq(strsplit("+-*/%=!<>"));
+	idList eq(strsplit("+-*/%=!<>"));
 	if (eq.indexOf(ch, stringEquals) >= 0 && this->source.peek() == '=') {
 		ret += (this->source.get());
 		// a second =
@@ -404,6 +386,7 @@ Infix Lexer::getTokensTill(String delim) {
 		if (tmp.value() == "$eof" || tmp.value() == delim) return ret;
 		ret.push(tmp);
 	}
+	return ret;
 }
 
 Vector<Error> Lexer::getErrors() const { return this->errors; }
@@ -412,16 +395,51 @@ bool Lexer::ended() {
 	return (this->source && this->source.eof() && this->innerBuffer.empty());
 }
 
-bool importLexerData() {
-	Keywords = strsplit("var let typeof String Number Boolean Array and or not equals delete", ' ');
-	InbuiltFunctions = strsplit("print input readNumber readString readLine get", ' ');
-	Constants = strsplit("null infinity true false", ' ');
+bool importLexerData(ifstream& datareader) {
+	if (!datareader) return false;
+	String buff[7];
+	for(int i = 0; i < 7; i++) {
+		if (datareader.eof()) break;
+		buff[i].get(datareader);
+	}
+
+	Keywords = strsplit(buff[0], ' ');
+	InbuiltFunctions = strsplit(buff[1], ' ');
+	Constants = strsplit(buff[2], ' ');
 	Keywords.append(Constants);
-	Punctuators = strsplit("()[]{},:;");
+	Punctuators = strsplit(buff[3]);
 	// operators.
-	binaryOperators = strsplit("+ += - -= * *= / /= % %= = == === != !== > >= < <= && || ? . []", ' ');
-	unaryOperators = strsplit("! ++ --", ' ');
-	Opstarts = strsplit("+-*/%=?&|<>!.");
+	binaryOperators = strsplit(buff[4], ' ');
+	unaryOperators = strsplit(buff[5], ' ');
+	Opstarts = strsplit(buff[6]);
+
+	// setup the directive tokens:
+	eofToken = Token("$eof", DIRECTIVE);
+    nullToken = Token("$null", DIRECTIVE);
+	newlineToken = Token("$endline", DIRECTIVE);
+
+	// literal tokens
+	nullvalToken = Token("null", KEYWORD, CONSTANT);
+	trueToken = Token("true", LITERAL, BOOLEAN);
+	falseToken = Token("false", LITERAL, BOOLEAN);
+
+	return true;
+}
+
+bool importErrorCodes(ifstream& ecreader) {
+	if (!ecreader) return false;
+	String buff; Vector<String> vs;
+
+	errorCodes.clear(); errorDesc.clear();
+	while (!ecreader.eof()) {
+		ecreader >> buff;
+		if (buff.substr(0, 1) != "#" && buff.indexOf(":") > 0) {
+			vs = strsplit(buff, ":");
+			errorCodes.pushback(vs[0].trim());
+			errorDesc.pushback(vs[1]);
+		}
+	}
+	ecreader.close();
 	return true;
 }
 
