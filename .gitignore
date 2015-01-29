@@ -20,5 +20,6 @@
 *.out
 *.app
 
-#log directory
+#log directory, and test algs
 /logs/
+/rc/*.pm
