@@ -6,7 +6,6 @@ Vector<String> strsplit(String, String);
 String strjoin(Vector<String>, String);
 String integerToString(long);
 String numberToString(double);
-bool stringEquals(String, String);
 
 /** Implementation **/
 // splits a string into parts, by spl.
@@ -56,8 +55,4 @@ String numberToString(double val) {
 	char str[100];
 	sprintf(str, "%f", val);
 	return String(str);
-}
-
-bool stringEquals(String a, String b) {
-	return (a.equals(b));
 }
