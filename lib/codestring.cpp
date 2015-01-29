@@ -84,10 +84,11 @@ bool String::clear() {
 }
 
 // Typecast to string constant : char *
-void String::c_str(char * ref) {
+char* String::c_str() {
+	char ref[_len + 1];
 	for(__SIZETYPE i=0; i<_len; i++) ref[i] = _data[i];
 	ref[_len] = '\0';
-	return;
+	return ref;
 }
 
 /**************************
@@ -124,8 +125,7 @@ char& String::operator[] (__SIZETYPE index ) const {
 // Operator +
 String String::operator+ (const String& r ) const {
 	int tlen = r.length();
-	if (_len + tlen + 1 > MAX_STRING_LENGTH) forcequit(11); // only for turbo.
-	char tmp[MAX_STRING_LENGTH]; // char tmp[_len+ tlen +1];
+	char tmp[_len+ tlen +1];
 	for(__SIZETYPE i=0; i<_len; i++)
 		tmp[i] = _data[i];
 	for(__SIZETYPE j=0; j<tlen; j++)
@@ -150,8 +150,7 @@ String String::substr(__SIZETYPE st, __SIZETYPE  len) const {
 	if( st < 0 ) st = 0;
 	if( st + len > _len || len == -1 ) len = _len - st;
 
-	if (len + 1 > MAX_STRING_LENGTH) forcequit(11); // only for turbo.
-	char s[MAX_STRING_LENGTH]; // char s[ len+1 ]; 
+	char s[ len+1 ]; 
 
 	for( __SIZETYPE i=0 ; i<len ; ++i ){
 		s[i] = _data[ st+i ];
@@ -276,15 +275,11 @@ bool String::isNumber() const {
 
 long String::toInteger() const {
 	String tmp(*this);
-	char str[MAX_STRING_LENGTH];
-	tmp.c_str(str);
-	return atol(str);
+	return atol(tmp.c_str());
 }
 double String::toNumber() const {
 	String tmp(*this);
-	char str[MAX_STRING_LENGTH];
-	tmp.c_str(str);
-	return atof(str);
+	return atof(tmp.c_str());
 }
 
 /***********************************

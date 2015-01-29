@@ -40,7 +40,7 @@ String Error::message() const {
 	else if (this->_severity == ERROR_ERROR) ret += "Error: ";
 	else if (this->_severity == ERROR_WARNING) ret += "Warning: ";
 
-	i = errorCodes.indexOf(this->_code, stringEquals);
+	i = errorCodes.indexOf(this->_code);
 	if (i >= 0) ret += errorDesc[i];
 	ret += this->_flag;
 
@@ -98,9 +98,7 @@ void Token::setValue(String s) { this->_value = s; }
 
 // constructors, and dynamic data managers.
 Lexer::Lexer (String data) {
-	char str[MAX_STRING_LENGTH];
-	data.c_str(str);
-	this->source.open(str);
+	this->source.open(data.c_str());
 	if (!this->source) this->errors.pushback(Error("l0", data, -1, ERROR_FATAL));
 	this->line = 1;
 	this->indent = 0;
@@ -162,13 +160,13 @@ Token Lexer::toToken(String val) {
 		return Token(val, LITERAL, NUMBER);
 	}
 	// punctuator
-	if (Punctuators.indexOf(val, stringEquals) >= 0) {
+	if (Punctuators.indexOf(val) >= 0) {
 		return Token(val, PUNCTUATOR);
 	}
 
 	// keywords
-	if (Keywords.indexOf(val, stringEquals) >= 0) {
-		if (Constants.indexOf(val, stringEquals) >= 0) {
+	if (Keywords.indexOf(val) >= 0) {
+		if (Constants.indexOf(val) >= 0) {
 			if (val == trueToken.value() || val == falseToken.value()) return Token(val, LITERAL, BOOLEAN);
 			return Token(val, KEYWORD, CONSTANT);
 		}
@@ -177,13 +175,13 @@ Token Lexer::toToken(String val) {
 	}
 
 	// inbuilt functions
-	if (InbuiltFunctions.indexOf(val, stringEquals) >= 0) return Token(val, IDENTIFIER, FUNCTION);
+	if (InbuiltFunctions.indexOf(val) >= 0) return Token(val, IDENTIFIER, FUNCTION);
 
 	// operators. assumes that the operator has been extracted properly.
-	if (binaryOperators.indexOf(val, stringEquals) >= 0) {
+	if (binaryOperators.indexOf(val) >= 0) {
 		return Token(val, OPERATOR, BINARYOP);
 	}
-	if (unaryOperators.indexOf(val, stringEquals) >= 0) {
+	if (unaryOperators.indexOf(val) >= 0) {
 		return Token(val, OPERATOR, UNARYOP);
 	}
 
@@ -311,14 +309,14 @@ String Lexer::readIdentifier() {
 // note: some operators are 'decided' by the parser, because they depend on situation.
 String Lexer::readOperator() {
 	char ch = this->source.peek();
-	if (Opstarts.indexOf(ch, stringEquals) == -1) return "";
+	if (Opstarts.indexOf(ch) == -1) return "";
 
 	this->source.get();
 	String ret = ch;
 
 	// check whether can be followed by =
 	idList eq(strsplit("+-*/%=!<>"));
-	if (eq.indexOf(ch, stringEquals) >= 0 && this->source.peek() == '=') {
+	if (eq.indexOf(ch) >= 0 && this->source.peek() == '=') {
 		ret += (this->source.get());
 		// a second =
 		if ((ch == '=' || ch == '!') && (this->source.peek() == '=')) {
@@ -358,10 +356,10 @@ Token Lexer::getToken() {
 		val = this->readIdentifier(); // identifier/keyword
 	} else if (isdigit(ch)) {
 		val = this->readNumber(); // numeric constant
-	} else if (Punctuators.indexOf(ch, stringEquals) >= 0) {
+	} else if (Punctuators.indexOf(ch) >= 0) {
 		val = ch; // punctuator. keep it as it is.";
 		this->source.get();
-	} else if (Opstarts.indexOf(ch, stringEquals) >= 0) {
+	} else if (Opstarts.indexOf(ch) >= 0) {
 		val = this->readOperator();
 	} else { // just ignore the character, as of now. This should flag an unknown character error.
 		val = ch;
