@@ -29,7 +29,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope sc) {
 				
 				bool isAssign = false;
 				Vector<String> assignmentOp(strsplit("= += -= *= /= %=", ' '));
-				if (assignmentOp.indexOf(tmp.value(), stringEquals)) {
+				if (assignmentOp.indexOf(tmp.value())) {
 					oper = tmp.value().substr(0, 1);
 					isAssign = true;
 				}

@@ -49,7 +49,7 @@ tokenType Variable::hasMember(Token ref) {
 		return false;
 	}
 	else if (this->type() == OBJECT) {
-		if (this->_keys.indexOf(ref.value(), stringEquals) >= 0) return true;
+		if (this->_keys.indexOf(ref.value()) >= 0) return true;
 		return false;
 	}
 	return false;
