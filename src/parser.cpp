@@ -186,7 +186,6 @@ RPN Parser::expressionToRPN(Infix args) {
 				}
 				if (tmp.value() != "(") {
 					this->sendError(Error("p1", ")", tmp.lineNumber())); // unbalanced )
-					DEBUG(tmp.value());
 				}
 			}
 			else if (current.value() == "]") {
