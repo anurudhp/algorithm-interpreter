@@ -7,12 +7,13 @@ Evaluator::Evaluator(Parser *pr) {
 Token Evaluator::evaluateRPN(RPN source, VariableScope sc) {
 	Token tmp;
 	Stack<Token> valuestack;
+	Queue<Token> statementValues;
 	while (source.pop(tmp)) {
 		if (tmp.type() == LITERAL) valuestack.push(tmp);
 		if (tmp.value() == ";") {
 			Token t;
 			valuestack.pop(t);
-			cerr << t.value() << endl;
+			statementValues.push(t);
 			continue;
 		}
 		
@@ -40,7 +41,9 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope sc) {
 			}
 		}
 	}
-	valuestack.pop(tmp);
+	while (valuestack.pop(tmp)) statementValues.push(tmp);
+	
+	
 	return tmp;
 }
 #endif // COMPONENT_EVALUATOR_H
