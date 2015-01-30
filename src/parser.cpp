@@ -1,10 +1,40 @@
-#ifdef COMPONENT_PARSER_H
+ifdef COMPONENT_PARSER_H
 // do not include this file directly.
 // use parser.h instead.
 
 // include the implementation of classes:
 //     Variable, VariableScope, Function
 #include "variables.cpp"
+
+HashedData::HashedData() {};
+
+csIf HashedData::getIf() {
+    csIf c;
+    c.if_condition = statements[0];
+    c.if_statements = statements[1];
+    c.else_statements = statements[2];
+    c.if_variables = variables[0];
+    c.else_variables = variables[1];
+    return c;
+}
+
+csWhile HashedData::getWhile() {
+    csWhile c;
+    c.while_condition = statements[0];
+    c.while_statements = statements[1];
+    c.while_variables = variables[0];
+    return c;
+}
+
+csFor HashedData::getFor() {
+    csFor c;
+    c.for_initialization = statements[0];
+    c.for_condition = statements[1];
+    c.for_update = statements[2];
+    c.for_statements = statements[3];
+    c.for_variables = variables[0];
+    return c;
+}
 
 /*************************************
 * Implementation: class Parser
@@ -93,7 +123,7 @@ RPN Parser::parseDeclaration(tokenType type) {
 }
 RPN Parser::parseFunction() {
 	return RPN();
-	
+
 }
 /**** Static Parsing Procedures ****/
 RPN Parser::expressionToRPN(Infix args) {
@@ -141,7 +171,7 @@ RPN Parser::expressionToRPN(Infix args) {
 			Token tmp;
 			if (!args.pop(tmp) || tmp.value() != "(") this->sendError(Error("p3.1", "", current.lineNumber())); // function call should be succeeded by a (
 			operstack.push(tmp);
-			
+
 			if (!args.empty() && args.front().value() == ")") {
 				// zero argument function call:
 				funcarglist.push(0);
@@ -163,15 +193,15 @@ RPN Parser::expressionToRPN(Infix args) {
 							Token func;
 							operstack.pop(func);
 							output.push(func);
-							
+
 							__SIZETYPE argnum;
 							if (funcarglist.pop(argnum)) output.push(toArgsToken(argnum));
 							else {
 								// unable to find number of arguments: arglist is empty.
 								// should not happen.
-								this->sendError(Error("p3.2", "@args", tmp.lineNumber())); 
+								this->sendError(Error("p3.2", "@args", tmp.lineNumber()));
 							}
-							
+
 							if (!operstack.empty() && operstack.top().value() == ".") {
 								// dereference the method.
 								Token deref;
