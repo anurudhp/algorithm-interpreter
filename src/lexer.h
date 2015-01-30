@@ -21,6 +21,7 @@
 	#define STRING 51
 	#define NUMBER 52
 	#define BOOLEAN 53
+	#define INTEGER 54
 #define HASHED 6
 	
 #define TABLEN 4
@@ -60,7 +61,7 @@ idList errorCodes, errorDesc;
 // global to store all reserved words, and symbols.
 idList Keywords,
        Constants, // stores all predefined literal constant keywords
-       InbuiltFunctions, // stores all inbuilt functions. 
+       InbuiltFunctionList, // stores all inbuilt functions. 
        Punctuators, // all symbols which separate lexer input.
        Opstarts,
        unaryOperators, 

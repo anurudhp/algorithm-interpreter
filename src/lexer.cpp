@@ -34,7 +34,8 @@ int Error::severity() const { return this->_severity; }
 String Error::message() const {
 	__SIZETYPE i;
 	String ret;
-	ret = ret + "Line " + integerToString(this->_line) + ": ";
+	if (this->_line >= 0) ret = ret + "Line " + integerToString(this->_line) + ": ";
+	else ret = ret + "Runtime Error: ";
 
 	if (this->_severity == ERROR_FATAL) ret += "FATAL Error: ";
 	else if (this->_severity == ERROR_ERROR) ret += "Error: ";
@@ -175,7 +176,7 @@ Token Lexer::toToken(String val) {
 	}
 
 	// inbuilt functions
-	if (InbuiltFunctions.indexOf(val) >= 0) return Token(val, IDENTIFIER, FUNCTION);
+	if (InbuiltFunctionList.indexOf(val) >= 0) return Token(val, IDENTIFIER, FUNCTION);
 
 	// operators. assumes that the operator has been extracted properly.
 	if (binaryOperators.indexOf(val) >= 0) {
@@ -402,7 +403,7 @@ bool importLexerData(ifstream& datareader) {
 	}
 
 	Keywords = strsplit(buff[0], ' ');
-	InbuiltFunctions = strsplit(buff[1], ' ');
+	InbuiltFunctionList = strsplit(buff[1], ' ');
 	Constants = strsplit(buff[2], ' ');
 	Keywords.append(Constants);
 	Punctuators = strsplit(buff[3]);
@@ -434,7 +435,8 @@ bool importErrorCodes(ifstream& ecreader) {
 		if (buff.substr(0, 1) != "#" && buff.indexOf(":") > 0) {
 			vs = strsplit(buff, ":");
 			errorCodes.pushback(vs[0].trim());
-			errorDesc.pushback(vs[1]);
+			vs.popfront();
+			errorDesc.pushback(strjoin(vs, ":"));
 		}
 	}
 	ecreader.close();
