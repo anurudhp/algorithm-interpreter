@@ -79,16 +79,18 @@ String::~String() {
 bool String::clear() {
 	_len = 0;
 	delete[] _data;
+	delete[] _data2;
 	_data = 0;
 	return 1;
 }
 
 // Typecast to string constant : char *
 char* String::c_str() {
-	char ref[_len + 1];
-	for(__SIZETYPE i=0; i<_len; i++) ref[i] = _data[i];
-	ref[_len] = '\0';
-	return ref;
+	delete []_data2;
+	_data2 = new char[_len + 1];
+	for(__SIZETYPE i=0; i<_len; i++) _data2[i] = _data[i];
+	_data2[_len] = '\0';
+	return _data2;
 }
 
 /**************************
