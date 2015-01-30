@@ -11,6 +11,34 @@ typedef Queue<Token> RPN;
 #define PARSE_STARTED 43
 #define PARSE_FAILED 44
 
+class HashedData
+{
+    Vector< RPN > statements;
+    Vector< Vector<Variable> > variables;
+
+    public:
+
+    struct csIf {
+        RPN if_condition,if_statements,else_statements;
+        Vector< Variable > if_variables,else_variables;
+    };
+    struct csWhile {
+        RPN while_condition,while_statements;
+        Vector< Variable > while_variables;
+    };
+    struct csFor {
+        RPN for_initialization,for_condition,for_update,for_statements;
+        Vector< Variable > for_variables;
+    };
+
+    HashedData();
+
+    csIf getIf();
+    csWhile getWhile();
+    csFor getFor();
+
+};
+
 class Parser
 {
 	private:
@@ -19,7 +47,7 @@ class Parser
 	Vector <Error> errors;
 	RPN output;
 	int status;
-	
+
 	// lexer interaction interface:
 	Lexer *lexer;
 
