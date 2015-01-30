@@ -32,12 +32,12 @@ Token InbuiltFunctions::read(tokenType t1, istream& in) {
     }
     if(t1 == STRING) {
         in >> s;
-        return Lexer::toToken(Lexer::stringToLiteral(s1));
+        return Lexer::toToken(Lexer::stringToLiteral(s));
     }
     if(t1 == BOOLEAN) {
 		in >> s;
-        if(s1 != "true" && s1 != "false") return nullvalToken;
-        return Lexer::toToken(s1);
+        if(s != "true" && s != "false") return nullvalToken;
+        return Lexer::toToken(s);
     }
 }
 
@@ -50,7 +50,7 @@ Token InbuiltFunctions::get(istream& in) {
 Token InbuiltFunctions::readLine(istream& in) {
     String s;
 	s.get(in, '\n');
-    return Lexer::toToken(s1);
+    return Lexer::toToken(s);
 }
 
 #endif /* COMPONENT_PARSER_IO_H */
