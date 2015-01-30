@@ -9,7 +9,7 @@ class Variable
 	String _id;
 	Token _value;
 	Vector<String> _keys;
-	Vector<Variable*> _values;
+	Vector<Variable> _values;
 	Object *_object;
 
 	public:
@@ -24,15 +24,15 @@ class Variable
 
 	// value access:
 	bool setValue(const Variable&);
-	bool hasValueAt(String);
+	bool hasValueAt(Token);
 	Variable& valueAt(Token);
 	bool setValueAt(Token, Variable);
+	Function getMethod(String);
 	
-	// member function access:
-	tokenType hasMember(Token);
-	Function getMemberFunction(String);
-	Variable getDataMember(String);
+	friend class Object;
 };
+
+static Variable nullVariableRef;
 
 class VariableScope
 {
@@ -40,22 +40,26 @@ class VariableScope
 
 	public:
 	VariableScope();
-	VariableScope(const VariableScope&);
+	VariableScope& operator= (const VariableScope&);
 
 	bool stackVariables();
 	bool stackVariables(Vector<Variable>&);
 	bool addVariable(Variable&);
 	bool popVariables();
 	bool popVariables(Vector<Variable>&);
-	Variable resolve(String);
-	__SIZETYPE exists(String);
+	
+	bool exists(String);
+	bool existsAtTop(String);
+	Variable& resolve(String);
+	Vector<Variable>& getBaseVariables();
 	__SIZETYPE depth() const;
 };
 
 class Function
 {
 	String _id;
-	Vector<String> params;
+	Vector<String> parameters;
+	Vector<Variable> functionVariables;
 	RPN statements;
 
 	public:
@@ -76,10 +80,12 @@ class Function
 
 class Object
 {
+	String _id;
 	Function constructor;
 	Vector<Function> prototypes;
 	
 	public:
+	String id();
 	Function getConstructor();
 	bool hasPrototype(String);
 	Function getPrototype(String);
