@@ -14,7 +14,7 @@ class String
 {
 private:
 	__SIZETYPE _len; // size
-	char* _data; // the actual string
+	char *_data, *_data2; // the actual string
 
 	// static data:
 protected:
