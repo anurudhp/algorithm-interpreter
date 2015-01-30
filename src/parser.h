@@ -13,30 +13,27 @@ typedef Queue<Token> RPN;
 
 class HashedData
 {
-    Vector< RPN > statements;
-    Vector< Vector<Variable> > variables;
+	Vector< RPN > statementSet;
+	Vector< Vector<Variable> > variableSet;
 
-    public:
+	public:
 
-    struct csIf {
-        RPN if_condition,if_statements,else_statements;
-        Vector< Variable > if_variables,else_variables;
-    };
-    struct csWhile {
-        RPN while_condition,while_statements;
-        Vector< Variable > while_variables;
-    };
-    struct csFor {
-        RPN for_initialization,for_condition,for_update,for_statements;
-        Vector< Variable > for_variables;
-    };
+	struct csIf {
+		RPN ifCondition,ifStatements,elseStatements;
+		Vector< Variable > ifVariables,elseVariables;
+	};
+	struct csFor {
+		RPN forInitialization,forCondition,forUpdate,forStatements;
+		Vector< Variable > forVariables;
+	};
 
-    HashedData();
+	bool clearStatements();
+	bool clearVariables();
+	bool addStatements(RPN)
+	bool addVariables(Vector<Variable>);
 
-    csIf getIf();
-    csWhile getWhile();
-    csFor getFor();
-
+	csIf getIf();
+	csFor getFor();
 };
 
 class Parser
@@ -75,9 +72,9 @@ class Parser
 	/* static parsing procedures: */
 	// checks whether the RPN is valid.
 	static bool validateRPN(RPN);
-
 	static Token toArgsToken(__SIZETYPE);
 
+	friend class Evaluator;
 };
 
 #endif /* COMPONENT_PARSER_H */

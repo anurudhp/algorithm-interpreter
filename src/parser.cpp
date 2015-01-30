@@ -6,34 +6,32 @@ ifdef COMPONENT_PARSER_H
 //     Variable, VariableScope, Function
 #include "variables.cpp"
 
-HashedData::HashedData() {};
+/*******************************
+* Implementation: class HashedData
+********************************/
+bool HashedData::clearStatements() { return this->statementSet.clear(); }
+bool HashedData::clearVariables() { return this->variableSet.clear(); }
+bool HashedData::addStatements(RPN st) { return this->statementSet.pushback(st); }
+bool HashedData::addVariables(Vector<Variable> v) { return this->variableSet.pushback(v); }
 
-csIf HashedData::getIf() {
-    csIf c;
-    c.if_condition = statements[0];
-    c.if_statements = statements[1];
-    c.else_statements = statements[2];
-    c.if_variables = variables[0];
-    c.else_variables = variables[1];
-    return c;
+HashedData::csIf HashedData::getIf() {
+	csIf c;
+	c.ifCondition = statementSet[0];
+	c.ifStatements = statementSet[1];
+	c.elseStatements = statementSet[2];
+	c.ifVariables = variableSet[0];
+	c.elseVariables = variableSet[1];
+	return c;
 }
 
-csWhile HashedData::getWhile() {
-    csWhile c;
-    c.while_condition = statements[0];
-    c.while_statements = statements[1];
-    c.while_variables = variables[0];
-    return c;
-}
-
-csFor HashedData::getFor() {
-    csFor c;
-    c.for_initialization = statements[0];
-    c.for_condition = statements[1];
-    c.for_update = statements[2];
-    c.for_statements = statements[3];
-    c.for_variables = variables[0];
-    return c;
+HashedData::csFor HashedData::getFor() {
+	csFor c;
+	c.forInitialization = statementSet[0];
+	c.forCondition = statementSet[1];
+	c.forUpdate = statementSet[2];
+	c.forStatements = statementSet[3];
+	c.forVariables = variableSet[0];
+	return c;
 }
 
 /*************************************
