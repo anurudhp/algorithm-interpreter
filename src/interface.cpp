@@ -1,4 +1,33 @@
+// Macros for debugging:
+#define DEB       cerr << ">> REACHED <<\n";
+#define PRINT(i)  cerr << ">> " << i << endl;
+#define DEBUG(i)  cerr << ">> " << #i << " = " << i << endl;
+
 #include "interface.h"
+
+bool loadData();
+void logRPN(RPN);
+
+int main()
+{
+	loadData();
+
+	Lexer *lexer = new Lexer("../logs/test.alg");
+	Parser *parser = new Parser(lexer);
+	if (!parser->parseSource()) {
+		cerr << "\nParsing failed...\n";
+		return 0;
+	}
+	cerr << "Parsing complete.\n";
+	logRPN(parser->getOutput());
+	
+	cout << "_________________________________________\n";
+	Evaluator *eval = new Evaluator(parser);
+	bool res = eval->runProgram();
+	cout << "_________________________________________\n";
+	if (!res) cerr << "\nEvaluation failed...\n";
+	return 0;
+}
 
 bool loadData() {
 	ifstream fin;
@@ -23,34 +52,18 @@ bool loadData() {
 	cerr << " done.\n";
 	fin.close();
 	
+	cerr << endl;
 	return true;
 }
 
-int main()
-{
-	loadData();
-	Lexer *lexer = new Lexer("../logs/test.alg");
-	
-	Parser *parser = new Parser(lexer, "");
-	if (!parser->parseSource()) {
-		cerr << "\nParsing failed...\n";
-		return 0;
-	}
-	cerr << "Parsing complete.\n";
-	
-	RPN out = parser->getOutput();
-	RPN out2 = out;
+void logRPN(RPN r) {
 	ofstream fout("../logs/rpn.txt"); // log tokens.
 	Token tok;
-	while (out.pop(tok)) {
+	while (r.pop(tok)) {
 		fout << tok.value() << '\t';
 		if (tok.value() == ";") fout << endl;
 	}
 	fout << endl;
 	fout.close();
-	
-	Evaluator *eval = new Evaluator(parser);
-	tok = eval->evaluateRPN(out2, VariableScope());
-	cout << tok.value() << endl;
-	return 0;
+	cerr << "RPN logged.\n";
 }
