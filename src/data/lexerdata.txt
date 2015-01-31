@@ -1,6 +1,6 @@
-var const global typeof String Number Boolean Array and or not equals delete
+var const global null typeof String Number Boolean Array and or not equals delete
 print input readNumber readString readLine get
-null infinity true false
+infinity true false
 ()[]{},:;
 + += - -= * *= / /= % %= = == === != !== > >= < <= && || ? . []
 ! ++ --
