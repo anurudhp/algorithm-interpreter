@@ -17,7 +17,22 @@ Token InbuiltFunctions::write(Token t, ostream& out) {
         return trueToken;
     }
     if (t.subtype() == STRING) {
-        out << Lexer::tokenToString(t.value());
+        String val = Lexer::tokenToString(t);
+		for (__SIZETYPE i = 0; i < val.length(); i++) {
+			if (val.charAt(i) == '\\') {
+				// escape special chars
+				char c = val.charAt(i + 1);
+				switch (val.charAt(i + 1)) {
+				case 'n': c = '\n'; break;
+				case 't': c = '\t'; break;
+				case 'a': c = '\a'; break;
+				case 'r': c = '\r'; break;
+				}
+				out << c;
+				i++;
+			}
+			else out << val.charAt(i);
+		}
         return trueToken;
     }
     return falseToken;
