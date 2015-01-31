@@ -9,13 +9,14 @@
 // empty constructor.
 String::String() {
 	_len = 0;
-	_data = 0;
+	_data = _data2 = NULL;
 }
 
 // copy contructors : assignment is copy
 String::String(const String& s) {
+	_data2 = NULL;
 	_len = s.length();
-	_data = 0;
+	_data = NULL;
 	_data = new char[_len];
 	if( !_data ) forcequit(10);
 	for(int i=0; i<_len; i++)
@@ -23,8 +24,9 @@ String::String(const String& s) {
 }
 
 String::String(const char *s) {
+	_data2 = NULL;
 	_len = strlen(s);
-	_data = 0;
+	_data = NULL;
 	_data = new char[ _len ];
 	if( !_data ) forcequit(10);
 	for( __SIZETYPE i=0; i<_len; i++)
@@ -32,8 +34,9 @@ String::String(const char *s) {
 }
 
 String::String(char ch) {
+	_data2 = NULL;
 	_len = 1;
-	_data = 0;
+	_data = NULL;
 	_data = new char[1];
 	if( !_data ) forcequit(10);
 	_data[0] = ch;
@@ -41,9 +44,8 @@ String::String(char ch) {
 
 // operator =
 String& String::operator= (const String& s) {
+	clear();
 	_len = s.length();
-	delete[] _data;
-	_data = 0;
 	_data = new char[_len];
 	if( !_data ) forcequit(10);
 	for(int i=0; i<_len; i++)
@@ -52,9 +54,8 @@ String& String::operator= (const String& s) {
 }
 
 String& String::operator= (const char* s ) {
+	clear();
 	_len = strlen(s);
-	delete[] _data;
-	_data = 0;
 	_data = new char[_len];
 	if( !_data ) forcequit(10);
 	for(int i=0; i<_len; i++)
@@ -63,9 +64,8 @@ String& String::operator= (const char* s ) {
 }
 
 String& String::operator=(char ch ) {
+	clear();
 	_len = 1;
-	delete[] _data;
-	_data = 0;
 	_data = new char[1];
 	if( !_data ) forcequit(10);
 	_data[0] = ch;
@@ -79,14 +79,16 @@ String::~String() {
 bool String::clear() {
 	_len = 0;
 	delete[] _data;
+	_data = NULL;
 	delete[] _data2;
-	_data = 0;
+	_data2 = NULL;
 	return 1;
 }
 
 // Typecast to string constant : char *
 char* String::c_str() {
 	delete []_data2;
+	_data2 = NULL;
 	_data2 = new char[_len + 1];
 	for(__SIZETYPE i=0; i<_len; i++) _data2[i] = _data[i];
 	_data2[_len] = '\0';
