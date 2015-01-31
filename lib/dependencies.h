@@ -42,7 +42,7 @@ template <class T> class Deque;
 template <class T> class Stack;
 template <class T> class Queue;
 
-bool forcequit(int ecode = 1){
+void forcequit(int ecode = 1){
 	cerr<<"FORCE QUIT : ";
 	switch (ecode) {
 		case 10: cerr << "string|heap exhausted"; break;
@@ -52,7 +52,6 @@ bool forcequit(int ecode = 1){
 		case 30: cerr << "deque|underflow"; break;
 	}
 	exit(ecode);
-	return ecode; // warning in turbo.
 }
 
 #endif /* CUSTOM_DEPENDENCIES_H */

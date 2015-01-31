@@ -77,6 +77,7 @@ Token Operations::add(Token t1, Token t2) {
 			   s2 = Lexer::tokenToString(t2);
 		return Lexer::toToken(Lexer::stringToLiteral(s1 + s2));
 	}
+	return nullvalToken;
 }
 
 Token Operations::subtract(Token t1, Token t2) {
@@ -199,7 +200,7 @@ Token Operations::compare(String S, Token t1, Token t2) {
 		return falseToken;
 	}
 	if(S == "==="){
-		if(t1.subtype() != t2.subtype()) falseToken;
+		if(t1.subtype() != t2.subtype()) return falseToken;
 		if(Operations::typecastToken(t1,NUMBER).value().toNumber() == Operations::typecastToken(t2,NUMBER).value().toNumber()) return trueToken;
 		return falseToken;
 	}

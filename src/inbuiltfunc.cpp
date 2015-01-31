@@ -39,6 +39,7 @@ Token InbuiltFunctions::read(tokenType t1, istream& in) {
         if(s != "true" && s != "false") return nullvalToken;
         return Lexer::toToken(s);
     }
+	return nullvalToken;
 }
 
 Token InbuiltFunctions::get(istream& in) {

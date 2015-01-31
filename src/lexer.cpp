@@ -399,7 +399,7 @@ bool importLexerData(ifstream& datareader) {
 	String buff[7];
 	for(int i = 0; i < 7; i++) {
 		if (datareader.eof()) break;
-		buff[i].get(datareader);
+		buff[i].get(datareader, '\n');
 	}
 
 	Keywords = strsplit(buff[0], ' ');

@@ -10,7 +10,7 @@ void logRPN(RPN);
 
 int main()
 {
-	loadData();
+	if (!loadData()) return 0;
 
 	Lexer *lexer = new Lexer("../logs/test.alg");
 	Parser *parser = new Parser(lexer);
