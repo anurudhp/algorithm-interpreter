@@ -32,7 +32,7 @@ class Variable
 	friend class Object;
 };
 
-static Variable nullVariableRef;
+Variable nullVariableRef;
 
 class VariableScope
 {

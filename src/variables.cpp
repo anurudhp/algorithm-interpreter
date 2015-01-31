@@ -6,10 +6,7 @@
 * Implementation: Class Variable
 *********************************/
 
-Variable::Variable() {
-	_id = "";
-	_value = Token();
-}
+Variable::Variable() {}
 Variable::Variable(Token val) {
 	_id = val.value();
 	_value = val;
@@ -139,21 +136,25 @@ VariableScope::VariableScope() {
 }
 VariableScope& VariableScope::operator= (const VariableScope& sc) {
 	this->varstack = sc.varstack;
+	return *this;
 }
 
 // adds an empty vector of variables to the top.
 bool VariableScope::stackVariables() {
 	this->varstack.pushback(Vector<Variable>());
+	return true;
 }
 // adds the passed vector to the top.
 bool VariableScope::stackVariables(Vector<Variable>& vars) {
 	this->varstack.pushback(vars);
+	return true;
 }
 
 // adds a variable to the top-most vector of the scope
 bool VariableScope::addVariable(Variable& var) {
 	if (this->varstack.size() == 0) this->stackVariables();
 	this->varstack[-1].pushback(var);
+	return true;
 }
 // deletes the topmost variable vector.
 bool VariableScope::popVariables() {
@@ -245,6 +246,7 @@ bool Function::setStatements(RPN st) {
 }
 
 bool validate() {
+	return true;
 }
 Token Function::evaluate(Vector<Token> parameters, Evaluator& eval) {
 	for (__SIZETYPE i = 0; i < functionVariables.size(); i++) {
