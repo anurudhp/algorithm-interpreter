@@ -131,7 +131,7 @@ String Lexer::entityMap(String val) {
 
 // extracts the string value from a literal token.
 String Lexer::tokenToString(Token t) {
-	if (t.type() != LITERAL && t.subtype() != STRING) return "";
+	if (t.type() != LITERAL || t.subtype() != STRING) return t.value();
 	String val = t.value().substr(1);
 	val = val.substr(0, val.length() - 1);
 	return val;
@@ -235,7 +235,9 @@ String Lexer::readString() {
 	char st = this->source.get(),
 		 tmp = 0;
 	String ret = st;
-	while (tmp != st) {
+	bool esc = false;
+	while ((tmp != st || esc) && !this->ended()) {
+		esc = false;
 		tmp = this->source.get();
 		if (tmp == '\n') {
 			// error. string not terminated properly.
@@ -247,16 +249,10 @@ String Lexer::readString() {
 
 		if (tmp == '\\') {
 			// escape: get the next character.
+			ret += '\\';
 			tmp = this->source.get();
-			if (tmp != '\n') {
-				switch (tmp) {
-				case 'n': tmp = '\n'; break;
-				case 't': tmp = '\t'; break;
-				case 'a': tmp = '\a'; break;
-				case 'r': tmp = '\r'; break;
-				}
-			}
-			else this->endLine();
+			if (tmp == '\n') this->endLine();
+			else esc = true;
 		}
 		ret += tmp;
 	}

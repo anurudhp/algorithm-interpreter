@@ -21,10 +21,10 @@ int main()
 	cerr << "Parsing complete.\n";
 	logRPN(parser->getOutput());
 	
-	cout << "_________________________________________\n";
+	cout << "_________________________________________\n\n";
 	Evaluator *eval = new Evaluator(parser);
 	bool res = eval->runProgram();
-	cout << "_________________________________________\n";
+	cout << "\n_________________________________________\n";
 	if (!res) cerr << "\nEvaluation failed...\n";
 	return 0;
 }

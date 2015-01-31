@@ -65,17 +65,20 @@ Token Operations::binaryOperator(String op, Token a, Token b) {
 }
 
 Token Operations::add(Token t1, Token t2) {
-	if (t1.subtype() == NUMBER) {
+	if (t1.subtype() == STRING || t2.subtype() == STRING) {
+		t1 = typecastToken(t1, STRING);
+		t2 = typecastToken(t2, STRING);
+		String s1 = Lexer::tokenToString(t1),
+			   s2 = Lexer::tokenToString(t2);
+		return  Lexer::toToken(Lexer::stringToLiteral(s1 + s2));
+	}
+	
+	if (t1.subtype() == NUMBER || t2.subtype() == NUMBER || t1.subtype() == BOOLEAN || t2.subtype() == BOOLEAN) {
+		t1 = typecastToken(t1, NUMBER);
 		t2 = typecastToken(t2, NUMBER);
 		double a1 = t1.value().toNumber(),
 			   a2 = t2.value().toNumber();
 		return Lexer::toToken(numberToString(a1 + a2));
-	}
-	if (t1.subtype() == STRING) {
-		t2 = typecastToken(t2, STRING);
-		String s1 = Lexer::tokenToString(t1),
-			   s2 = Lexer::tokenToString(t2);
-		return Lexer::toToken(Lexer::stringToLiteral(s1 + s2));
 	}
 	return nullvalToken;
 }
