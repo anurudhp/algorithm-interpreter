@@ -151,7 +151,7 @@ bool Parser::parseSource() {
 	return true;
 }
 
-/* 
+/*
 * Parses a block of a given depth.
 * assumes that block has ended if indent changes.
 * Variables can be declared inside blocks, and will be treated as locals to that block.
@@ -160,9 +160,9 @@ RPN Parser::parseBlock(bufferIndex depth) {
 	RPN blockOutput;
 	Token current;
 	Infix lineBuffer;
-	 
+
 	Token eqTok = Lexer::toToken("=");
-	
+
 	variables.stackVariables(); // variables in this block.
 
 	while (!lexer->ended()) {
@@ -174,7 +174,7 @@ RPN Parser::parseBlock(bufferIndex depth) {
 			break;
 		}
 		lineBuffer = lexer->getTokensTill("$endline");
-		
+
 		// variable declaration(s)
 		if (current.value() == "var" || current.value() == "const" || current.value() == "global") {
 			Token vartok;
@@ -185,7 +185,7 @@ RPN Parser::parseBlock(bufferIndex depth) {
 				bool reDec = false;
 				if (current.value() == "global") {
 					Vector<Variable>& globs = variables.getBaseVariables();
-					for (__SIZETYPE i = 0; i < globs.size(); i++) 
+					for (__SIZETYPE i = 0; i < globs.size(); i++)
 						if (globs[i].id() == vartok.value()) {
 							this->sendError("p", vartok.value(), vartok.lineNumber()); // re-declaration of global variable
 							reDec = true;
@@ -195,20 +195,20 @@ RPN Parser::parseBlock(bufferIndex depth) {
 					this->sendError("p", vartok.value(), vartok.lineNumber()); // re-declaration of variable
 					reDec = true;
 				}
-				
+
 				// no errors, add the variable.
 				if (!reDec) {
 					Variable v(vartok);
 					if (current.value() == "global") variables.getBaseVariables().pushback(v);
 					else variables.addVariable(v);
-					
+
 					// now parse the declaration:
 					Token tmp; RPN decl;
 
 					if (lineBuffer.pop(tmp) && tmp.value() == "=") { // initialised.
 						// peek the next token for the type.
 						if (lineBuffer.empty()) this->sendError("p3", "expression after = for initialisation", current.lineNumber()); // expected
-						
+
 						this->lexer->putbackToken(newlineToken);
 						Stack<Token> v2;
 						while (lineBuffer.pop(tmp)) v2.push(tmp);
@@ -225,11 +225,11 @@ RPN Parser::parseBlock(bufferIndex depth) {
 			Token tmp;
 			HashedData hdIf;
 			HashedData::csIf i;
-			
+
 			i.ifCondition = this->expressionToRPN(lineBuffer);
 			i.ifStatements = this->parseBlock(depth + 1);
 			this->variables.popVariables(i.ifVariables);
-			
+
 			// check for an `else`
 			tmp = lexer->getToken();
 			if (tmp.value() == "else" && tmp.indent() == depth) {
@@ -244,13 +244,49 @@ RPN Parser::parseBlock(bufferIndex depth) {
 				i.elseStatements = this->parseBlock(nextDepth);
 				this->variables.popVariables(i.elseVariables);
 			}
-			
+
 			// hash and store:
 			hdIf.setValues(i);
 			blockOutput.push(current); // the `if` token
 			blockOutput.push(this->hashify(hdIf)); // the hashed token.
 		}
-		
+		else if(current.value() == "while") {
+
+            HashedData hdWhile;
+            HashedData::csFor w;
+
+            w.forCondition = this->expressionToRPN(lineBuffer);
+			w.forStatements = this->parseBlock(depth + 1);
+			this->variables.popVariables(w.forVariables);
+
+			hdWhile.setValues(w);
+			blockOutput.push(current);
+			blockOutput.push(this->hashify(hdWhile));
+
+		}
+		else if(current.value() == "for") {
+            HashedData hdFor;
+            HashedData::csFor f;
+            Infix I;
+            Token T;
+            lineBuffer.pop(T);
+            I.push(T);
+            f.forInitialization = this->expressionToRPN(I);
+            I.pop();
+            lineBuffer.pop(T);
+            I.push(T);
+            f.forCondition = this->expressionToRPN(I);
+            I.pop();
+            lineBuffer.pop(T);
+            I.push(T);
+            f.forUpdate = this->expressionToRPN(I);
+            f.forStatements = this->parseBlock(depth+1);
+            this->variables.popVariables(f.forVariables);
+
+            hdFor.setValues(f);
+			blockOutput.push(current);
+			blockOutput.push(this->hashify(hdFor));
+		}
 		else if (current.value() == "function") {
 			// `function` declaration format:
 			// function <name> ( <param1>, <param2>, <param3>)
@@ -260,7 +296,7 @@ RPN Parser::parseBlock(bufferIndex depth) {
 			if (!!this->getFunction(funcname.value()).id()) this->sendError("p", String(" of function ") + funcname.value(), current.lineNumber()); // re-declaration
 
 			Function func(funcname.value());
-			
+
 			Vector<String> params;
 			// extract the parameter list:
 			if (!lineBuffer.pop(tmp) || tmp.value() != "(") this->sendError("p1", "( after function name", current.lineNumber()); // expected
@@ -276,7 +312,7 @@ RPN Parser::parseBlock(bufferIndex depth) {
 				}
 				if (tmp.value() != ")") this->sendError("p1", " closing ) in function declaration", tmp.lineNumber());
 			}
-			
+
 			func.setParams(params);
 			// set the function's statements (hashes stored in parser itself)
 			RPN funcst = this->parseBlock(depth + 1);
@@ -291,11 +327,11 @@ RPN Parser::parseBlock(bufferIndex depth) {
 			Infix i;
 			i.push(current);
 			while (lineBuffer.pop(current)) i.push(current);
-			
+
 			RPN tempout = this->expressionToRPN(i);
 			while (tempout.pop(current)) blockOutput.push(current);
 		}
-		
+
 	}
 	return blockOutput;
 }
@@ -304,12 +340,12 @@ RPN Parser::parseDeclaration(Token var) {
 	// procedure to parse variable initialisations, on declaration
 	// accounts for parsing arrays and hash tables.
 	// errors can be directly caught. carefully call converting to RPN.
-	
+
 	Token current;
 	RPN decl;
 	if (this->lexer->ended()) return decl;
 	current = this->lexer->getToken();
-	
+
 	if (current.value() == "{") { // parse a hash-table (object primitive)
 		// ns
 	}
@@ -334,7 +370,7 @@ RPN Parser::parseDeclaration(Token var) {
 			if (depthB == -1) break;
 			if (tmp.type() != DIRECTIVE) args.push(tmp);
 		}
-		
+
 		while (depthB-- > 0) this->sendError("p1", "[", current.lineNumber());
 		while (depthP-- > 0) this->sendError("p1", "(", current.lineNumber());
 	}
@@ -358,7 +394,7 @@ RPN Parser::parseDeclaration(Token var) {
 		// while (a2.pop(tmp)) DEBUG(tmp.value())
 		decl = this->expressionToRPN(args);
 	}
-	
+
 	return decl;
 }
 
@@ -371,7 +407,7 @@ RPN Parser::expressionToRPN(Infix args) {
 	Token current, prevtok;
 	Stack<Token> operstack;
 
-	//static 
+	//static
 	Token subscriptOp = Lexer::toToken("[]"),
 	             ternaryOp = Token("?:", OPERATOR, MULTINARYOP),
 	             statementEnd = Lexer::toToken(";"),
@@ -379,7 +415,7 @@ RPN Parser::expressionToRPN(Infix args) {
 	             minuseqTok = Lexer::toToken("-="),
 	             oneTok = Lexer::toToken("1");
 
-	//static 
+	//static
 	Token funcInvoke = Token("@invoke", DIRECTIVE, FUNCTION);
 
 	args.push(statementEnd);
