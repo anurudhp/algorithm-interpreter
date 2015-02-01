@@ -33,6 +33,9 @@ Token Operations::typecastToken(Token tok, tokenType type) {
 			String val = Lexer::tokenToString(tok);
 			if (val.isNumber()) return Lexer::toToken(val);
 		}
+		if (tok.subtype() == CONSTANT) {
+			if (tok.value() == "infinity") return tok;
+		}
 	}
 	else if (type == STRING) {
 		String val = Lexer::stringToLiteral(tok.value());
@@ -163,55 +166,67 @@ int Operations::comparePriority(Token a, Token b) {
 	return (pa - pb);
 }
 
-Token Operations::compare(String S, Token t1, Token t2) {
-	if(t1.subtype() != NUMBER && t1.subtype() != BOOLEAN) return nullvalToken;
-	if(t2.subtype() != NUMBER && t2.subtype() != BOOLEAN) return nullvalToken;
-	if(S == "<") {
-		if(t1.subtype() != t2.subtype()) return nullvalToken;
-		if(Operations::typecastToken(t1,NUMBER).value().toNumber() < Operations::typecastToken(t2,NUMBER).value().toNumber()) return trueToken;
-		return falseToken;
-	}
-	if(S == ">"){
-		if(t1.subtype() != t2.subtype()) return nullvalToken;
-		if(Operations::typecastToken(t1,NUMBER).value().toNumber() > Operations::typecastToken(t2,NUMBER).value().toNumber()) return trueToken;
-		return falseToken;
-	}
-	if(S == "<="){
-		if(t1.subtype() != t2.subtype()) return nullvalToken;
-		if(Operations::typecastToken(t1,NUMBER).value().toNumber() <= Operations::typecastToken(t2,NUMBER).value().toNumber()) return trueToken;
-		return falseToken;
-	}
-	if(S == ">="){
-		if(t1.subtype() != t2.subtype()) return nullvalToken;
-		if(Operations::typecastToken(t1,NUMBER).value().toNumber() >= Operations::typecastToken(t2,NUMBER).value().toNumber()) return trueToken;
-		return falseToken;
-	}
-	if(S == "=="){
-		if(t1.subtype() == t2.subtype()) {
-			if(Operations::typecastToken(t1,NUMBER).value().toNumber() == Operations::typecastToken(t2,NUMBER).value().toNumber()) return trueToken;
-			return falseToken;
+Token Operations::compare(String op, Token t1, Token t2) {
+	// == === != !== : for all types.
+	if (t1.type() != LITERAL || t2.type() != LITERAL) return nullvalToken;
+	DEBUG(op);
+	if (op == "=="){DEBUG(t1.value()) DEBUG(t2.value())
+		if (t1.subtype() == BOOLEAN) t1 = typecastToken(t1, NUMBER);
+		if (t2.subtype() == BOOLEAN) t2 = typecastToken(t2, NUMBER);
+
+		if (t1.subtype() == CONSTANT || t2.subtype() == CONSTANT) {
+			if (t1.subtype() == CONSTANT && t2.subtype() == CONSTANT) {
+				if (t1.value() == t2.value()) return trueToken;
+				return falseToken;
+			}
+			if (t2.subtype() == CONSTANT) return compare("==", t2, t1);
+			if (t1.value() == "infinity") return falseToken;
+			return nullvalToken;
 		}
-		if(Operations::typecastToken(t1,BOOLEAN).value() == Operations::typecastToken(t2,BOOLEAN).value()) return trueToken;
-		return falseToken;
-	}
-	if(S == "!="){
-		if(t1.subtype() == t2.subtype()) {
-			if(Operations::typecastToken(t1,NUMBER).value().toNumber() != Operations::typecastToken(t2,NUMBER).value().toNumber()) return trueToken;
-			return falseToken;
+		if (t1.subtype() != t2.subtype()) t2 = typecastToken(t2, t1.subtype());
+		
+		if (t1.subtype() == NUMBER) {
+			if (t1.value().toNumber() == t2.value().toNumber()) return trueToken;
 		}
-		if(Operations::typecastToken(t1,BOOLEAN).value() != Operations::typecastToken(t2,BOOLEAN).value()) return trueToken;
+		else if (t1.subtype() == STRING) {
+			if (t1.value() == t2.value()) return trueToken;
+		}
 		return falseToken;
+		
 	}
-	if(S == "==="){
+	if (op == "!="){
+		return unaryOperator("!", compare("==", t1, t2));
+	}
+	if (op == "==="){
 		if(t1.subtype() != t2.subtype()) return falseToken;
-		if(Operations::typecastToken(t1,NUMBER).value().toNumber() == Operations::typecastToken(t2,NUMBER).value().toNumber()) return trueToken;
+		return compare("==", t1, t2);
+	}
+	if (op == "!=="){
+		return unaryOperator("!", compare("===", t1, t2));
+	}
+
+	// > >= < <= : only for numbers (boolean converted to equivalent numbers)
+	t1 = typecastToken(t1, NUMBER);
+	t2 = typecastToken(t2, NUMBER);
+	if (op == "<") {
+		if (t1.value() == "infinity") return falseToken;
+		if (t2.value() == "infinity") return trueToken;
+		
+		double v1 = t1.value().toNumber(),
+		       v2 = t2.value().toNumber();
+		if (v1 < v2) return trueToken;
 		return falseToken;
 	}
-	if(S == "!=="){
-		if(t1.subtype() != t2.subtype()) return falseToken;
-		if(Operations::typecastToken(t1,NUMBER).value().toNumber() != Operations::typecastToken(t2,NUMBER).value().toNumber()) return trueToken;
-		return falseToken;
+	if (op == ">") {
+		return unaryOperator("!", logical("||", compare("==", t1, t2), compare("<", t1, t2)));
 	}
+	if (op == "<=") {
+		return compare(">", t1, t2);
+	}
+	if (op == ">=") {
+		return compare("<", t1, t2);
+	}
+	
 	return nullvalToken;
 }
 
