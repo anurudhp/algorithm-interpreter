@@ -72,10 +72,12 @@ class Function
 	String id() const;
 	RPN getStatements() const;
 
-	bool setParams(Vector<String>);
-	bool setStatements(RPN);
-	bool validate();
-	Token evaluate(Vector<Token>, Evaluator&);
+	// parsing:
+	void setParams(Vector<String>);
+	void setStatements(RPN);
+	void setVariables(Vector<Variable>);
+	// evaluating:
+	Token evaluate(Vector<Variable>, Evaluator&);
 };
 
 class Object

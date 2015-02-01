@@ -171,6 +171,7 @@ bool VariableScope::exists(String id) {
 	for (i = d - 1; i >= 0; i--) {
 		Vector<Variable>& vars = this->varstack[i];
 		for (j = 0; j < vars.size(); j++) {
+			DEBUG(vars[j].id())
 			if (vars[j].id() == id) return true;
 		}
 	}
@@ -214,9 +215,8 @@ __SIZETYPE VariableScope::depth() const { return this->varstack.size(); }
 * Implementation: Class Function
 *********************************/
 
-Function::Function() {
-	this->_id = "";
-}
+Function::Function() {}
+
 Function::Function(String id) {
 	this->_id = id;
 }
@@ -232,36 +232,32 @@ Function::Function(const Function& f) {
 }
 
 __SIZETYPE Function::paramsSize() const { return this->parameters.size(); }
-
 String Function::id() const { return this->_id; }
 RPN Function::getStatements() const { return this->statements; }
 
-bool Function::setParams(Vector<String> p) {
-	this->parameters = p;
-	return true;
-}
-bool Function::setStatements(RPN st) {
-	this->statements = st;
-	return true;
-}
+void Function::setParams(Vector<String> p) { this->parameters = p; }
+void Function::setStatements(RPN st) { this->statements = st; }
+void Function::setVariables(Vector<Variable> fv) { this->functionVariables = fv; }
 
-bool validate() {
-	return true;
-}
-Token Function::evaluate(Vector<Token> parameters, Evaluator& eval) {
-	for (__SIZETYPE i = 0; i < functionVariables.size(); i++) {
-		if (i > parameters.size()) parameters.pushback(nullvalToken);
-		functionVariables[i].setValue(Variable(parameters[i]));
+Token Function::evaluate(Vector<Variable> args, Evaluator& eval) {
+	Vector<Variable> fvars;
+	Variable nullVar;
+	nullVar.setValue(nullvalToken);
+	for (__SIZETYPE i = 0; i < this->parameters.size(); i++) {
+		if (i > args.size()) args.pushback(nullVar);
+		Variable arg(this->parameters[i]);
+		arg.setValue(args[i]);
+		fvars.pushback(arg);
 	}
+
 	VariableScope scope;
 	scope.stackVariables(eval.getGlobals());
-	scope.stackVariables(functionVariables);
-
+	scope.stackVariables(fvars);
 	Token ret = eval.evaluateRPN(this->statements, scope);
-	
+
 	// update the globals in the evaluator.
 	eval.getGlobals() = scope.getBaseVariables();
-	
+
 	if (!ret.value()) ret = nullvalToken;
 	return ret;
 }
