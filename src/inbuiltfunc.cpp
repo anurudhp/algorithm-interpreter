@@ -12,7 +12,7 @@ struct InbuiltFunctions {
 
 Token InbuiltFunctions::write(Token t, ostream& out) {
 	if (t.type() != LITERAL) return falseToken;
-    if (t.subtype() == NUMBER || t.subtype() == BOOLEAN ) {
+    if (t.subtype() == NUMBER || t.subtype() == BOOLEAN || t.subtype() == CONSTANT) {
         out << t.value();
         return trueToken;
     }
@@ -48,11 +48,6 @@ Token InbuiltFunctions::read(tokenType t1, istream& in) {
     if(t1 == STRING) {
         in >> s;
         return Lexer::toToken(Lexer::stringToLiteral(s));
-    }
-    if(t1 == BOOLEAN) {
-		in >> s;
-        if(s != "true" && s != "false") return nullvalToken;
-        return Lexer::toToken(s);
     }
 	return nullvalToken;
 }
