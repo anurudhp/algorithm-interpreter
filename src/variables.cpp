@@ -171,7 +171,6 @@ bool VariableScope::exists(String id) {
 	for (i = d - 1; i >= 0; i--) {
 		Vector<Variable>& vars = this->varstack[i];
 		for (j = 0; j < vars.size(); j++) {
-			DEBUG(vars[j].id())
 			if (vars[j].id() == id) return true;
 		}
 	}
