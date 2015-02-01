@@ -16,9 +16,6 @@ bool Evaluator::runProgram() {
 	if (this->failed) {
 		return this->showErrors(cerr);
 	}
-	for (__SIZETYPE i = 0; i < rets.size(); i ++) {
-		cerr << ">> rets[" << i << "] = " << rets[i].value() << endl;
-	}
 	return true;
 }
 
@@ -68,7 +65,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope, Vector<Token>* st
 	Vector<String> assignmentOp(strsplit("= += -= *= /= %=", ' '));
 
 	while (source.pop(current)) {
-		if (current.type() == LITERAL) valuestack.push(current);
+		if (current.type() == LITERAL || current.subtype() == VARIABLE) valuestack.push(current);
 		else if (current.value() == ";") {
 			Token t;
 			// if (valuestack.pop(t) && statementValues != NULL) statementValues->pushback(t);
@@ -136,30 +133,31 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope, Vector<Token>* st
 
 				if (isAssign) {
 					if (oper == "=") { // a = b
-						DEBUG(a.value())
 						if (scope.exists(a.value())) scope.resolve(a.value()).setValue(Variable(b));
-						else PRINT("NOT IN SCOPE")
+						res = a;
 					}
 					else { // a = res
-						2;
+						if (scope.exists(a.value())) scope.resolve(a.value()).setValue(Variable(res));
 					}
 				}
 				valuestack.push(res);
 			}
 		}
 		else if (current.type() == KEYWORD) {
-			//PRINT("at if")
-			if (current.value() == "if") {// DEBUG("inside if")
+
+			if (current.value() == "if") {
 				Token hashtok;
 				source.pop(hashtok);
 				HashedData hd = this->parser->getHashedData(hashtok.value());
 				HashedData::csIf ifSet = hd.getIf();
 
-				Token val = evaluateRPN(ifSet.ifCondition, scope);DEBUG(val.value())
+				Token val = evaluateRPN(ifSet.ifCondition, scope);
 				val = Operations::typecastToken(val, BOOLEAN);
 
 				if (val.value() == "true") {
 					scope.stackVariables(ifSet.ifVariables);
+					RPN r = ifSet.ifStatements;
+					while (r.pop(val)) DEBUG(val.value())
 					evaluateRPN(ifSet.ifStatements, scope);
 					scope.popVariables();
 				}
@@ -176,7 +174,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope, Vector<Token>* st
 				Token argtok, inv, tmp;
 				source.pop(argtok); source.pop(inv);
 				
-				long numOfArgs = argtok.value().substr(5).toInteger(); // argtok.value(): @args|<int>
+				long numOfArgs = argtok.value().substr(6).toInteger(); // argtok.value(): @args|<int>
 				Vector<Token> args;
 				while (numOfArgs--) {
 					if (valuestack.pop(tmp)) args.pushfront(tmp);
@@ -186,6 +184,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope, Vector<Token>* st
 				
 				}
 				else { // global function:
+				PRINT("global func")
 					if (InbuiltFunctionList.indexOf(current.value()) >= 0) {
 						Token res;
 						if (current.value() == "print") {

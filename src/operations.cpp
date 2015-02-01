@@ -169,8 +169,8 @@ int Operations::comparePriority(Token a, Token b) {
 Token Operations::compare(String op, Token t1, Token t2) {
 	// == === != !== : for all types.
 	if (t1.type() != LITERAL || t2.type() != LITERAL) return nullvalToken;
-	DEBUG(op);
-	if (op == "=="){DEBUG(t1.value()) DEBUG(t2.value())
+
+	if (op == "=="){
 		if (t1.subtype() == BOOLEAN) t1 = typecastToken(t1, NUMBER);
 		if (t2.subtype() == BOOLEAN) t2 = typecastToken(t2, NUMBER);
 

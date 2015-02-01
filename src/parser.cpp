@@ -214,6 +214,7 @@ RPN Parser::parseBlock(bufferIndex depth) {
 						while (lineBuffer.pop(tmp)) v2.push(tmp);
 						while (v2.pop(tmp)) this->lexer->putbackToken(tmp);
 
+						vartok.setSubtype(VARIABLE);
 						decl = this->parseDeclaration(vartok);
 						while (decl.pop(tmp)) blockOutput.push(tmp);
 					}
@@ -400,6 +401,7 @@ RPN Parser::expressionToRPN(Infix args) {
 			if (!args.empty() && args.front().value() == "(") {
 				current.setSubtype(FUNCTION);
 			} else { // is a variable/property
+				current.setSubtype(VARIABLE);
 				output.push(current);
 			}
 		}
