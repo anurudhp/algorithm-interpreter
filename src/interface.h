@@ -19,8 +19,8 @@ class Object;
 #include "evaluator.h"
 
 #include "lexer.cpp"
-#include "inbuiltfunc.cpp"
 #include "operations.cpp"
+#include "inbuiltfunc.cpp"
 #include "parser.cpp"
 #include "evaluator.cpp"
 

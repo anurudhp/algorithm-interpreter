@@ -1,7 +1,10 @@
 // Macros for debugging:
-#define DEB       cerr << ">> REACHED <<\n";
-#define PRINT(i)  cerr << ">> " << i << endl;
-#define DEBUG(i)  cerr << ">> " << #i << " = " << i << endl;
+int debugLevel = 1;
+#define DEB       if (debugLevel > 1) cerr << ">> REACHED <<\n";
+#define PRINT(i)  if (debugLevel > 1) cerr << ">> " << i << endl;
+#define DEBUG(i)  if (debugLevel > 1) cerr << ">> " << #i << " = " << i << endl;
+#define LOG(i)    if (debugLevel > 0) cerr << i;
+#define LOGN(i)   if (debugLevel > 0) cerr << i << endl;
 
 #include "interface.h"
 
@@ -10,15 +13,17 @@ void logRPN(RPN);
 
 int main()
 {
+	cerr << "Debug Level: ";
+	cin >> debugLevel;
 	if (!loadData()) return 0;
-
+	
 	Lexer *lexer = new Lexer("../logs/test.alg");
 	Parser *parser = new Parser(lexer);
 	if (!parser->parseSource()) {
 		cerr << "\nParsing failed...\n";
 		return 0;
 	}
-	cerr << "Parsing complete.\n";
+	LOGN("Parsing complete.\n");
 	logRPN(parser->getOutput());
 	
 	cout << "_________________________________________\n\n";
@@ -33,23 +38,23 @@ bool loadData() {
 	ifstream fin;
 	
 	fin.open("data/lexerdata.txt");
-	cerr << "Loading lexer data...";
+	LOG("Loading lexer data...");
 	if (!importLexerData(fin)) {
 		cerr << " unable to load\n";
 		fin.close();
 		return false;
 	}
-	cerr << " done.\n";
+	LOGN("done.");
 	fin.close();
 	
 	fin.open("data/errorcodes.txt");
-	cerr << "Loading error codes and descriptions...";
+	LOG("Loading error codes and descriptions...");
 	if (!importErrorCodes(fin)) {
 		cerr << " unable to load\n";
 		fin.close();
 		return false;
 	}
-	cerr << " done.\n";
+	LOGN("done.");
 	fin.close();
 	
 	cerr << endl;
@@ -65,5 +70,5 @@ void logRPN(RPN r) {
 	}
 	fout << endl;
 	fout.close();
-	cerr << "RPN logged.\n";
+	LOGN("RPN logged.");
 }
