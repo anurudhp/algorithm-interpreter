@@ -11,6 +11,7 @@ l2: Too many decimal points in numeric value
 
 p1: unbalanced 
 p2: unexpected
+p3: expected
 
 #variable errors
 p4.1: re-declaration of variable 
