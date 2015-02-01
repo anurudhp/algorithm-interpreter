@@ -153,7 +153,8 @@ Token Lexer::toToken(String val) {
 
 	val = entityMap(val);
 	// string literal:
-	if (val[0] == '\"' || val[0] == '\'') {
+	if ((val[0] == '\"' || val[0] == '\'') && (val.length() >= 2)) {
+		val[0] = val[-1] = '\"';
 		return Token(val, LITERAL, STRING);
 	}
 	// numeric literal
@@ -169,7 +170,7 @@ Token Lexer::toToken(String val) {
 	if (Keywords.indexOf(val) >= 0) {
 		if (Constants.indexOf(val) >= 0) {
 			if (val == trueToken.value() || val == falseToken.value()) return Token(val, LITERAL, BOOLEAN);
-			return Token(val, KEYWORD, CONSTANT);
+			return Token(val, LITERAL, CONSTANT);
 		}
 
 		return Token(val, KEYWORD);
