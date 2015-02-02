@@ -253,10 +253,10 @@ RPN Parser::parseBlock(bufferIndex depth) {
 		}
 		else if(current.value() == "while") {
 
-            HashedData hdWhile;
-            HashedData::csFor w;
+			HashedData hdWhile;
+			HashedData::csFor w;
 
-            w.forCondition = this->expressionToRPN(lineBuffer);
+			w.forCondition = this->expressionToRPN(lineBuffer);
 			w.forStatements = this->parseBlock(depth + 1);
 			this->variables.popVariables(w.forVariables);
 
@@ -266,25 +266,25 @@ RPN Parser::parseBlock(bufferIndex depth) {
 
 		}
 		else if(current.value() == "for") {
-            HashedData hdFor;
-            HashedData::csFor f;
-            Infix I;
-            Token T;
-            lineBuffer.pop(T);
-            I.push(T);
-            f.forInitialization = this->expressionToRPN(I);
-            I.pop();
-            lineBuffer.pop(T);
-            I.push(T);
-            f.forCondition = this->expressionToRPN(I);
-            I.pop();
-            lineBuffer.pop(T);
-            I.push(T);
-            f.forUpdate = this->expressionToRPN(I);
-            f.forStatements = this->parseBlock(depth+1);
-            this->variables.popVariables(f.forVariables);
+			HashedData hdFor;
+			HashedData::csFor f;
+			Infix I;
+			Token T;
+			lineBuffer.pop(T);
+			I.push(T);
+			f.forInitialization = this->expressionToRPN(I);
+			I.pop();
+			lineBuffer.pop(T);
+			I.push(T);
+			f.forCondition = this->expressionToRPN(I);
+			I.pop();
+			lineBuffer.pop(T);
+			I.push(T);
+			f.forUpdate = this->expressionToRPN(I);
+			f.forStatements = this->parseBlock(depth+1);
+			this->variables.popVariables(f.forVariables);
 
-            hdFor.setValues(f);
+			hdFor.setValues(f);
 			blockOutput.push(current);
 			blockOutput.push(this->hashify(hdFor));
 		}
@@ -363,7 +363,7 @@ RPN Parser::parseDeclaration(Token var) {
 			else if (tmp.value() == "]") depthB--;
 
 			if ((tmp.value() == "," && depthB ==  0 && depthP == 0) ||
-			    (tmp.value() == "]" && depthB == -1 && depthP == 0)) {
+				(tmp.value() == "]" && depthB == -1 && depthP == 0)) {
 					RPN arrayElem = this->expressionToRPN(args);
 					args.clear();
 					decl.push(var);
