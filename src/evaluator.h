@@ -18,9 +18,12 @@ class Evaluator
 	bool sendError(String, String, bufferIndex = -1, int = ERROR_ERROR);
 	bool showErrors(ostream&, bool = false);
 
+	// variable caches
 	Variable& getCachedVariable(String);
 	String cacheVariable(Variable);
 	String cacheVariableRef(Variable*);
+
+	Variable& getVariable(String, VariableScope&, bool = false);
 	Vector<Variable>& getGlobals();
 	
 	// procedures

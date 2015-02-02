@@ -168,6 +168,7 @@ RPN Parser::parseBlock(bufferIndex depth) {
 	while (!lexer->ended()) {
 		current = lexer->getToken();
 		if (current.value() == "$eof") break;
+		if (current.value() == "$endline") continue;
 		if (current.indent() != depth) {
 			// block ended, break
 			lexer->putbackToken(current);
@@ -294,6 +295,7 @@ RPN Parser::parseBlock(bufferIndex depth) {
 			
 			RPN tempout = this->expressionToRPN(i);
 			while (tempout.pop(current)) blockOutput.push(current);
+			blockOutput.push(Token(";", PUNCTUATOR));
 		}
 		
 	}
@@ -314,29 +316,34 @@ RPN Parser::parseDeclaration(Token var) {
 		// ns
 	}
 	else if (current.value() == "[") { // parse array (primitive)
-		long depthP = 0, depthB = 0;
+		long depthP = 0, depthB = 0, index = 0;
 		Infix args;
-		Token tmp;
+		Token tmp, tmp2;
 		while (!this->lexer->ended()) {
 			tmp = this->lexer->getToken();
-			switch (tmp.value()[0]) {
-			case '(': depthP++;
-			case ')': depthP--;
-			case '[': depthB++;
-			case ']': depthB--;
-			case ',':
-				if (depthB == 0 && depthP == 0) {
+			if (tmp.value() == "(") depthP++;
+			else if (tmp.value() == ")") depthP--;
+			else if (tmp.value() == "[") depthB++;
+			else if (tmp.value() == "]") depthB--;
+
+			if ((tmp.value() == "," && depthB ==  0 && depthP == 0) ||
+			    (tmp.value() == "]" && depthB == -1 && depthP == 0)) {
 					RPN arrayElem = this->expressionToRPN(args);
 					args.clear();
-					while (arrayElem.pop(tmp)) decl.push(tmp);
-				}
+					decl.push(var);
+					decl.push(Lexer::toToken(integerToString(index)));
+					decl.push(Lexer::toToken("[]"));
+					while (arrayElem.pop(tmp2)) decl.push(tmp2);
+					decl.push(Lexer::toToken("="));
+					decl.push(Lexer::toToken(";"));
+					index++;
 			}
 			if (depthB == -1) break;
 			if (tmp.type() != DIRECTIVE) args.push(tmp);
 		}
 		
-		while (depthB-- > 0) this->sendError("p1", "[", current.lineNumber());
-		while (depthP-- > 0) this->sendError("p1", "(", current.lineNumber());
+		while (depthB-- > 0) this->sendError("p2", "[", current.lineNumber());
+		while (depthP-- > 0) this->sendError("p2", "(", current.lineNumber());
 	}
 	else { // parse an expression.
 		long depth = 0;
@@ -357,6 +364,7 @@ RPN Parser::parseDeclaration(Token var) {
 		Infix a2 = args;
 		// while (a2.pop(tmp)) DEBUG(tmp.value())
 		decl = this->expressionToRPN(args);
+		decl.push(Lexer::toToken(";"));
 	}
 	
 	return decl;
@@ -371,21 +379,18 @@ RPN Parser::expressionToRPN(Infix args) {
 	Token current, prevtok;
 	Stack<Token> operstack;
 
-	//static 
-	Token subscriptOp = Lexer::toToken("[]"),
+	static Token subscriptOp = Lexer::toToken("[]"),
 	             ternaryOp = Token("?:", OPERATOR, MULTINARYOP),
 	             statementEnd = Lexer::toToken(";"),
 	             pluseqTok = Lexer::toToken("+="),
 	             minuseqTok = Lexer::toToken("-="),
 	             oneTok = Lexer::toToken("1");
 
-	//static 
-	Token funcInvoke = Token("@invoke", DIRECTIVE, FUNCTION);
+	static Token funcInvoke = Token("@invoke", DIRECTIVE, FUNCTION);
 
-	args.push(statementEnd);
 	Stack<__SIZETYPE> funcarglist;
 
-	while (args.pop(current)) {//DEBUG(current.value())
+	while (args.pop(current)) {
 		if (current.value() == "$endline" || current.value() == ";") {
 			while (operstack.pop(current)) {
 				// check for unbalanced ( and [
@@ -513,6 +518,11 @@ RPN Parser::expressionToRPN(Infix args) {
 			output.push(current);
 		}
 		prevtok = current;
+	}
+	while (operstack.pop(current)) {
+		// check for unbalanced ( and [
+		if (current.value() == "(" || current.value() == "[") this->sendError(Error("p1", current.value(), current.lineNumber()));
+		output.push(current);
 	}
 
 	// finally, after parsing the infix buffer, append the pre and post RPN.

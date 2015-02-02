@@ -29,10 +29,12 @@ class Variable
 	bool setValueAt(Token, Variable);
 	Function getMethod(String);
 	
+	Token print(ostream& = cout);
+	
 	friend class Object;
 };
 
-Variable nullVariableRef;
+Variable nullVariableRef(";");
 
 class VariableScope
 {
@@ -85,8 +87,12 @@ class Object
 	String _id;
 	Function constructor;
 	Vector<Function> prototypes;
+	bool isFundamental;
 	
 	public:
+	Object();
+	Object(String, bool);
+
 	String id();
 	Function getConstructor();
 	bool hasPrototype(String);

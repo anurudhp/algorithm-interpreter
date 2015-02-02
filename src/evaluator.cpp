@@ -19,7 +19,7 @@ bool Evaluator::runProgram() {
 	return true;
 }
 
-// interface
+/*** interface ***/
 bool Evaluator::sendError(Error e) {
 	this->errors.pushback(e);
 	this->failed = true;
@@ -40,6 +40,7 @@ bool Evaluator::showErrors(ostream& out, bool clearAfterDisplay) {
 	return false;
 }
 
+/*** Variable Caches and management ***/
 Variable& Evaluator::getCachedVariable(String id) {
 	if (id.substr(0, 2) == "#c") {
 		long index = id.substr(2).toNumber();
@@ -49,8 +50,28 @@ Variable& Evaluator::getCachedVariable(String id) {
 	return nullVariableRef;
 }
 
-String Evaluator::cacheVariable(Variable) {
-	return String();
+String Evaluator::cacheVariable(Variable v) {
+	Variable *ref = new Variable();
+	ref->setValue(v);
+	return this->cacheVariableRef(ref);
+}
+String Evaluator::cacheVariableRef(Variable *ref) {
+	this->cache.pushback(ref);
+	long index = this->cache.size() - 1;
+	String hash = "#c";
+	hash += integerToString(index);
+	return hash;
+}
+
+Variable& Evaluator::getVariable(String id, VariableScope& scope, bool searchCache) {
+	if (scope.exists(id)) {
+		return scope.resolve(id);
+	}
+	if (searchCache) {
+		Variable& v = this->getCachedVariable(id);
+		return v;
+	}
+	return nullVariableRef;
 }
 
 Vector<Variable>& Evaluator::getGlobals() {
@@ -114,21 +135,13 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope, Vector<Token>* st
 				va = a;
 				vb = b;
 				if (a.subtype() == VARIABLE) {
-					if (a.type() == IDENTIFIER) {
-						if (scope.exists(a.value())) va = scope.resolve(a.value()).value();
-					}
-					else if (a.type() == DIRECTIVE) {
-					
-					}
+					Variable& v1 = this->getVariable(a.value(), scope, true);
+					if (v1.id() == ";") 
 				}
 				if (b.subtype() == VARIABLE) {
-					if (b.type() == IDENTIFIER) {
-						if (scope.exists(b.value())) vb = scope.resolve(b.value()).value();
-					}
-					else if (b.type() == DIRECTIVE) {
-					
-					}
+					Variable& v2 = this->getVariable(a.value(), scope, true);
 				}
+
 				Token res = Operations::binaryOperator(oper, va, vb);
 
 				if (isAssign) {

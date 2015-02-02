@@ -6,10 +6,13 @@
 * Implementation: Class Variable
 *********************************/
 
-Variable::Variable() {}
+Variable::Variable() {
+	this->_object = NULL;
+}
 Variable::Variable(Token val) {
 	_id = val.value();
 	_value = val;
+	this->_object = NULL;
 }
 Variable::Variable(const Variable& v) {
 	_id = v._id;
@@ -51,8 +54,12 @@ bool Variable::setValue(const Variable& v) {
 bool Variable::hasValueAt(Token key) {
 	if (this->type() == ARRAY) {
 		key = Operations::typecastToken(key, NUMBER);
-		if (key.value() == "null" || !key.value().isInteger()) return false;
+		if (key.value() == "null") return false;
 		
+		// check for properties/methods:
+		if (!this->_object) this->_object = ArrayObject;
+		
+		(key.value().isInteger()) return false;
 		__SIZETYPE index = key.value().toInteger();
 		if (index < 0) index += this->_values.size();
 		
@@ -267,6 +274,12 @@ Token Function::evaluate(Vector<Variable> args, Evaluator& eval) {
 /*******************************
 * Implementation: class Object 
 ********************************/
+Object::Object() { isFundamental = false; }
+
+Object::Object(String name, bool f) {
+	this->_id = name;
+	this->isFundamental = f;
+}
 
 String Object::id() { return this->_id; }
 
