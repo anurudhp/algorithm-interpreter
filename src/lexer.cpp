@@ -428,7 +428,7 @@ bool importErrorCodes(ifstream& ecreader) {
 
 	errorCodes.clear(); errorDesc.clear();
 	while (!ecreader.eof()) {
-		ecreader >> buff;
+		buff.get(ecreader, '\n');
 		if (buff.substr(0, 1) != "#" && buff.indexOf(":") > 0) {
 			vs = strsplit(buff, ":");
 			errorCodes.pushback(vs[0].trim());
