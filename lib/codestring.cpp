@@ -250,15 +250,9 @@ __SIZETYPE String::countOccurences(const String& find ) const {
 **********************************/
 
 bool String::isInteger() const {
-	__SIZETYPE i;
-	for (i = 0; i < _len; i++) {
-		if (_data[i] == '-') {
-			if (i != 0) return false;
-			else continue;
-		}
-		else if (!(_data[i] >= '0' && _data[i] <= '9')) return false;
-	}
-	return true;
+	if (!this->isNumber()) return false;
+	double s = this->toNumber();
+	return (s == (double(int(s))));
 }
 bool String::isNumber() const {
 	__SIZETYPE i;
