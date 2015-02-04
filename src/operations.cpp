@@ -137,8 +137,8 @@ Token Operations::logical(String op, Token t1, Token t2) {
 Token Operations::unaryOperator(String op, Token tok) {
 	if (op == "!") {
 		typecastToken(tok, BOOLEAN);
-		if (tok.value() == "true") return falseToken;
-		return falseToken;
+		if (tok.value() == "true") {return falseToken;}
+		return trueToken;
 	}
 	if (op == "-") {
 		tok = typecastToken(tok, NUMBER);
@@ -191,7 +191,7 @@ Token Operations::compare(String op, Token t1, Token t2) {
 			if (t1.value().toNumber() == t2.value().toNumber()) return trueToken;
 		}
 		else if (t1.subtype() == STRING) {
-			if (t1.value() == t2.value()) return trueToken;
+			if (t1.value() == t2.value()) {return trueToken;}
 		}
 		return falseToken;
 
@@ -223,10 +223,12 @@ Token Operations::compare(String op, Token t1, Token t2) {
 		return unaryOperator("!", logical("||", compare("==", t1, t2), compare("<", t1, t2)));
 	}
 	if (op == "<=") {
-		return compare(">", t1, t2);
+        if(t1.value().toNumber()==t2.value().toNumber()) return trueToken;
+		return compare("<", t1, t2);
 	}
 	if (op == ">=") {
-		return compare("<", t1, t2);
+	    if(t1.value().toNumber()==t2.value().toNumber()) return trueToken;
+		return compare(">", t1, t2);
 	}
 
 	return nullvalToken;
