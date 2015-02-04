@@ -7,6 +7,7 @@ class Evaluator
 	Vector <Error> errors;
 	VariableScope variables;
 	Vector<Variable*> cache;
+	Stack<Function> functionStack;
 	Parser *parser;
 	bool failed;
 	

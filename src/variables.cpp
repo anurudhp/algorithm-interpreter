@@ -259,20 +259,25 @@ __SIZETYPE VariableScope::depth() const { return this->varstack.size(); }
 * Implementation: Class Function
 *********************************/
 
-Function::Function() {}
+Function::Function() {
+	hasRet = false;
+}
 
 Function::Function(String id) {
 	this->_id = id;
+	hasRet = false;
 }
 Function::Function(String id, Vector<String> params, RPN st) {
 	this->_id = id;
 	this->parameters = params;
 	this->statements = st;
+	hasRet = false;
 }
 Function::Function(const Function& f) {
 	this->_id = f._id;
 	this->parameters = f.parameters;
 	this->statements = f.statements;
+	hasRet = false;
 }
 
 __SIZETYPE Function::paramsSize() const { return this->parameters.size(); }
@@ -283,10 +288,17 @@ void Function::setParams(Vector<String> p) { this->parameters = p; }
 void Function::setStatements(RPN st) { this->statements = st; }
 void Function::setVariables(Vector<Variable> fv) { this->functionVariables = fv; }
 
+bool Function::hasReturned() const { return this->hasRet; }
+bool Function::setReturn(Token ret) {
+	if (this->hasRet) return false;
+	this->hasRet = true;
+	this->returnVal = ret;
+	return true;
+}
+
 Token Function::evaluate(Vector<Variable> args, Evaluator& eval) {
 	Vector<Variable> fvars;
-	Variable nullVar;
-	nullVar.setValue(nullvalToken);
+	Variable nullVar(nullvalToken);
 	for (__SIZETYPE i = 0; i < this->parameters.size(); i++) {
 		if (i > args.size()) args.pushback(nullVar);
 		Variable arg(this->parameters[i]);
@@ -297,12 +309,22 @@ Token Function::evaluate(Vector<Variable> args, Evaluator& eval) {
 	VariableScope scope;
 	scope.stackVariables(eval.getGlobals());
 	scope.stackVariables(fvars);
-	Token ret = eval.evaluateRPN(this->statements, scope);
+	scope.stackVariables(functionVariables);
 
+	eval.evaluateRPN(this->statements, scope);
 	// update the globals in the evaluator.
 	eval.getGlobals() = scope.getBaseVariables();
 
-	if (!ret.value()) ret = nullvalToken;
+	Token ret = this->returnVal;
+	if (!this->hasReturned()) ret = nullvalToken;
+	this->hasRet = false;
+
+	if (ret.subtype() == VARIABLE && scope.exists(ret.value())) {
+		// local variable returned. cache it in the evaluator
+		Variable& v = scope.resolve(ret.value());
+		String hash = eval.cacheVariable(v);
+		ret = Token(hash, DIRECTIVE, VARIABLE);
+	}
 	return ret;
 }
 /*******************************

@@ -52,6 +52,7 @@ Variable& Evaluator::getCachedVariable(String id) {
 
 String Evaluator::cacheVariable(Variable v) {
 	Variable *ref = new Variable();
+	if (ref == NULL) forcequit();
 	ref->setValue(v);
 	return this->cacheVariableRef(ref);
 }
@@ -95,6 +96,9 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope, Vector<Token>* st
 
 	while (source.pop(current)) {
 		if (this->failed) return Token();
+		if (!this->functionStack.empty()) {
+			if (this->functionStack.top().hasReturned()) return Token();
+		}
 		if (current.type() == LITERAL || current.subtype() == VARIABLE) valuestack.push(current);
 		else if (current.value() == ";") {
 			Token t;
@@ -107,6 +111,10 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope, Vector<Token>* st
 				Token a, b;
 				valuestack.pop(b);
 				valuestack.pop(a);
+
+				if (b.subtype() == VARIABLE) {
+					b = this->getVariable(b.value(), scope, true).value();
+				}
 				bool valid = false;
 				if (a.type() == LITERAL) {
 					if (a.subtype() == STRING && b.value().isInteger()) {
@@ -125,11 +133,29 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope, Vector<Token>* st
 				}
 				else if (a.subtype() == VARIABLE) {
 					Variable& var = this->getVariable(a.value(), scope, true);
-					if (b.type() == LITERAL) {
-						Variable& prop = var.valueAt(b);
-						String hash = this->cacheVariableRef(&prop);
-						valuestack.push(Token(hash, DIRECTIVE, VARIABLE));
-						valid = true;
+					if (var.type() == STRING) {
+						if (b.value().isInteger()) {
+							a = var.value();
+							long ind = b.value().toInteger();
+							String str = Lexer::tokenToString(a);
+							if (ind < 0 || ind >= str.length()) {
+								this->sendError(Error("r")); // invalid index
+								valuestack.push(nullvalToken);
+							}
+							else {
+								str = Lexer::stringToLiteral(str.substr(ind, 1));
+								valuestack.push(Lexer::toToken(str));
+							}
+							valid = true;
+						}
+					}
+					else if (var.type() == ARRAY || var.type() == OBJECT) {
+						if (var.hasValueAt(b)) {
+							Variable& prop = var.valueAt(b);
+							String hash = this->cacheVariableRef(&prop);
+							valuestack.push(Token(hash, DIRECTIVE, VARIABLE));
+							valid = true;
+						}
 					}
 				}
 
@@ -199,14 +225,24 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope, Vector<Token>* st
 			}
 		}
 		else if (current.type() == KEYWORD) {
-
-			if (current.value() == "if") {
+			if (current.value() == "return") {
+				// function stack shouldn't be empty.
+				// set the return for the top of the stack, and break the evaluation.
+				if (!this->functionStack.empty()) {
+					Token ret;
+					valuestack.pop(ret);
+					this->functionStack.top().setReturn(ret);
+					break;
+				}
+			}
+			else if (current.value() == "if") {
 				Token hashtok;
 				source.pop(hashtok);
 				HashedData hd = this->parser->getHashedData(hashtok.value());
 				HashedData::csIf ifSet = hd.getIf();
 
 				Token val = evaluateRPN(ifSet.ifCondition, scope);
+				if (val.subtype() == VARIABLE) val = this->getVariable(val.value(), scope, true).value();
 				val = Operations::typecastToken(val, BOOLEAN);
 
 				if (val.value() == "true") {
@@ -227,6 +263,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope, Vector<Token>* st
 				HashedData::csFor whileSet = hd.getFor();
 
 				Token val = evaluateRPN(whileSet.forCondition, scope);
+				if (val.subtype() == VARIABLE) val = this->getVariable(val.value(), scope, true).value();
 				val = Operations::typecastToken(val, BOOLEAN);
 
 				while (val.value() == "true") {
@@ -234,6 +271,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope, Vector<Token>* st
 					evaluateRPN(whileSet.forStatements, scope);
 					scope.popVariables();
 					val = evaluateRPN(whileSet.forCondition, scope);
+					if (val.subtype() == VARIABLE) val = this->getVariable(val.value(), scope, true).value();
 					val = Operations::typecastToken(val, BOOLEAN);
 				}
 			}
@@ -327,10 +365,13 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope, Vector<Token>* st
 								if (args[i].type() == LITERAL) argVars.pushback(Variable(args[i]));
 								else if (args[i].subtype() == VARIABLE) argVars.pushback(this->getVariable(args[i].value(), scope, true));
 							}
-							tmp = func.evaluate(argVars, *this);
+							this->functionStack.push(func);
+							tmp = this->functionStack.top().evaluate(argVars, *this);
+							this->functionStack.pop();
 						} else {
 							this->sendError("rf1", current.value()); // unable to find function.
 						}
+						valuestack.push(tmp);
 					}
 				}
 			}
