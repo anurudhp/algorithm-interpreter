@@ -12,10 +12,16 @@ struct InbuiltFunctions {
 
 Token InbuiltFunctions::write(Token t, ostream& out) {
 	if (t.type() != LITERAL) return falseToken;
-    if (t.subtype() == NUMBER || t.subtype() == BOOLEAN || t.subtype() == CONSTANT) {
+    if (t.subtype() == BOOLEAN || t.subtype() == CONSTANT) {
         out << t.value();
         return trueToken;
     }
+	if (t.subtype() == NUMBER) {
+		String val(t.value().trim());
+		if (val.isInteger()) out << val.toInteger();
+		else out << val.toNumber();
+        return trueToken;
+	}
     if (t.subtype() == STRING) {
         String val = Lexer::tokenToString(t);
 		for (__SIZETYPE i = 0; i < val.length(); i++) {

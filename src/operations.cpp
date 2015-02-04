@@ -38,8 +38,9 @@ Token Operations::typecastToken(Token tok, tokenType type) {
 		}
 	}
 	else if (type == STRING) {
-		String val = Lexer::stringToLiteral(tok.value());
-		return Lexer::toToken(val);
+		String val = tok.value();
+		if (val.isInteger()) val = integerToString(val.toInteger());
+		return Lexer::toToken(Lexer::stringToLiteral(val));
 	}
 	else if (type == BOOLEAN) {
 		if (tok.subtype() == NUMBER) {
@@ -75,7 +76,6 @@ Token Operations::add(Token t1, Token t2) {
 			   s2 = Lexer::tokenToString(t2);
 		return  Lexer::toToken(Lexer::stringToLiteral(s1 + s2));
 	}
-	
 	if (t1.subtype() == NUMBER || t2.subtype() == NUMBER || t1.subtype() == BOOLEAN || t2.subtype() == BOOLEAN) {
 		t1 = typecastToken(t1, NUMBER);
 		t2 = typecastToken(t2, NUMBER);
@@ -90,7 +90,8 @@ Token Operations::subtract(Token t1, Token t2) {
 	if (t1.subtype() != NUMBER && t2.subtype() != NUMBER) return nullvalToken;
 	double a1 = t1.value().toNumber(),
 		   a2 = t2.value().toNumber();
-	return Lexer::toToken(numberToString(a1 - a2));
+	Token subtr = Lexer::toToken(numberToString(a1 - a2));
+	return subtr;
 }
 
 Token Operations::multiply(Token t1, Token t2) {
@@ -151,6 +152,7 @@ Token Operations::unaryOperator(String op, Token tok) {
 // Operator Priorities:
 int Operations::priority(String op) {
 	if (op == ".") return 20;
+	if (op == "typeof") return 18;
 	if (op == "++" || op == "--") return 15;
 	if (op == "*" || op == "/" || op == "%")  return 10;
 	if (op == "+" || op == "-") return 8;
@@ -184,7 +186,7 @@ Token Operations::compare(String op, Token t1, Token t2) {
 			return nullvalToken;
 		}
 		if (t1.subtype() != t2.subtype()) t2 = typecastToken(t2, t1.subtype());
-		
+
 		if (t1.subtype() == NUMBER) {
 			if (t1.value().toNumber() == t2.value().toNumber()) return trueToken;
 		}
@@ -192,7 +194,7 @@ Token Operations::compare(String op, Token t1, Token t2) {
 			if (t1.value() == t2.value()) return trueToken;
 		}
 		return falseToken;
-		
+
 	}
 	if (op == "!="){
 		return unaryOperator("!", compare("==", t1, t2));
@@ -211,7 +213,7 @@ Token Operations::compare(String op, Token t1, Token t2) {
 	if (op == "<") {
 		if (t1.value() == "infinity") return falseToken;
 		if (t2.value() == "infinity") return trueToken;
-		
+
 		double v1 = t1.value().toNumber(),
 		       v2 = t2.value().toNumber();
 		if (v1 < v2) return trueToken;
@@ -226,7 +228,7 @@ Token Operations::compare(String op, Token t1, Token t2) {
 	if (op == ">=") {
 		return compare("<", t1, t2);
 	}
-	
+
 	return nullvalToken;
 }
 
