@@ -1,4 +1,5 @@
-var const global typeof delete and or not equals if else while until do for foreach
+var const global typeof delete and or not equals
+if else while until do for foreach function return
 print printLine readNumber readString readLine String Number Boolean Array
 null infinity true false
 ()[]{},:;
