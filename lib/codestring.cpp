@@ -107,7 +107,7 @@ __SIZETYPE String::length() const {
 // return the character at an index
 char String::charAt(__SIZETYPE index) const {
 	if( index < 0 ) index += _len;
-	if( index > _len || index < 0 ) return 0;
+	if( index >= _len || index < 0 ) return 0;
 	return _data[index];
 }
 
