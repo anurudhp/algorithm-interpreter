@@ -56,6 +56,8 @@ HashedData::csFor HashedData::getFor() {
 	return c;
 }
 
+Vector<RPN> HashedData::getStatements() { return this->statementSet; }
+
 /*******************************
 * end implementation: HashedData
 ********************************/
@@ -141,6 +143,10 @@ bool Parser::parseSource() {
 	this->lexer->putbackToken(tok);
 
 	this->output = this->parseBlock(0); // parse the global block
+	this->validateRPN(this->output);
+
+	lexerErrors = this->lexer->getErrors();
+	for (__SIZETYPE i = 0; i < lexerErrors.size(); i++) this->sendError(lexerErrors[i]);
 
 	if (this->showErrors(cerr)) {
 		this->status = PARSE_FAILED;
@@ -167,6 +173,7 @@ RPN Parser::parseBlock(bufferIndex depth) {
 
 	while (!lexer->ended()) {
 		current = lexer->getToken();
+		if (current.value() == "$null") return RPN();
 		if (current.value() == "$eof") break;
 		if (current.value() == "$endline") continue;
 		if (current.indent() != depth) {
@@ -188,12 +195,12 @@ RPN Parser::parseBlock(bufferIndex depth) {
 					Vector<Variable>& globs = variables.getBaseVariables();
 					for (__SIZETYPE i = 0; i < globs.size(); i++)
 						if (globs[i].id() == vartok.value()) {
-							this->sendError("p", vartok.value(), vartok.lineNumber()); // re-declaration of global variable
+							this->sendError("p4.1", vartok.value(), vartok.lineNumber()); // re-declaration of global variable
 							reDec = true;
 						}
 				}
 				else if (variables.existsAtTop(vartok.value())) {
-					this->sendError("p", vartok.value(), vartok.lineNumber()); // re-declaration of variable
+					this->sendError("p4.1", vartok.value(), vartok.lineNumber()); // re-declaration of variable
 					reDec = true;
 				}
 
@@ -252,7 +259,6 @@ RPN Parser::parseBlock(bufferIndex depth) {
 			blockOutput.push(this->hashify(hdIf)); // the hashed token.
 		}
 		else if(current.value() == "while") {
-
 			HashedData hdWhile;
 			HashedData::csFor w;
 
@@ -265,8 +271,8 @@ RPN Parser::parseBlock(bufferIndex depth) {
 			blockOutput.push(this->hashify(hdWhile));
 
 		}
-		else if(current.value() == "for") {
-			HashedData hdFor;
+		else if (current.value() == "for") {
+			/*HashedData hdFor;
 			HashedData::csFor f;
 			Infix I;
 			Token T;
@@ -281,6 +287,25 @@ RPN Parser::parseBlock(bufferIndex depth) {
 			lineBuffer.pop(T);
 			I.push(T);
 			f.forUpdate = this->expressionToRPN(I);
+			f.forStatements = this->parseBlock(depth+1);
+			this->variables.popVariables(f.forVariables);
+
+			hdFor.setValues(f);
+			blockOutput.push(current);
+			blockOutput.push(this->hashify(hdFor));*/
+		}
+		else if (current.value() == "foreach") {
+			// foreach key in object
+			// foreach index in array
+			HashedData hdFor;
+			HashedData::csFor f;
+
+			RPN foreachCondition;
+			Token tmp;
+			lineBuffer.pop(tmp); // key/index
+			if (tmp.type() == IDENTIFIER);
+
+			f.forCondition = foreachCondition;
 			f.forStatements = this->parseBlock(depth+1);
 			this->variables.popVariables(f.forVariables);
 
@@ -323,11 +348,16 @@ RPN Parser::parseBlock(bufferIndex depth) {
 			Vector<Variable> v;
 			variables.popVariables(v);
 			func.setVariables(v);
+			
+			this->functions.pushback(func);
 		}
 		else {
 			Infix i;
 			i.push(current);
+			bool pr = (current.value() == "print");
+			if (pr) i.push(Lexer::toToken("("));
 			while (lineBuffer.pop(current)) i.push(current);
+			if (pr) i.push(Lexer::toToken(")"));
 
 			RPN tempout = this->expressionToRPN(i);
 			while (tempout.pop(current)) blockOutput.push(current);
@@ -349,12 +379,10 @@ RPN Parser::parseDeclaration(Token var) {
 	current = this->lexer->getToken();
 
 	if (current.value() == "{") { // parse a hash-table (object primitive)
-		// ns
-	}
-	else if (current.value() == "[") { // parse array (primitive)
 		long depthP = 0, depthB = 0, index = 0;
-		Infix args;
+		Infix args, tempdecl;
 		Token tmp, tmp2;
+		
 		while (!this->lexer->ended()) {
 			tmp = this->lexer->getToken();
 			if (tmp.value() == "(") depthP++;
@@ -366,12 +394,40 @@ RPN Parser::parseDeclaration(Token var) {
 				(tmp.value() == "]" && depthB == -1 && depthP == 0)) {
 					RPN arrayElem = this->expressionToRPN(args);
 					args.clear();
-					decl.push(var);
-					decl.push(Lexer::toToken(integerToString(index)));
-					decl.push(Lexer::toToken("[]"));
-					while (arrayElem.pop(tmp2)) decl.push(tmp2);
-					decl.push(Lexer::toToken("="));
-					decl.push(Lexer::toToken(";"));
+					tempdecl.push(var);
+					tempdecl.push(Lexer::toToken(integerToString(index)));
+					tempdecl.push(Lexer::toToken("[]"));
+					while (arrayElem.pop(tmp2)) tempdecl.push(tmp2);
+					tempdecl.push(Lexer::toToken("="));
+					tempdecl.push(Lexer::toToken(";"));
+					index++;
+			}
+			if (depthB == -1) break;
+			if (tmp.type() != DIRECTIVE) args.push(tmp);
+		}
+	}
+	else if (current.value() == "[") { // parse array (primitive)
+		long depthP = 0, depthB = 0, index = 0;
+		Infix args, tempdecl;
+		Token tmp, tmp2;
+		
+		while (!this->lexer->ended()) {
+			tmp = this->lexer->getToken();
+			if (tmp.value() == "(") depthP++;
+			else if (tmp.value() == ")") depthP--;
+			else if (tmp.value() == "[") depthB++;
+			else if (tmp.value() == "]") depthB--;
+
+			if ((tmp.value() == "," && depthB ==  0 && depthP == 0) ||
+				(tmp.value() == "]" && depthB == -1 && depthP == 0)) {
+					RPN arrayElem = this->expressionToRPN(args);
+					args.clear();
+					tempdecl.push(var);
+					tempdecl.push(Lexer::toToken(integerToString(index)));
+					tempdecl.push(Lexer::toToken("[]"));
+					while (arrayElem.pop(tmp2)) tempdecl.push(tmp2);
+					tempdecl.push(Lexer::toToken("="));
+					tempdecl.push(Lexer::toToken(";"));
 					index++;
 			}
 			if (depthB == -1) break;
@@ -380,6 +436,15 @@ RPN Parser::parseDeclaration(Token var) {
 
 		while (depthB-- > 0) this->sendError("p2", "[", current.lineNumber());
 		while (depthP-- > 0) this->sendError("p2", "(", current.lineNumber());
+		decl.clear();
+		decl.push(var);
+		decl.push(Lexer::toToken(integerToString(index)));
+		decl.push(Lexer::toToken("Array"));
+		decl.push(this->toArgsToken(1));
+		decl.push(Token("@invoke", DIRECTIVE, FUNCTION));
+		decl.push(Lexer::toToken("="));
+		decl.push(Lexer::toToken(";"));
+		while (tempdecl.pop(tmp)) decl.push(tmp);
 	}
 	else { // parse an expression.
 		long depth = 0;
@@ -391,14 +456,12 @@ RPN Parser::parseDeclaration(Token var) {
 
 		while (!this->lexer->ended()) {
 			tmp = this->lexer->getToken();
-			// DEBUG(tmp.value())
 			if (tmp.value() == "(" || tmp.value() == "[") depth++;
 			else if (tmp.value() == ")" || tmp.value() == "]") depth--;
 			else if ((tmp.value() == ","  && depth == 0) || tmp.value() == "$endline") break;
 			args.push(tmp);
 		}
 		Infix a2 = args;
-		// while (a2.pop(tmp)) DEBUG(tmp.value())
 		decl = this->expressionToRPN(args);
 		decl.push(Lexer::toToken(";"));
 	}
@@ -479,7 +542,7 @@ RPN Parser::expressionToRPN(Infix args) {
 							else {
 								// unable to find number of arguments: arglist is empty.
 								// should not happen.
-								this->sendError(Error("p3.2", "@args", tmp.lineNumber()));
+								this->sendError(Error("p3.2", "@args", current.lineNumber()));
 							}
 
 							if (!operstack.empty() && operstack.top().value() == ".") {
@@ -495,7 +558,7 @@ RPN Parser::expressionToRPN(Infix args) {
 					output.push(tmp);
 				}
 				if (tmp.value() != "(") {
-					this->sendError(Error("p1", ")", tmp.lineNumber())); // unbalanced )
+					this->sendError(Error("p1", ")", current.lineNumber())); // unbalanced )
 				}
 			}
 			else if (current.value() == "]") {
@@ -503,7 +566,7 @@ RPN Parser::expressionToRPN(Infix args) {
 					if (tmp.value() == "[") break;
 					output.push(tmp);
 				}
-				if (tmp.value() != "[") this->sendError(Error("p1", "]", tmp.lineNumber())); // unbalanced ]
+				if (tmp.value() != "[") this->sendError(Error("p1", "]", current.lineNumber())); // unbalanced ]
 				output.push(subscriptOp);
 			}
 			else if (current.value() == ",") {
@@ -519,14 +582,14 @@ RPN Parser::expressionToRPN(Infix args) {
 					if (tmp.value() == "?") break;
 					output.push(tmp);
 				}
-				if (tmp.value() != "?") this->sendError(Error("p2", ": without a ?", tmp.lineNumber())); // unexpected : without a ?
+				if (tmp.value() != "?") this->sendError(Error("p2", ": without a ?", current.lineNumber())); // unexpected : without a ?
 				operstack.pop();
 				operstack.push(ternaryOp);
 			}
 		}
 		if (current.type() == OPERATOR) {
 			if (current.value() == "-") { // check for unary minus
-				if (!prevtok.value() || prevtok.value() == "(" || prevtok.value() == ";") {
+				if (!prevtok.value() || prevtok.value() == "(" || prevtok.value() == "=" || prevtok.value() == ";") {
 					current.setSubtype(UNARYOP);
 				}
 			}
@@ -568,6 +631,99 @@ RPN Parser::expressionToRPN(Infix args) {
 	while (postChange.pop(current)) finalOutput.push(current);
 
 	return finalOutput;
+}
+
+bool Parser::validateRPN(RPN rpn) {
+	Stack<tokenType> vals;
+	Token curr;
+	Vector<String> assignmentOp(strsplit("= += -= *= %= /=", ' '));
+	bool success = true;
+
+	while (rpn.pop(curr)) {
+		if (curr.value() == ";") vals.clear();
+		else if (curr.type() == LITERAL) vals.push(LITERAL);
+		else if (curr.type() == IDENTIFIER) vals.push(curr.subtype());
+		else if (curr.type() == OPERATOR) {
+			if (curr.subtype() == UNARYOP) {
+				if (!vals.pop())
+				vals.push(LITERAL);
+			}
+			else if (curr.subtype() == BINARYOP) {
+				tokenType t1, t2;
+				if (!vals.pop(t2) || !vals.pop(t1)) {
+					this->sendError("p3.3", curr.value(), curr.lineNumber());
+					success = false;
+				}
+				else if (assignmentOp.indexOf(curr.value()) >= 0) {
+					if (t1 != VARIABLE) {
+						this->sendError("rv1", "", curr.lineNumber());
+						success = false;
+					}
+					vals.push(t1);
+				}
+				else if (curr.value() == ".") {
+					if (t1 != VARIABLE || t2 != VARIABLE) {
+						this->sendError("ro1", curr.value(), curr.lineNumber());
+						success = false;
+					}
+					vals.push(VARIABLE);
+				}
+				else if (curr.value() == "[]") {
+					if (t1 != VARIABLE) {
+						this->sendError("ro1", curr.value(), curr.lineNumber());
+						success = false;
+					}
+					vals.push(VARIABLE);
+				}
+				else {
+					vals.push(LITERAL);
+				}
+			}
+			else if (curr.subtype() == MULTINARYOP) { // only ?: (3 args)
+				tokenType t1, t2, t3;
+				vals.pop(t3); vals.pop(t2); vals.pop(t1);
+				vals.push(t2);
+			}
+		}
+		else if (curr.type() == DIRECTIVE) {
+			if (curr.value().substr(0, 6) == "@args|") {
+				long ind = curr.value().substr(6).toInteger();
+				DEBUG(ind)
+				vals.pop(); // function token
+				while (ind--) vals.pop(); // args
+				Token inv; tokenType t1;
+				rpn.pop(inv);
+				if (inv.value() == ".") {
+					if (!vals.pop(t1)) {
+						this->sendError("p3.3", inv.value(), inv.lineNumber());
+						success = false;
+						t1 = VARIABLE; // prevent further errors
+					}
+					else if (t1 != VARIABLE) {
+						this->sendError("ro1", inv.value(), inv.lineNumber());
+						success = false;
+						t1 = VARIABLE; // prevent further errors
+					}
+					rpn.pop(inv);
+				}
+				vals.push(VARIABLE);
+			}
+			else if (curr.type() == HASHED) {
+				Vector<RPN> st = this->getHashedData(curr.value()).getStatements();
+				RPN tmp;
+				while (st.popfront(tmp)) success = success && this->validateRPN(tmp);
+			}
+		}
+		else if (curr.type() == KEYWORD) {
+			if (curr.value() == "if" || curr.value() == "while" || curr.value() == "for" || curr.value() == "foreach") {
+				rpn.pop(curr);
+				Vector<RPN> st = this->getHashedData(curr.value()).getStatements();
+				RPN tmp;
+				while (st.popfront(tmp)) success = success && this->validateRPN(tmp);
+			}
+		}
+	}
+	return success;
 }
 
 Token Parser::toArgsToken(__SIZETYPE num) {

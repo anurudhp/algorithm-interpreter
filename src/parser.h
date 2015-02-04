@@ -31,6 +31,8 @@ class HashedData
 
 	csIf getIf();
 	csFor getFor();
+	
+	Vector<RPN> getStatements();
 };
 
 
@@ -76,12 +78,10 @@ class Parser
 
 	// assumes that the tokens have already been read.
 	RPN expressionToRPN(Infix);
-
-	/* static parsing procedures: */
 	// checks whether the RPN is valid.
-	static bool validateRPN(RPN);
+	bool validateRPN(RPN);
+	
 	static Token toArgsToken(__SIZETYPE);
-
 	friend class Evaluator;RPN getOutput(){return output;}
 };
 

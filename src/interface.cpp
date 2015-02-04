@@ -2,7 +2,9 @@
 int debugLevel = 1;
 #define DEB       if (debugLevel > 1) cerr << ">> REACHED <<\n";
 #define PRINT(i)  if (debugLevel > 1) cerr << ">> " << i << endl;
+#define PRINT2(i)  if (debugLevel > 1) cerr << ">>>>> " << i << endl;
 #define DEBUG(i)  if (debugLevel > 1) cerr << ">> " << #i << " = " << i << endl;
+#define DEBUG2(i) if (debugLevel > 1) cerr << ">>>> " << #i << " = " << i << endl;
 #define LOG(i)    if (debugLevel > 0) cerr << i;
 #define LOGN(i)   if (debugLevel > 0) cerr << i << endl;
 
@@ -56,6 +58,8 @@ bool loadData() {
 	}
 	LOGN("done.");
 	fin.close();
+	
+	nullVariableRef.setValue(Token("null", LITERAL, CONSTANT));
 	
 	cerr << endl;
 	return true;

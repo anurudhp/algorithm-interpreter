@@ -10,10 +10,12 @@ class Variable
 	Token _value;
 	Vector<String> _keys;
 	Vector<Variable> _values;
+	tokenType _type;
 	Object *_object;
 
 	public:
 	Variable();
+	Variable(String);
 	Variable(Token);
 	Variable(const Variable&);
 	Variable& operator= (const Variable&);
@@ -23,13 +25,14 @@ class Variable
 	Token value() const;
 
 	// value access:
+	void setType(tokenType);
 	bool setValue(const Variable&);
 	bool hasValueAt(Token);
 	Variable& valueAt(Token);
 	bool setValueAt(Token, Variable);
 	Function getMethod(String);
 	
-	Token print(ostream& = cout);
+	Token printValues(ostream& = cout);
 	
 	friend class Object;
 };

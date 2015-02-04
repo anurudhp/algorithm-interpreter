@@ -21,6 +21,7 @@ class Evaluator
 	// variable caches
 	Variable& getCachedVariable(String);
 	String cacheVariable(Variable);
+	String cacheVariable();
 	String cacheVariableRef(Variable*);
 
 	Variable& getVariable(String, VariableScope&, bool = false);

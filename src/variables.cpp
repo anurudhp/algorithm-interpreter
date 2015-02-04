@@ -7,11 +7,24 @@
 *********************************/
 
 Variable::Variable() {
+	this->_type = UNKNOWN;
 	this->_object = NULL;
 }
+Variable::Variable(String id) {
+	this->_id = id;
+	this->_type = UNKNOWN;
+	this->_object = NULL;
+}
+
 Variable::Variable(Token val) {
-	_id = val.value();
-	_value = val;
+	this->_type = UNKNOWN;
+	if (val.type() == IDENTIFIER) {
+		_id = val.value();
+	}
+	else if (val.type() == LITERAL) {
+		this->_value = val;
+		this->_type = val.subtype();
+	}
 	this->_object = NULL;
 }
 Variable::Variable(const Variable& v) {
@@ -29,21 +42,22 @@ String Variable::id() const {
 }
 
 tokenType Variable::type() {
-	tokenType ty = this->_value.type();
-	switch (ty) {
-		case NUMBER: case BOOLEAN: case STRING:
-		case HASHED: case ARRAY: case OBJECT:
-		return ty;
-	}
-	if (!this->_keys.empty()) return OBJECT;
-	if (!this->_values.empty()) return ARRAY;
-	return UNKNOWN;
+	return _type;
+}
+void Variable::setType(tokenType t) {
+	this->_type = t;
+	if (t == ARRAY || t == OBJECT) this->_value.setType(t);
 }
 
 Token Variable::value() const { return this->_value; }
 
 // Member/embedded value accessors
 bool Variable::setValue(const Variable& v) {
+	if (_id.charAt(0) == ';') {
+		_value = nullvalToken;
+		return false;
+	}
+	_type = v._type;
 	_value = v._value;
 	_keys = v._keys;
 	_values = v._values;
@@ -56,10 +70,7 @@ bool Variable::hasValueAt(Token key) {
 		key = Operations::typecastToken(key, NUMBER);
 		if (key.value() == "null") return false;
 		
-		// check for properties/methods:
-		if (!this->_object) this->_object = ArrayObject;
-		
-		(key.value().isInteger()) return false;
+		if (!key.value().isInteger()) return false;
 		__SIZETYPE index = key.value().toInteger();
 		if (index < 0) index += this->_values.size();
 		
@@ -70,14 +81,20 @@ bool Variable::hasValueAt(Token key) {
 		key = Operations::typecastToken(key, STRING);
 		if (key.value() == "null") return false;
 		
-		if (this->_keys.indexOf(key.value()) == -1) return false;
+		if (this->_keys.indexOf(key.value()) == -1) {
+			this->_keys.pushback(key.value());
+			this->_values.pushback(Variable());
+			this->_values[-1].setValue(nullvalToken);
+		}
 		return true;
 	}
 	return false;
 }
 
 Variable& Variable::valueAt(Token key) {
-	if (!this->hasValueAt(key)) return nullVariableRef;
+	if (!this->hasValueAt(key)) {
+		return nullVariableRef;
+	}
 	
 	__SIZETYPE index = 0;
 	if (this->type() == ARRAY) {
@@ -128,6 +145,27 @@ bool Variable::setValueAt(Token key, Variable value) {
 Function Variable::getMethod(String funcId) {
 	if (this->type() != OBJECT || this->_object == NULL) return Function();
 	return this->_object->getPrototype(funcId);
+}
+
+Token Variable::printValues(ostream& out) {
+	if (_type == STRING || _type == BOOLEAN || _type == NUMBER) {
+		return InbuiltFunctions::write(_value);
+	}
+	
+	Token res = trueToken, tmp;
+	if (_type == ARRAY) {
+		out << "[ ";
+		bool first = true;
+		for (__SIZETYPE i = 0; i < _values.size(); i++) {
+			if (first) first = false;
+			else out << ", ";
+			tmp = _values[i].printValues(out);
+			res = Operations::logical("&&", res, tmp);
+		}
+		out << " ]";
+		return res;
+	}
+	return falseToken;
 }
 
 /*******************************
