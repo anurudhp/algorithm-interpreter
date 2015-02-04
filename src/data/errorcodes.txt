@@ -10,15 +10,28 @@ l2: Too many decimal points in numeric value
 ####################
 
 p1: unbalanced 
-p2: unexpected
-p3: expected
+p2: unexpected 
+p3: expected 
 
 #variable errors
 p4.1: re-declaration of variable 
 p4.2: invalid identifier 
 # function errors:
-p3.1: expected ( after function name
-p3.2: parser error- unable to detect number of function arguments
+p3.1: expected ( after function name 
+p3.2: parser error- unable to detect number of function arguments 
+p3.3: too few arguments for operator 
 
 # no support:
 ns: Not Supported 
+
+######################
+# runtime errors     #
+######################
+
+# variables
+rv1: invalid left-hand side for assignment 
+rv2: cannot find property of null 
+ro1: invalid operands for 
+
+rf1: unable to find function 
+rf2: does not have method 

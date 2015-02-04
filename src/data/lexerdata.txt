@@ -1,5 +1,5 @@
-var const global typeof delete String Number Boolean Array and or not equals if else while until do for
-print write readNumber readString readLine
+var const global typeof delete and or not equals if else while until do for foreach
+print printLine readNumber readString readLine String Number Boolean Array
 null infinity true false
 ()[]{},:;
 + += - -= * *= / /= % %= = == === != !== > >= < <= && || ? . []
