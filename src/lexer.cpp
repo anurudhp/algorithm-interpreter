@@ -35,7 +35,7 @@ String Error::message() const {
 	__SIZETYPE i;
 	String ret;
 	if (this->_line >= 0) ret = ret + "Line " + integerToString(this->_line) + ": ";
-	else ret = ret + "Runtime Error: ";
+	else ret = ret + "(Runtime) ";
 
 	if (this->_severity == ERROR_FATAL) ret += "FATAL Error: ";
 	else if (this->_severity == ERROR_ERROR) ret += "Error: ";
@@ -145,6 +145,17 @@ String Lexer::stringToLiteral(String val) {
 	return ret;
 }
 
+String Lexer::typeToString(tokenType ty) {
+	switch (ty) {
+		case STRING: return "string";
+		case NUMBER: return "number";
+		case BOOLEAN: return "boolean";
+		case ARRAY: return "array";
+		case OBJECT: return "object";
+	}
+	return "";
+}
+
 // Converts a string into a token,
 // assumes string to be somewhat valid.
 Token Lexer::toToken(String val) {
@@ -158,7 +169,8 @@ Token Lexer::toToken(String val) {
 		return Token(val, LITERAL, STRING);
 	}
 	// numeric literal
-	if (val[0] >= '0' && val[0] <= '9') {
+	if ((val[0] >= '0' && val[0] <= '9') || 
+	    (val[0] == '-' && val.length() > 1 && val.substr(1).isNumber())) {
 		return Token(val, LITERAL, NUMBER);
 	}
 	// punctuator
@@ -168,6 +180,7 @@ Token Lexer::toToken(String val) {
 
 	// keywords
 	if (Keywords.indexOf(val) >= 0) {
+		if (val == "typeof") return Token(val, OPERATOR, UNARYOP);
 		if (Constants.indexOf(val) >= 0) {
 			if (val == trueToken.value() || val == falseToken.value()) return Token(val, LITERAL, BOOLEAN);
 			return Token(val, LITERAL, CONSTANT);
