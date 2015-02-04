@@ -16,6 +16,7 @@ p3: expected
 #variable errors
 p4.1: re-declaration of variable 
 p4.2: invalid identifier 
+p4.3: expected function parameter separator , 
 # function errors:
 p3.1: expected ( after function name 
 p3.2: parser error- unable to detect number of function arguments 
