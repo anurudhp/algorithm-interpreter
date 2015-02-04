@@ -252,6 +252,9 @@ RPN Parser::parseBlock(bufferIndex depth) {
 				i.elseStatements = this->parseBlock(nextDepth);
 				this->variables.popVariables(i.elseVariables);
 			}
+			else {
+				lexer->putbackToken(tmp);
+			}
 
 			// hash and store:
 			hdIf.setValues(i);
@@ -325,16 +328,21 @@ RPN Parser::parseBlock(bufferIndex depth) {
 
 			Vector<String> params;
 			// extract the parameter list:
-			if (!lineBuffer.pop(tmp) || tmp.value() != "(") this->sendError("p1", "( after function name", current.lineNumber()); // expected
+			if (!lineBuffer.pop(tmp) || tmp.value() != "(") this->sendError("p3", "( after function name", current.lineNumber()); // expected
 			if (!lineBuffer.pop(tmp)) this->sendError("p1", "closing ) ", current.lineNumber()); // expected
 			if (tmp.value() != ")") { // has non-void parameter list
 				// first parameter is `tmp`
 				if (tmp.type() != IDENTIFIER) this->sendError("p4.2", tmp.value(), tmp.lineNumber());
+				else params.pushback(tmp.value());
+
 				while (lineBuffer.pop(tmp)) {
 					if (tmp.value() == ")") break;
 					if (tmp.value() != ",") this->sendError("p4.3", "", tmp.lineNumber()); // expected function arg separator ,
 					else if (!lineBuffer.pop(tmp) || tmp.type() != IDENTIFIER) this->sendError("p1", " identifier after ,", tmp.lineNumber()); // expected identifier after separator ,
-					else params.pushback(tmp.value());
+					else {
+						DEBUG(tmp.value())
+						params.pushback(tmp.value());
+					}
 				}
 				if (tmp.value() != ")") this->sendError("p1", " closing ) in function declaration", tmp.lineNumber());
 			}
@@ -348,8 +356,14 @@ RPN Parser::parseBlock(bufferIndex depth) {
 			Vector<Variable> v;
 			variables.popVariables(v);
 			func.setVariables(v);
-			
+
 			this->functions.pushback(func);
+		}
+		else if (current.value() == "return") {
+			RPN returnExpr = this->expressionToRPN(lineBuffer);
+			Token tmp;
+			while (returnExpr.pop(tmp)) blockOutput.push(tmp);
+			blockOutput.push(current);
 		}
 		else {
 			Infix i;
@@ -382,7 +396,7 @@ RPN Parser::parseDeclaration(Token var) {
 		long depthP = 0, depthB = 0, index = 0;
 		Infix args, tempdecl;
 		Token tmp, tmp2;
-		
+
 		while (!this->lexer->ended()) {
 			tmp = this->lexer->getToken();
 			if (tmp.value() == "(") depthP++;
@@ -410,7 +424,7 @@ RPN Parser::parseDeclaration(Token var) {
 		long depthP = 0, depthB = 0, index = 0;
 		Infix args, tempdecl;
 		Token tmp, tmp2;
-		
+
 		while (!this->lexer->ended()) {
 			tmp = this->lexer->getToken();
 			if (tmp.value() == "(") depthP++;
@@ -645,7 +659,10 @@ bool Parser::validateRPN(RPN rpn) {
 		else if (curr.type() == IDENTIFIER) vals.push(curr.subtype());
 		else if (curr.type() == OPERATOR) {
 			if (curr.subtype() == UNARYOP) {
-				if (!vals.pop())
+				if (!vals.pop()) {
+					this->sendError("p3.3", curr.value(), curr.lineNumber());
+					success = false;
+				}
 				vals.push(LITERAL);
 			}
 			else if (curr.subtype() == BINARYOP) {
@@ -688,7 +705,6 @@ bool Parser::validateRPN(RPN rpn) {
 		else if (curr.type() == DIRECTIVE) {
 			if (curr.value().substr(0, 6) == "@args|") {
 				long ind = curr.value().substr(6).toInteger();
-				DEBUG(ind)
 				vals.pop(); // function token
 				while (ind--) vals.pop(); // args
 				Token inv; tokenType t1;

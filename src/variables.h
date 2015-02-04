@@ -31,9 +31,9 @@ class Variable
 	Variable& valueAt(Token);
 	bool setValueAt(Token, Variable);
 	Function getMethod(String);
-	
+
 	Token printValues(ostream& = cout);
-	
+
 	friend class Object;
 };
 
@@ -52,7 +52,7 @@ class VariableScope
 	bool addVariable(Variable&);
 	bool popVariables();
 	bool popVariables(Vector<Variable>&);
-	
+
 	bool exists(String);
 	bool existsAtTop(String);
 	Variable& resolve(String);
@@ -66,6 +66,9 @@ class Function
 	Vector<String> parameters;
 	Vector<Variable> functionVariables;
 	RPN statements;
+
+	Token returnVal;
+	bool hasRet;
 
 	public:
 	Function();
@@ -83,6 +86,8 @@ class Function
 	void setVariables(Vector<Variable>);
 	// evaluating:
 	Token evaluate(Vector<Variable>, Evaluator&);
+	bool hasReturned() const;
+	bool setReturn(Token);
 };
 
 class Object
@@ -91,7 +96,7 @@ class Object
 	Function constructor;
 	Vector<Function> prototypes;
 	bool isFundamental;
-	
+
 	public:
 	Object();
 	Object(String, bool);
