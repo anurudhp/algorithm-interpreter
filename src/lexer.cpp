@@ -406,21 +406,24 @@ bool Lexer::ended() {
 
 bool importLexerData(ifstream& datareader) {
 	if (!datareader) return false;
-	String buff[7];
-	for(int i = 0; i < 7; i++) {
+	String buff[8];
+	int i;
+	for(i = 0; i < 8; i++) {
 		if (datareader.eof()) break;
 		buff[i].get(datareader, '\n');
 	}
-
-	Keywords = strsplit(buff[0], ' ');
-	InbuiltFunctionList = strsplit(buff[1], ' ');
-	Constants = strsplit(buff[2], ' ');
+	i = 0;
+	Keywords.clear();
+	Keywords.append(strsplit(buff[i++], ' '));
+	Keywords.append(strsplit(buff[i++], ' '));
+	InbuiltFunctionList = strsplit(buff[i++], ' ');
+	Constants = strsplit(buff[i++], ' ');
 	Keywords.append(Constants);
-	Punctuators = strsplit(buff[3]);
+	Punctuators = strsplit(buff[i++]);
 	// operators.
-	binaryOperators = strsplit(buff[4], ' ');
-	unaryOperators = strsplit(buff[5], ' ');
-	Opstarts = strsplit(buff[6]);
+	binaryOperators = strsplit(buff[i++], ' ');
+	unaryOperators = strsplit(buff[i++], ' ');
+	Opstarts = strsplit(buff[i++]);
 
 	// setup the directive tokens:
 	eofToken = Token("$eof", DIRECTIVE);
