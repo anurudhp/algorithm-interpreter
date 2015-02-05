@@ -277,6 +277,7 @@ Function::Function(const Function& f) {
 	this->_id = f._id;
 	this->parameters = f.parameters;
 	this->statements = f.statements;
+	this->functionVariables = f.functionVariables;
 	hasRet = false;
 }
 
@@ -297,18 +298,18 @@ bool Function::setReturn(Token ret) {
 }
 
 Token Function::evaluate(Vector<Variable> args, Evaluator& eval) {
-	Vector<Variable> fvars;
+	Vector<Variable> func_args;
 	Variable nullVar(nullvalToken);
 	for (__SIZETYPE i = 0; i < this->parameters.size(); i++) {
 		if (i > args.size()) args.pushback(nullVar);
 		Variable arg(this->parameters[i]);
 		arg.setValue(args[i]);
-		fvars.pushback(arg);
+		func_args.pushback(arg);
 	}
 
 	VariableScope scope;
 	scope.stackVariables(eval.getGlobals());
-	scope.stackVariables(fvars);
+	scope.stackVariables(func_args);
 	scope.stackVariables(functionVariables);
 
 	eval.evaluateRPN(this->statements, scope);
