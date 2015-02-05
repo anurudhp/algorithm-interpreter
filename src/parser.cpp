@@ -281,26 +281,44 @@ RPN Parser::parseBlock(bufferIndex depth) {
 			//    (or) for i = N downto 1
 			HashedData hdFor;
 			HashedData::csFor f;
-			Token tmp; Infix expr; RPN res;
+			Token tmp, eq, iter, comp;
+			Infix expr; RPN res;
 
 			// get the iterator variable
-			if (!lineBuffer.pop(tmp) || tmp.type() != IDENTIFIER) this->sendError("p3", "identifier as iterator in `for` expression", tmp.lineNumber());
-			f.counterVariables.pushback(Variable(tmp.value()));
-			f.forInitialization.push(tmp);
-
+			if (!lineBuffer.pop(iter) || iter.type() != IDENTIFIER) this->sendError("p3", "identifier as iterator in `for` expression", iter.lineNumber());
+			iter.setSubtype(VARIABLE);
+			f.counterVariables.pushback(Variable(iter));
 			// get the =
-			if (!lineBuffer.pop(tmp) || tmp.value() != "=") this->sendError("p3", "=", tmp.lineNumber());
-			f.forInitialization.push(tmp);
+			if (!lineBuffer.pop(eq) || eq.value() != "=") this->sendError("p3", "=", tmp.lineNumber());
 
 			expr.clear();
 			while (lineBuffer.pop(tmp)) {
 				if (tmp.value() == "to" || tmp.value() == "downto") break;
 				expr.push(tmp);
 			}
-			if (tmp.value() != "to" && tmp.value() == "downto") this->sendError("p3", "to", tmp.lineNumber());
+			if (tmp.value() != "to" && tmp.value() != "downto") this->sendError("p3", "to", tmp.lineNumber());
+			comp = tmp;
 			res = this->expressionToRPN(expr);
+			
+			f.forInitialization.push(iter);
+			while (res.pop(tmp)) f.forInitialization.push(tmp);
+			f.forInitialization.push(eq);
+			
+			res = this->expressionToRPN(lineBuffer);
+			f.forCondition.push(iter);
+			while (res.pop(tmp)) f.forCondition.push(tmp);
+			f.forCondition.push(Lexer::toToken((comp.value() == "to") ? "<=" : ">="));
+			
+			f.forUpdate.push(iter);
+			f.forUpdate.push(Lexer::toToken("1"));
+			f.forUpdate.push(Lexer::toToken((comp.value() == "to") ? "+=" : "-="));
+			
+			f.forStatements = this->parseBlock(depth + 1);
+			this->variables.popVariables(f.forVariables);
 
-
+			hdFor.setValues(f);
+			blockOutput.push(current);
+			blockOutput.push(this->hashify(hdFor));
 		}
 		else if (current.value() == "foreach") {
 			// foreach key in object

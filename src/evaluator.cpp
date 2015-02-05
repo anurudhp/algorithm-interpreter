@@ -288,6 +288,30 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope, Vector<Token>* st
 					val = Operations::typecastToken(val, BOOLEAN);
 				}
 			}
+			else if (current.value() == "for") {
+				Token hashtok;
+				source.pop(hashtok);
+				HashedData hd = this->parser->getHashedData(hashtok.value());
+				HashedData::csFor forSet = hd.getFor();
+
+				scope.stackVariables(forSet.counterVariables);
+				this->evaluateRPN(forSet.forInitialization, scope);
+
+				Token val = this->evaluateRPN(forSet.forCondition, scope);
+				if (val.subtype() == VARIABLE) val = this->getVariable(val.value(), scope, true).value();
+				val = Operations::typecastToken(val, BOOLEAN);
+
+				while (val.value() == "true") {
+					scope.stackVariables(forSet.forVariables);
+					this->evaluateRPN(forSet.forStatements, scope);
+					scope.popVariables();
+					this->evaluateRPN(forSet.forUpdate, scope);
+					val = this->evaluateRPN(forSet.forCondition, scope);
+					if (val.subtype() == VARIABLE) val = this->getVariable(val.value(), scope, true).value();
+					val = Operations::typecastToken(val, BOOLEAN);
+				}
+				scope.popVariables();
+			}
 
 		}
 		else if (current.type() == IDENTIFIER) {
