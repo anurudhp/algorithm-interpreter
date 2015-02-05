@@ -269,7 +269,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope, Vector<Token>* st
 					scope.popVariables();
 				}
 			}
-			else if (current.value() == "while") {
+			else if (current.value() == "while" || current.value() == "until") {
 				Token hashtok;
 				source.pop(hashtok);
 				HashedData hd = this->parser->getHashedData(hashtok.value());
@@ -278,8 +278,10 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope, Vector<Token>* st
 				Token val = evaluateRPN(whileSet.forCondition, scope);
 				if (val.subtype() == VARIABLE) val = this->getVariable(val.value(), scope, true).value();
 				val = Operations::typecastToken(val, BOOLEAN);
+				
+				String canContinue = (current.value() == "while") ? "true" : "false";
 
-				while (val.value() == "true") {
+				while (val.value() == canContinue) {
 					scope.stackVariables(whileSet.forVariables);
 					evaluateRPN(whileSet.forStatements, scope);
 					scope.popVariables();
