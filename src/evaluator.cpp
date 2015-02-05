@@ -88,8 +88,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope, Vector<Token>* st
 	if (this->failed) return Token();
 	Token current;
 	Stack<Token> valuestack;
-	RPN postEval;
-	// static
+
 	Vector<String> assignmentOp(strsplit("= += -= *= /= %=", ' '));
 	Variable nullvalVariable("$");
 	nullvalVariable.setValue(nullvalToken);
