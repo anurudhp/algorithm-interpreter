@@ -166,8 +166,8 @@ int Operations::priority(String op) {
 int Operations::comparePriority(Token a, Token b) {
 	int pa = priority(a.value()), pb = priority(b.value());
 	// exception: unary `-` vs `typeof`
-	if (a.value() == "-" && a.subtype() == UNARY && b.value() == "typeof") return 1;
-	if (b.value() == "-" && b.subtype() == UNARY && a.value() == "typeof") return 0;
+	if (a.value() == "-" && a.subtype() == UNARYOP && b.value() == "typeof") return 1;
+	if (b.value() == "-" && b.subtype() == UNARYOP && a.value() == "typeof") return 0;
 	return (pa - pb);
 }
 

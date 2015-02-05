@@ -33,6 +33,7 @@ void HashedData::setValues(csFor f) {
 
 	this->clearVariables();
 	this->addVariables(f.forVariables);
+	this->addVariables(f.counterVariables);
 }
 
 
@@ -53,6 +54,7 @@ HashedData::csFor HashedData::getFor() {
 	c.forUpdate = this->statementSet[2];
 	c.forStatements = this->statementSet[3];
 	c.forVariables = this->variableSet[0];
+	c.counterVariables = this->variableSet[1];
 	return c;
 }
 
@@ -119,7 +121,7 @@ Token Parser::hashify(HashedData& hd) {
 	return Token(hash, DIRECTIVE, HASHED);
 }
 HashedData Parser::getHashedData(String hash) {
-	long ind = hash.substr(0, 2).toNumber();
+	long ind = hash.substr(2).toNumber();
 	return this->hashes[ind];
 }
 
@@ -275,27 +277,30 @@ RPN Parser::parseBlock(bufferIndex depth) {
 
 		}
 		else if (current.value() == "for") {
-			/*HashedData hdFor;
+			// format: for i = 1 to N
+			//    (or) for i = N downto 1
+			HashedData hdFor;
 			HashedData::csFor f;
-			Infix I;
-			Token T;
-			lineBuffer.pop(T);
-			I.push(T);
-			f.forInitialization = this->expressionToRPN(I);
-			I.pop();
-			lineBuffer.pop(T);
-			I.push(T);
-			f.forCondition = this->expressionToRPN(I);
-			I.pop();
-			lineBuffer.pop(T);
-			I.push(T);
-			f.forUpdate = this->expressionToRPN(I);
-			f.forStatements = this->parseBlock(depth+1);
-			this->variables.popVariables(f.forVariables);
+			Token tmp; Infix expr; RPN res;
 
-			hdFor.setValues(f);
-			blockOutput.push(current);
-			blockOutput.push(this->hashify(hdFor));*/
+			// get the iterator variable
+			if (!lineBuffer.pop(tmp) || tmp.type() != IDENTIFIER) this->sendError("p3", "identifier as iterator in `for` expression", tmp.lineNumber());
+			f.counterVariables.pushback(Variable(tmp.value()));
+			f.forInitialization.push(tmp);
+
+			// get the =
+			if (!lineBuffer.pop(tmp) || tmp.value() != "=") this->sendError("p3", "=", tmp.lineNumber());
+			f.forInitialization.push(tmp);
+
+			expr.clear();
+			while (lineBuffer.pop(tmp)) {
+				if (tmp.value() == "to" || tmp.value() == "downto") break;
+				expr.push(tmp);
+			}
+			if (tmp.value() != "to" && tmp.value() == "downto") this->sendError("p3", "to", tmp.lineNumber());
+			res = this->expressionToRPN(expr);
+
+
 		}
 		else if (current.value() == "foreach") {
 			// foreach key in object
@@ -306,7 +311,8 @@ RPN Parser::parseBlock(bufferIndex depth) {
 			RPN foreachCondition;
 			Token tmp;
 			lineBuffer.pop(tmp); // key/index
-			if (tmp.type() == IDENTIFIER);
+			if (tmp.type() != IDENTIFIER) this->sendError("p3", "identifier as iterator in `foreach` expression", tmp.lineNumber());
+			f.counterVariables.pushback(Variable(tmp));
 
 			f.forCondition = foreachCondition;
 			f.forStatements = this->parseBlock(depth+1);
@@ -351,7 +357,7 @@ RPN Parser::parseBlock(bufferIndex depth) {
 
 			// set the function's locals
 			Vector<Variable> v;
-			variables.popVariables(v);
+			this->variables.popVariables(v);
 			func.setVariables(v);
 
 			this->functions.pushback(func);
@@ -365,7 +371,7 @@ RPN Parser::parseBlock(bufferIndex depth) {
 		else {
 			Infix i;
 			i.push(current);
-			bool pr = (current.value() == "print");
+			bool pr = (current.value() == "print" || current.value() == "printLine");
 			if (pr) i.push(Lexer::toToken("("));
 			while (lineBuffer.pop(current)) i.push(current);
 			if (pr) i.push(Lexer::toToken(")"));
@@ -604,25 +610,22 @@ RPN Parser::expressionToRPN(Infix args) {
 					current.setSubtype(UNARYOP);
 				}
 			}
+			else if (current.value() == "++" || current.value() == "--") {
+				if (!args.empty() && args.front().type() == IDENTIFIER) current.setSubtype(PRE);
+				else current.setSubtype(POST);
+			}
 
-			if (current.value() == "++" || current.value() == "--") {
-				// this is kindof problematic, coz `a[i]++` is a valid expression.
-				// support for these operators will be added later. as of now ignore them.
-				this->sendError(Error("ns", current.value(), current.lineNumber()));
-			}
-			else {
-				Token oper, tval;
-				while (!operstack.empty()) {
-					tval = operstack.top();
-					if (tval.value() == "(" || tval.value() == "[") break;
-					if (Operations::comparePriority(tval, current) >= 0) {
-						operstack.pop(oper);
-						output.push(oper);
-					}
-					else break;
+			Token oper, tval;
+			while (!operstack.empty()) {
+				tval = operstack.top();
+				if (tval.value() == "(" || tval.value() == "[") break;
+				if (Operations::comparePriority(tval, current) >= 0) {
+					operstack.pop(oper);
+					output.push(oper);
 				}
-				operstack.push(current);
+				else break;
 			}
+			operstack.push(current);
 		}
 		if (current.type() == LITERAL) {
 			output.push(current);
@@ -676,18 +679,18 @@ bool Parser::validateRPN(RPN rpn) {
 					vals.push(t1);
 				}
 				else if (curr.value() == ".") {
-					if (t1 != VARIABLE || t2 != VARIABLE) {
+					if ((t1 != VARIABLE && t1 != OBJECT) || t2 != VARIABLE) {
 						this->sendError("ro1", curr.value(), curr.lineNumber());
 						success = false;
 					}
-					vals.push(VARIABLE);
+					vals.push(t1);
 				}
 				else if (curr.value() == "[]") {
-					if (t1 != VARIABLE) {
+					if (t1 != VARIABLE && t1 != OBJECT) {
 						this->sendError("ro1", curr.value(), curr.lineNumber());
 						success = false;
 					}
-					vals.push(VARIABLE);
+					vals.push(t1);
 				}
 				else {
 					vals.push(LITERAL);
@@ -697,6 +700,18 @@ bool Parser::validateRPN(RPN rpn) {
 				tokenType t1, t2, t3;
 				vals.pop(t3); vals.pop(t2); vals.pop(t1);
 				vals.push(t2);
+			}
+			else if (curr.subtype() == PRE || curr.subtype() == POST) {
+				tokenType t;
+				if (!vals.pop(t)) {
+					this->sendError("p3.3", curr.value(), curr.lineNumber());
+					success = false;
+				}
+				if (t != VARIABLE) {
+					this->sendError("ro1", curr.value(), curr.lineNumber());
+					success = false;
+				}
+				vals.push(LITERAL);
 			}
 		}
 		else if (curr.type() == DIRECTIVE) {
@@ -719,7 +734,7 @@ bool Parser::validateRPN(RPN rpn) {
 					}
 					rpn.pop(inv);
 				}
-				vals.push(VARIABLE);
+				vals.push(OBJECT);
 			}
 			else if (curr.type() == HASHED) {
 				Vector<RPN> st = this->getHashedData(curr.value()).getStatements();
