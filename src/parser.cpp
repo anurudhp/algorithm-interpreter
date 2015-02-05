@@ -263,7 +263,7 @@ RPN Parser::parseBlock(bufferIndex depth) {
 			blockOutput.push(current); // the `if` token
 			blockOutput.push(this->hashify(hdIf)); // the hashed token.
 		}
-		else if(current.value() == "while") {
+		else if(current.value() == "while" || current.value() == "until") {
 			HashedData hdWhile;
 			HashedData::csFor w;
 
