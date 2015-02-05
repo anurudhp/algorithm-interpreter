@@ -21,6 +21,7 @@ p4.3: expected function parameter separator ,
 p3.1: expected ( after function name 
 p3.2: parser error- unable to detect number of function arguments 
 p3.3: too few arguments for operator 
+p3.4: redeclaration of function 
 
 # no support:
 ns: Not Supported 

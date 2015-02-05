@@ -108,7 +108,7 @@ Function Parser::getFunction(String id) {
 		f = this->functions[i];
 		if (f.id() == id) return f;
 	}
-	return f;
+	return Function();
 }
 
 Token Parser::hashify(HashedData& hd) {
@@ -322,7 +322,7 @@ RPN Parser::parseBlock(bufferIndex depth) {
 			Token funcname, tmp;
 			if (!lineBuffer.pop(funcname)) this->sendError("p", "after keyword function", current.lineNumber()); // expected
 			if (funcname.type() != IDENTIFIER) this->sendError("p", " valid function name", current.lineNumber()); // expected
-			if (!!this->getFunction(funcname.value()).id()) this->sendError("p", String(" of function ") + funcname.value(), current.lineNumber()); // re-declaration
+			if (!!this->getFunction(funcname.value()).id()) this->sendError("p3.4", funcname.value(), current.lineNumber()); // re-declaration
 
 			Function func(funcname.value());
 
@@ -339,10 +339,7 @@ RPN Parser::parseBlock(bufferIndex depth) {
 					if (tmp.value() == ")") break;
 					if (tmp.value() != ",") this->sendError("p4.3", "", tmp.lineNumber()); // expected function arg separator ,
 					else if (!lineBuffer.pop(tmp) || tmp.type() != IDENTIFIER) this->sendError("p1", " identifier after ,", tmp.lineNumber()); // expected identifier after separator ,
-					else {
-						DEBUG(tmp.value())
-						params.pushback(tmp.value());
-					}
+					else params.pushback(tmp.value());
 				}
 				if (tmp.value() != ")") this->sendError("p1", " closing ) in function declaration", tmp.lineNumber());
 			}
