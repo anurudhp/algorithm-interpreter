@@ -152,8 +152,8 @@ Token Operations::unaryOperator(String op, Token tok) {
 // Operator Priorities:
 int Operations::priority(String op) {
 	if (op == ".") return 20;
-	if (op == "typeof") return 18;
-	if (op == "++" || op == "--") return 15;
+	if (op == "++" || op == "--") return 18;
+	if (op == "typeof") return 15;
 	if (op == "*" || op == "/" || op == "%")  return 10;
 	if (op == "+" || op == "-") return 8;
 	if (op == "<" || op == "<=" || op == ">" || op == ">=") return 6;
@@ -165,6 +165,9 @@ int Operations::priority(String op) {
 
 int Operations::comparePriority(Token a, Token b) {
 	int pa = priority(a.value()), pb = priority(b.value());
+	// exception: unary `-` vs `typeof`
+	if (a.value() == "-" && a.subtype() == UNARY && b.value() == "typeof") return 1;
+	if (b.value() == "-" && b.subtype() == UNARY && a.value() == "typeof") return 0;
 	return (pa - pb);
 }
 
