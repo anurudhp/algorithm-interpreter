@@ -10,6 +10,8 @@
 	#define UNARYOP  21
 	#define BINARYOP 22
 	#define MULTINARYOP 23
+	#define POST 24
+	#define PRE 25
 #define PUNCTUATOR 3
 #define IDENTIFIER 4
 	#define VARIABLE 41

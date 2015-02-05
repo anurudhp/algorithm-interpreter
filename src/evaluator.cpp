@@ -88,6 +88,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope, Vector<Token>* st
 	if (this->failed) return Token();
 	Token current;
 	Stack<Token> valuestack;
+	RPN postEval;
 	// static
 	Vector<String> assignmentOp(strsplit("= += -= *= /= %=", ' '));
 	Variable nullvalVariable("$");
@@ -223,6 +224,19 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope, Vector<Token>* st
 				}
 				valuestack.push(res);
 			}
+			else if (current.subtype() == PRE || current.subtype() == POST) {
+				Token tok, val, res;
+				valuestack.pop(tok);
+				
+				Variable& v = this->getVariable(tok.value(), scope, true);
+				if (v.type() != NUMBER) this->sendError("ro2", current.value()); // ++ and -- work only on numbers
+				
+				val = v.value(); // the old value.
+				res = Operations::binaryOperator(current.value().substr(0, 1), val, Lexer::toToken("1")); // after inc/dec
+				v.setValue(res);
+				
+				valuestack.push((current.subtype() == PRE) ? res : val);
+			}
 		}
 		else if (current.type() == KEYWORD) {
 			if (current.value() == "return") {
@@ -320,8 +334,11 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope, Vector<Token>* st
 							String hash = this->cacheVariable();
 							Variable& v = this->getVariable(hash, scope, true);
 							v.setType(ARRAY);
+
 							Token arrSize; args.popfront(arrSize);
+							if (arrSize.subtype() == VARIABLE) arrSize = this->getVariable(arrSize.value(), scope, true).value();
 							long asize = arrSize.value().toInteger();
+
 							for (__SIZETYPE i = 0; i < asize; i++)
 								v.setValueAt(Lexer::toToken(integerToString(i)), nullvalVariable);
 							res = Token(hash, DIRECTIVE, VARIABLE);
@@ -330,10 +347,6 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope, Vector<Token>* st
 							String hash = this->cacheVariable();
 							Variable& v = this->getVariable(hash, scope, true);
 							v.setType(OBJECT);
-							Token arrSize; args.popfront(arrSize);
-							long asize = arrSize.value().toInteger();
-							for (__SIZETYPE i = 0; i < asize; i++)
-								v.setValueAt(Lexer::toToken(integerToString(i)), nullvalVariable);
 							res = Token(hash, DIRECTIVE, VARIABLE);
 						}
 						else if (current.value() == "String" || current.value() == "Number" || current.value() == "Boolean") {

@@ -18,7 +18,7 @@ class HashedData
 	};
 	struct csFor {
 		RPN forInitialization,forCondition,forUpdate,forStatements;
-		Vector< Variable > forVariables;
+		Vector< Variable > forVariables, counterVariables;
 	};
 
 	bool clearStatements();
