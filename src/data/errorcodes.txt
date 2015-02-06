@@ -11,6 +11,7 @@ l2: Too many decimal points in numeric value
 
 p1: unbalanced 
 p2: unexpected 
+p2.2: unexpected token in primary expression: 
 p3: expected 
 
 #variable errors
@@ -32,7 +33,7 @@ ns: Not Supported
 ######################
 
 # variables
-rv1: invalid left-hand side for assignment : 
+rv1: invalid left-hand side for assignment: 
 rv2: cannot find property of null 
 ro1: invalid operands for 
 ro2: expected number for 

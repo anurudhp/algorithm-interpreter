@@ -520,6 +520,7 @@ RPN Parser::expressionToRPN(Infix args) {
 	Stack<__SIZETYPE> funcarglist;
 
 	while (args.pop(current)) {
+		bool expected = false;
 		if (current.value() == "$endline" || current.value() == ";") {
 			while (operstack.pop(current)) {
 				// check for unbalanced ( and [
@@ -528,6 +529,7 @@ RPN Parser::expressionToRPN(Infix args) {
 			}
 			current = statementEnd;
 			output.push(statementEnd);
+			expected = true;
 		}
 
 		if (current.type() == IDENTIFIER) {
@@ -538,6 +540,7 @@ RPN Parser::expressionToRPN(Infix args) {
 				current.setSubtype(VARIABLE);
 				output.push(current);
 			}
+			expected = true;
 		}
 		if (current.subtype() == FUNCTION) {
 			operstack.push(current);
@@ -545,12 +548,9 @@ RPN Parser::expressionToRPN(Infix args) {
 			if (!args.pop(tmp) || tmp.value() != "(") this->sendError(Error("p3.1", "", current.lineNumber())); // function call should be succeeded by a (
 			operstack.push(tmp);
 
-			if (!args.empty() && args.front().value() == ")") {
-				// zero argument function call:
-				funcarglist.push(0);
-			} else {
-				funcarglist.push(1);
-			}
+			// zero argument function call: in case next token is )
+			funcarglist.push((!args.empty() && args.front().value() == ")") ? 0 : 1);
+			expected = true;
 		}
 
 		if (current.type() == PUNCTUATOR) {
@@ -616,6 +616,7 @@ RPN Parser::expressionToRPN(Infix args) {
 				operstack.pop();
 				operstack.push(ternaryOp);
 			}
+			expected = true;
 		}
 		if (current.type() == OPERATOR) {
 			if (current.value() == "-") { // check for unary minus
@@ -639,9 +640,14 @@ RPN Parser::expressionToRPN(Infix args) {
 				else break;
 			}
 			operstack.push(current);
+			expected = true;
 		}
 		if (current.type() == LITERAL) {
 			output.push(current);
+			expected = true;
+		}
+		if (!expected) {
+			this->sendError("p2.2", current.value(), current.lineNumber());
 		}
 		prevtok = current;
 	}
