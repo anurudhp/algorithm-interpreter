@@ -51,6 +51,12 @@ void Variable::setType(tokenType t) {
 
 Token Variable::value() const { return this->_value; }
 
+__SIZETYPE Variable::length() const {
+	if (_type == STRING) return (this->_value.value().length() - 2);
+	if (_type == ARRAY || _type == OBJECT) return this->_values.size();
+	return -1;
+}
+
 // Member/embedded value accessors
 bool Variable::setValue(const Variable& v) {
 	if (_id.charAt(0) == ';') {
@@ -95,7 +101,7 @@ Variable& Variable::valueAt(Token key) {
 	if (!this->hasValueAt(key)) {
 		return nullVariableRef;
 	}
-	
+
 	__SIZETYPE index = 0;
 	if (this->type() == ARRAY) {
 		key = Operations::typecastToken(key, NUMBER);
@@ -142,6 +148,36 @@ bool Variable::setValueAt(Token key, Variable value) {
 	return false;
 }
 
+bool Variable::pushValue(Variable v, bool isFront) {
+	if (this->_type != ARRAY) return false;
+	if (isFront) this->_values.pushfront(v);
+	else this->_values.pushback(v);
+	return true;
+}
+bool Variable::popValue(Variable& v, bool isFront) {
+	if (this->_type != ARRAY) return false;
+	if (isFront) this->_values.popfront(v);
+	else this->_values.popback(v);
+	return true;
+}
+// methods for objects:
+bool Variable::addPair(Token key, Variable val) {
+	if (this->_type != OBJECT) return false;
+	return this->setValueAt(key, val);
+}
+bool Variable::deletePair(Token key, Variable& ref) {
+	if (this->_type != OBJECT) return false;
+	for (__SIZETYPE i = 0; i < this->_keys.size(); i++) {
+		if (key.value() == this->_keys[i]) {
+			this->_keys.remove(i);
+			ref = this->_values[i];
+			this->_values.remove(i);
+			return true;
+		}
+	}
+	return false;
+}
+
 Function Variable::getMethod(String funcId) {
 	if (this->type() != OBJECT || this->_object == NULL) return Function();
 	return this->_object->getPrototype(funcId);
@@ -163,6 +199,19 @@ Token Variable::printValues(ostream& out) {
 			res = Operations::logical("&&", res, tmp);
 		}
 		out << " ]";
+		return res;
+	}
+	if (_type == OBJECT) {
+		out << "{ ";
+		bool first = true;
+		for (__SIZETYPE i = 0; i < _values.size(); i++) {
+			if (first) first = false;
+			else out << ", ";
+			out << _keys[i] << ": ";
+			tmp = _values[i].printValues(out);
+			res = Operations::logical("&&", res, tmp);
+		}
+		out << " }";
 		return res;
 	}
 	return falseToken;

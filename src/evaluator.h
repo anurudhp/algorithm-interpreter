@@ -26,6 +26,7 @@ class Evaluator
 	String cacheVariableRef(Variable*);
 
 	Variable& getVariable(String, VariableScope&, bool = false);
+	Token getVariableValue(Token, VariableScope&, bool = false);
 	Vector<Variable>& getGlobals();
 	
 	// procedures
