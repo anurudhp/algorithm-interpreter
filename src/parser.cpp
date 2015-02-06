@@ -211,11 +211,12 @@ RPN Parser::parseBlock(bufferIndex depth) {
 					Variable v(vartok);
 					if (current.value() == "global") variables.getBaseVariables().pushback(v);
 					else variables.addVariable(v);
+					vartok.setSubtype(VARIABLE);
 
 					// now parse the declaration:
 					Token tmp; RPN decl;
-
 					if (lineBuffer.pop(tmp) && tmp.value() == "=") { // initialised.
+
 						// peek the next token for the type.
 						if (lineBuffer.empty()) this->sendError("p3", "expression after = for initialisation", current.lineNumber()); // expected
 
@@ -224,9 +225,10 @@ RPN Parser::parseBlock(bufferIndex depth) {
 						while (lineBuffer.pop(tmp)) v2.push(tmp);
 						while (v2.pop(tmp)) this->lexer->putbackToken(tmp);
 
-						vartok.setSubtype(VARIABLE);
 						decl = this->parseDeclaration(vartok);
+						blockOutput.push(vartok);
 						while (decl.pop(tmp)) blockOutput.push(tmp);
+						blockOutput.push(eqTok);
 					}
 				}
 			}
@@ -299,20 +301,20 @@ RPN Parser::parseBlock(bufferIndex depth) {
 			if (tmp.value() != "to" && tmp.value() != "downto") this->sendError("p3", "to", tmp.lineNumber());
 			comp = tmp;
 			res = this->expressionToRPN(expr);
-			
+
 			f.forInitialization.push(iter);
 			while (res.pop(tmp)) f.forInitialization.push(tmp);
 			f.forInitialization.push(eq);
-			
+
 			res = this->expressionToRPN(lineBuffer);
 			f.forCondition.push(iter);
 			while (res.pop(tmp)) f.forCondition.push(tmp);
 			f.forCondition.push(Lexer::toToken((comp.value() == "to") ? "<=" : ">="));
-			
+
 			f.forUpdate.push(iter);
 			f.forUpdate.push(Lexer::toToken("1"));
 			f.forUpdate.push(Lexer::toToken((comp.value() == "to") ? "+=" : "-="));
-			
+
 			f.forStatements = this->parseBlock(depth + 1);
 			this->variables.popVariables(f.forVariables);
 
@@ -414,36 +416,39 @@ RPN Parser::parseDeclaration(Token var) {
 	current = this->lexer->getToken();
 
 	if (current.value() == "{") { // parse a hash-table (object primitive)
-		long depthP = 0, depthB = 0, index = 0;
-		Infix args, tempdecl;
-		Token tmp, tmp2;
+		long depth = 0, index = 0;
+		Infix args, objdecl;
+		Token key, tmp, tmp2;
 
-		while (!this->lexer->ended()) {
-			tmp = this->lexer->getToken();
-			if (tmp.value() == "(") depthP++;
-			else if (tmp.value() == ")") depthP--;
-			else if (tmp.value() == "[") depthB++;
-			else if (tmp.value() == "]") depthB--;
+		objdecl = this->lexer->getTokensTill("}");
 
-			if ((tmp.value() == "," && depthB ==  0 && depthP == 0) ||
-				(tmp.value() == "]" && depthB == -1 && depthP == 0)) {
-					RPN arrayElem = this->expressionToRPN(args);
-					args.clear();
-					tempdecl.push(var);
-					tempdecl.push(Lexer::toToken(integerToString(index)));
-					tempdecl.push(Lexer::toToken("[]"));
-					while (arrayElem.pop(tmp2)) tempdecl.push(tmp2);
-					tempdecl.push(Lexer::toToken("="));
-					tempdecl.push(Lexer::toToken(";"));
-					index++;
+		while (!objdecl.empty()) {
+			if (!objdecl.pop(key)) this->sendError("p3", "key in object declaration", current.lineNumber());
+			if (!(key.type() == IDENTIFIER || key.type() == LITERAL)) this->sendError("p4.4", "", key.lineNumber());
+
+			if (key.type() == IDENTIFIER) key = Lexer::toToken(Lexer::stringToLiteral(key.value()));
+			decl.push(key);
+
+			if (!objdecl.pop(tmp) || tmp.value() != ":") this->sendError("p3", ": after key", current.lineNumber());
+
+			args.clear();
+			while (objdecl.pop(tmp)) {
+				if (tmp.value() == "(" || tmp.value() == "[") depth++;
+				else if (tmp.value() == ")" || tmp.value() == "]") depth--;
+				else if (tmp.value() == "," && depth ==  0) break;
+				else if (tmp.type() != DIRECTIVE) args.push(tmp);
 			}
-			if (depthB == -1) break;
-			if (tmp.type() != DIRECTIVE) args.push(tmp);
+			RPN objValue = this->expressionToRPN(args);
+			args.clear();
+			while (objValue.pop(tmp2)) decl.push(tmp2);
+			index++;
 		}
+		decl.push(Token("@init", DIRECTIVE, OBJECT));
+		decl.push(this->toArgsToken(index));
 	}
 	else if (current.value() == "[") { // parse array (primitive)
 		long depthP = 0, depthB = 0, index = 0;
-		Infix args, tempdecl;
+		Infix args;
 		Token tmp, tmp2;
 
 		while (!this->lexer->ended()) {
@@ -457,12 +462,7 @@ RPN Parser::parseDeclaration(Token var) {
 				(tmp.value() == "]" && depthB == -1 && depthP == 0)) {
 					RPN arrayElem = this->expressionToRPN(args);
 					args.clear();
-					tempdecl.push(var);
-					tempdecl.push(Lexer::toToken(integerToString(index)));
-					tempdecl.push(Lexer::toToken("[]"));
-					while (arrayElem.pop(tmp2)) tempdecl.push(tmp2);
-					tempdecl.push(Lexer::toToken("="));
-					tempdecl.push(Lexer::toToken(";"));
+					while (arrayElem.pop(tmp2)) decl.push(tmp2);
 					index++;
 			}
 			if (depthB == -1) break;
@@ -471,15 +471,10 @@ RPN Parser::parseDeclaration(Token var) {
 
 		while (depthB-- > 0) this->sendError("p2", "[", current.lineNumber());
 		while (depthP-- > 0) this->sendError("p2", "(", current.lineNumber());
-		decl.clear();
-		decl.push(var);
-		decl.push(Lexer::toToken(integerToString(index)));
-		decl.push(Lexer::toToken("Array"));
-		decl.push(this->toArgsToken(1));
-		decl.push(Token("@invoke", DIRECTIVE, FUNCTION));
-		decl.push(Lexer::toToken("="));
-		decl.push(Lexer::toToken(";"));
-		while (tempdecl.pop(tmp)) decl.push(tmp);
+		if (decl.empty()) index = 0;
+		else if (depthB > -1) this->sendError("p3", "closing ] in array declaration", current.lineNumber());
+		decl.push(Token("@init", DIRECTIVE, ARRAY));
+		decl.push(this->toArgsToken(index));
 	}
 	else { // parse an expression.
 		long depth = 0;
@@ -733,6 +728,22 @@ bool Parser::validateRPN(RPN rpn) {
 			}
 		}
 		else if (curr.type() == DIRECTIVE) {
+			if (curr.value() == "@init") {
+				// array/object primitive:
+				Token length; tokenType t;
+				rpn.pop(length);
+				long len = length.value().substr(6).toInteger();
+				if (curr.subtype() == ARRAY) {
+					while (len--) vals.pop(t);
+					vals.push(OBJECT);
+				}
+				else if (curr.subtype() == OBJECT) {
+					while (len--) {
+						vals.pop(); vals.pop();
+					}
+					vals.push(OBJECT);
+				}
+			}
 			if (curr.value().substr(0, 6) == "@args|") {
 				long ind = curr.value().substr(6).toInteger();
 				vals.pop(); // function token

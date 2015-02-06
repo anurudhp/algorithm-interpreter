@@ -23,6 +23,7 @@ class Variable
 	String id() const;
 	tokenType type();
 	Token value() const;
+	__SIZETYPE length() const;
 
 	// value access:
 	void setType(tokenType);
@@ -30,6 +31,13 @@ class Variable
 	bool hasValueAt(Token);
 	Variable& valueAt(Token);
 	bool setValueAt(Token, Variable);
+	
+	// methods for arrays:
+	bool pushValue(Variable, bool = false);
+	bool popValue(Variable&, bool = false);
+	// methods for objects:
+	bool addPair(Token, Variable);
+	bool deletePair(Token, Variable&);
 	Function getMethod(String);
 
 	Token printValues(ostream& = cout);
