@@ -232,7 +232,10 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope, Vector<Token>* st
 					String typeStr = Lexer::typeToString(ty);
 					valuestack.push(Lexer::toToken(Lexer::stringToLiteral(typeStr)));
 				}
-				else valuestack.push(Operations::unaryOperator(current.value(), a));
+				else {
+					a = this->getVariableValue(a, scope, true);
+					valuestack.push(Operations::unaryOperator(current.value(), a));
+				}
 			}
 			else if (current.subtype() == BINARYOP) {
 				// check if it is assignment operator:
@@ -368,7 +371,6 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope, Vector<Token>* st
 				}
 				scope.popVariables();
 			}
-
 		}
 		else if (current.type() == IDENTIFIER) {
 			if (current.subtype() == FUNCTION) {
@@ -424,7 +426,6 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope, Vector<Token>* st
 							}
 						}
 					}
-
 				}
 				else { // global function:
 					if (InbuiltFunctionList.indexOf(current.value()) >= 0) {

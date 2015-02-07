@@ -279,8 +279,9 @@ RPN Parser::parseBlock(bufferIndex depth) {
 
 		}
 		else if (current.value() == "for") {
-			// format: for i = 1 to N
-			//    (or) for i = N downto 1
+			// usage: 
+			//   for i = 1 to N
+			//   for i = N downto 1
 			HashedData hdFor;
 			HashedData::csFor f;
 			Token tmp, eq, iter, comp;
@@ -323,8 +324,9 @@ RPN Parser::parseBlock(bufferIndex depth) {
 			blockOutput.push(this->hashify(hdFor));
 		}
 		else if (current.value() == "foreach") {
-			// foreach key in object
-			// foreach index in array
+			// usage:
+			//   foreach key in object
+			//   foreach index in array
 			HashedData hdFor;
 			HashedData::csFor f;
 
@@ -480,8 +482,6 @@ RPN Parser::parseDeclaration(Token var) {
 		long depth = 0;
 		Infix args;
 		Token tmp;
-		args.push(var);
-		args.push(Lexer::toToken("="));
 		this->lexer->putbackToken(current);
 
 		while (!this->lexer->ended()) {
@@ -491,9 +491,7 @@ RPN Parser::parseDeclaration(Token var) {
 			else if ((tmp.value() == ","  && depth == 0) || tmp.value() == "$endline") break;
 			args.push(tmp);
 		}
-		Infix a2 = args;
 		decl = this->expressionToRPN(args);
-		decl.push(Lexer::toToken(";"));
 	}
 
 	return decl;
@@ -620,7 +618,7 @@ RPN Parser::expressionToRPN(Infix args) {
 		}
 		if (current.type() == OPERATOR) {
 			if (current.value() == "-") { // check for unary minus
-				if (!prevtok.value() || prevtok.value() == "(" || prevtok.value() == "=" || prevtok.value() == ";") {
+				if (!prevtok.value() || prevtok.value() == "(" || prevtok.value() == "=" || prevtok.value() == ";" || prevtok.type() == OPERATOR) {
 					current.setSubtype(UNARYOP);
 				}
 			}
