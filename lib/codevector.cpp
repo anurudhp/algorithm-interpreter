@@ -223,6 +223,7 @@ __SIZETYPE Vector<T>::indexOf(const T& val) const {
 	return ret;
 }
 
+// appends vector vec to this. if isFront is true, appends at the front.
 template<class T>
 bool Vector<T>::append(const Vector<T>& vec, bool isFront) {
 	node *st;

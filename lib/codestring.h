@@ -1,6 +1,5 @@
 /** 
-* This library is an alternative for the C++ STL String template
-* which is not available on older compilers.
+* This Implementation is an alternative for the C++ STL String Class
 **/
 #ifndef CODE_STRING_H
 #define CODE_STRING_H

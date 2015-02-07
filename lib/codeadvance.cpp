@@ -1,6 +1,7 @@
 #include "codestring.h"
 #include "codevector.h"
 
+// Set of functions for advanced manipulation on strings and vectors.
 // forward declarations:
 Vector<String> strsplit(String, String);
 String strjoin(Vector<String>, String);
@@ -45,7 +46,7 @@ String strjoin(Vector<String> vs, String join = "") {
 	return ret;
 }
 
-// conversions to string: stringify
+// conversions to string
 String integerToString(long val) {
 	char str[100];
 	sprintf(str, "%ld", val);
