@@ -154,7 +154,7 @@ String String::substr(__SIZETYPE st, __SIZETYPE  len) const {
 	if( st < 0 ) st = 0;
 	if( st + len > _len || len == -1 ) len = _len - st;
 
-	char s[ len+1 ]; 
+	char s[ len+1 ];
 
 	for( __SIZETYPE i=0 ; i<len ; ++i ){
 		s[i] = _data[ st+i ];
@@ -325,9 +325,11 @@ bool String::get(istream& input, char delim) {
 	input.getline(stringInputBuffer, MAX_STRING_LENGTH, delim);
 	*this = stringInputBuffer;
 	return true;
-} 
+}
 istream& operator>>(istream& input, String& str) {
-	str.get(input);
+	//str.get(input);
+	input >> String::stringInputBuffer;
+	str = String::stringInputBuffer;
 	return input;
 }
 

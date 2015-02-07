@@ -1,10 +1,10 @@
 // Macros for debugging:
 int debugLevel = 1;
-#define DEB       if (debugLevel > 1) cerr << ">> REACHED <<\n";
+#define DEB       if (debugLevel > 2) cerr << ">> REACHED <<\n";
 #define PRINT(i)  if (debugLevel > 1) cerr << ">> " << i << endl;
 #define PRINT2(i)  if (debugLevel > 1) cerr << ">>>>> " << i << endl;
-#define DEBUG(i)  if (debugLevel > 1) cerr << ">> " << #i << " = " << i << endl;
-#define DEBUG2(i) if (debugLevel > 1) cerr << ">>>> " << #i << " = " << i << endl;
+#define DEBUG(i)  if (debugLevel > 2) cerr << ">> " << #i << " = " << i << endl;
+#define DEBUG2(i) if (debugLevel > 2) cerr << ">>>> " << #i << " = " << i << endl;
 #define LOG(i)    if (debugLevel > 0) cerr << i;
 #define LOGN(i)   if (debugLevel > 0) cerr << i << endl;
 
@@ -16,7 +16,7 @@ void logRPN(RPN);
 int main()
 {
 	cerr << "Debug Level: ";
-	cin >> debugLevel;
+	cin >> debugLevel; cin.get();
 	if (!loadData()) return 0;
 	
 	Lexer *lexer = new Lexer("../logs/test.alg");
