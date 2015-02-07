@@ -186,7 +186,7 @@ RPN Parser::parseBlock(bufferIndex depth) {
 		lineBuffer = lexer->getTokensTill("$endline");
 
 		// variable declaration(s)
-		if (current.value() == "var" || current.value() == "const" || current.value() == "global") {
+		if (current.value() == "var" || current.value() == "global") {
 			Token vartok;
 
 			if (!lineBuffer.pop(vartok)) this->sendError("p3", "after var", current.lineNumber()); // expected identifier
