@@ -73,8 +73,7 @@ class Parser
 	bool parseSource();
 
 	RPN parseBlock(bufferIndex = 0);
-	RPN parseDeclaration(Token);
-	RPN parseFunction(Token);
+	RPN parseDeclaration();
 
 	// assumes that the tokens have already been read.
 	RPN expressionToRPN(Infix);

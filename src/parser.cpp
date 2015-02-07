@@ -225,7 +225,7 @@ RPN Parser::parseBlock(bufferIndex depth) {
 						while (lineBuffer.pop(tmp)) v2.push(tmp);
 						while (v2.pop(tmp)) this->lexer->putbackToken(tmp);
 
-						decl = this->parseDeclaration(vartok);
+						decl = this->parseDeclaration();
 						blockOutput.push(vartok);
 						while (decl.pop(tmp)) blockOutput.push(tmp);
 						blockOutput.push(eqTok);
@@ -408,7 +408,7 @@ RPN Parser::parseBlock(bufferIndex depth) {
 	return blockOutput;
 }
 
-RPN Parser::parseDeclaration(Token var) {
+RPN Parser::parseDeclaration() {
 	// procedure to parse variable initialisations, on declaration
 	// accounts for parsing arrays and hash tables.
 	// errors can be directly caught. carefully call converting to RPN.
