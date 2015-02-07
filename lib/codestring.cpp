@@ -327,7 +327,6 @@ bool String::get(istream& input, char delim) {
 	return true;
 }
 istream& operator>>(istream& input, String& str) {
-	//str.get(input);
 	input >> String::stringInputBuffer;
 	str = String::stringInputBuffer;
 	return input;

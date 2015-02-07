@@ -1,39 +1,15 @@
 #ifndef CUSTOM_DEPENDENCIES_H
 #define CUSTOM_DEPENDENCIES_H
 
-// use all available libraries,
-// check compiler and include files accordingly
-
-#if defined(__GNUC__)
-
+#include <iostream>
+#include <iomanip>
+#include <fstream>
 #include <cstring>
 #include <cctype>
-#include <iostream>
-#include <fstream>
 #include <cstdlib>
-#include <typeinfo>
 using namespace std;
 
-#else
-
-#include <string.h>
-#include <ctype.h>
-#include <iostream.h>
-#include <fstream.h>
-#include <stdlib.h>
-
-#define bool int
-#define true 1
-#define false 0
-
-#endif
-
-// Custom types
-#if defined(__GNUC__)
-typedef long long int  __SIZETYPE;
-#else
-typedef long int  __SIZETYPE; // older compilers dont support long long.
-#endif
+typedef long int  __SIZETYPE;
 
 // Custom Templates
 class String;
