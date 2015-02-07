@@ -431,7 +431,7 @@ bool importLexerData(ifstream& datareader) {
 	newlineToken = Token("$endline", DIRECTIVE);
 
 	// literal tokens
-	nullvalToken = Token("null", KEYWORD, CONSTANT);
+	nullvalToken = Token("null", LITERAL, CONSTANT);
 	trueToken = Token("true", LITERAL, BOOLEAN);
 	falseToken = Token("false", LITERAL, BOOLEAN);
 

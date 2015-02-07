@@ -4,16 +4,21 @@
 
 struct InbuiltFunctions {
 	// I/O functions:
+	static char INFCHAR;
 	static Token write(Token, ostream& = cout);
 	static Token read(tokenType, istream& = cin);
 	static Token get(istream& = cin);
 	static Token readLine(istream& = cin);
 };
 
+char InbuiltFunctions::INFCHAR = 236;
+
 Token InbuiltFunctions::write(Token t, ostream& out) {
 	if (t.type() != LITERAL) return falseToken;
     if (t.subtype() == BOOLEAN || t.subtype() == CONSTANT) {
-        out << t.value();
+		if (t.value() == "infinity") cout << INFCHAR;
+		else if (t.value() == "minusinfinity") cout << '-' << INFCHAR;
+        else out << t.value();
         return trueToken;
     }
 	if (t.subtype() == NUMBER) {

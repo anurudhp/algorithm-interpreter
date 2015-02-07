@@ -184,7 +184,7 @@ Function Variable::getMethod(String funcId) {
 }
 
 Token Variable::printValues(ostream& out) {
-	if (_type == STRING || _type == BOOLEAN || _type == NUMBER) {
+	if (_type == STRING || _type == BOOLEAN || _type == NUMBER || _type == CONSTANT) {
 		return InbuiltFunctions::write(_value);
 	}
 	

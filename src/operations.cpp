@@ -34,7 +34,8 @@ Token Operations::typecastToken(Token tok, tokenType type) {
 			if (val.isNumber()) return Lexer::toToken(val);
 		}
 		if (tok.subtype() == CONSTANT) {
-			if (tok.value() == "infinity") return tok;
+			if (tok.value() == "infinity" || tok.value() == "minusinfinity") return tok;
+			if (tok.value() == "null") return Lexer::toToken("1");
 		}
 	}
 	else if (type == STRING) {
@@ -50,6 +51,10 @@ Token Operations::typecastToken(Token tok, tokenType type) {
 		if (tok.subtype() == STRING) {
 			if (Lexer::tokenToString(tok).length() > 0) return trueToken;
 			return falseToken;
+		}
+		if (tok.subtype() == CONSTANT) {
+			if (tok.value() == "null") return falseToken;
+			if (tok.value() == "infinity" || tok.value() == "minusinfinity") return trueToken;
 		}
 	}
 	return nullvalToken;
@@ -77,16 +82,23 @@ Token Operations::add(Token t1, Token t2) {
 		return  Lexer::toToken(Lexer::stringToLiteral(s1 + s2));
 	}
 	if (t1.subtype() == NUMBER || t2.subtype() == NUMBER || t1.subtype() == BOOLEAN || t2.subtype() == BOOLEAN) {
+		if (t1.value() == "infinity" || t2.value() == "infinity") return Lexer::toToken("infinity");
+		if (t1.value() == "minusinfinity" || t2.value() == "minusinfinity") return Lexer::toToken("minusinfinity");
+		
 		t1 = typecastToken(t1, NUMBER);
 		t2 = typecastToken(t2, NUMBER);
 		double a1 = t1.value().toNumber(),
 			   a2 = t2.value().toNumber();
 		return Lexer::toToken(numberToString(a1 + a2));
 	}
+	if (t1.value() == "infinity" || t2.value() == "infinity") return Lexer::toToken("infinity");
 	return nullvalToken;
 }
 
 Token Operations::subtract(Token t1, Token t2) {
+	if (t1.value() == "infinity" || t2.value() == "minusinfinity") return Lexer::toToken("infinity");
+	if (t2.value() == "infinity" || t1.value() == "minusinfinity") return Lexer::toToken("minusinfinity");
+
 	if (t1.subtype() != NUMBER && t2.subtype() != NUMBER) return nullvalToken;
 	double a1 = t1.value().toNumber(),
 		   a2 = t2.value().toNumber();
@@ -141,6 +153,9 @@ Token Operations::unaryOperator(String op, Token tok) {
 		return trueToken;
 	}
 	if (op == "-") {
+		if (tok.value() == "infinity") return Lexer::toToken("minusinfinity");
+		if (tok.value() == "minusinfinity") return Lexer::toToken("infinity");
+		
 		tok = typecastToken(tok, NUMBER);
 		double num = -(tok.value().toNumber());
 		return Lexer::toToken(numberToString(num));
@@ -214,8 +229,8 @@ Token Operations::compare(String op, Token t1, Token t2) {
 	t1 = typecastToken(t1, NUMBER);
 	t2 = typecastToken(t2, NUMBER);
 	if (op == "<") {
-		if (t1.value() == "infinity") return falseToken;
-		if (t2.value() == "infinity") return trueToken;
+		if (t1.value() == "infinity" || t2.value() == "minusinfinity") return falseToken;
+		if (t2.value() == "infinity" || t1.value() == "minusinfinity") return trueToken;
 
 		double v1 = t1.value().toNumber(),
 		       v2 = t2.value().toNumber();
