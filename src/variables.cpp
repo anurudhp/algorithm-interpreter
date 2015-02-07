@@ -177,6 +177,10 @@ bool Variable::deletePair(Token key, Variable& ref) {
 	}
 	return false;
 }
+String Variable::getKey(__SIZETYPE index) {
+	if (this->_type != OBJECT || index >= this->length() || index < 0) return "";
+	return this->_keys[index];
+}
 
 Function Variable::getMethod(String funcId) {
 	if (this->type() != OBJECT || this->_object == NULL) return Function();

@@ -99,7 +99,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope, Vector<Token>* st
 	Vector<String> assignmentOp(strsplit("= += -= *= /= %=", ' '));
 	Variable nullvalVariable("$");
 	nullvalVariable.setValue(nullvalToken);
-	nullvalVariable.setType(UNKNOWN);
+	nullvalVariable.setType(CONSTANT);
 
 	while (source.pop(current)) {
 		if (this->failed) return Token();
@@ -150,7 +150,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope, Vector<Token>* st
 				Token vartok, prop;
 				valuestack.pop(prop);
 				valuestack.pop(vartok);
-				
+
 				Variable &var = this->getVariable(vartok.value(), scope, true);
 				if (var.type() != OBJECT) this->sendError("ro1", ". : LHS must be an object", vartok.lineNumber());
 				else {
@@ -368,6 +368,32 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope, Vector<Token>* st
 					val = this->evaluateRPN(forSet.forCondition, scope);
 					if (val.subtype() == VARIABLE) val = this->getVariable(val.value(), scope, true).value();
 					val = Operations::typecastToken(val, BOOLEAN);
+				}
+				scope.popVariables();
+			}
+			else if (current.value() == "foreach") {
+				Token hashtok;
+				source.pop(hashtok);
+				HashedData hd = this->parser->getHashedData(hashtok.value());
+				HashedData::csFor foreachSet = hd.getFor();
+
+				scope.stackVariables(foreachSet.counterVariables);
+				Variable &iter = scope.resolve(foreachSet.counterVariables[0].id());
+				Token objtok = this->evaluateRPN(foreachSet.forInitialization, scope);
+				Token itertok, onetok;
+
+				if (objtok.subtype() == VARIABLE) {
+					Variable &obj = this->getVariable(objtok.value(), scope, true);
+
+					for (__SIZETYPE index = 0; index < obj.length(); index++) {
+						if (obj.type() == ARRAY) itertok = Lexer::toToken(integerToString(index));
+						else if (obj.type() == OBJECT) itertok = Lexer::toToken(obj.getKey(index));
+						iter.setValue(itertok);
+
+						scope.stackVariables(foreachSet.forVariables);
+						this->evaluateRPN(foreachSet.forStatements, scope);
+						scope.popVariables();
+					}
 				}
 				scope.popVariables();
 			}

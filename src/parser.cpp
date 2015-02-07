@@ -327,22 +327,23 @@ RPN Parser::parseBlock(bufferIndex depth) {
 			// usage:
 			//   foreach key in object
 			//   foreach index in array
-			HashedData hdFor;
+			HashedData hdForeach;
 			HashedData::csFor f;
 
-			RPN foreachCondition;
 			Token tmp;
 			lineBuffer.pop(tmp); // key/index
-			if (tmp.type() != IDENTIFIER) this->sendError("p3", "identifier as iterator in `foreach` expression", tmp.lineNumber());
+			if (tmp.type() != IDENTIFIER) this->sendError("p3", "identifier as iterator in `foreach` expression", current.lineNumber());
 			f.counterVariables.pushback(Variable(tmp));
+			
+			if (!lineBuffer.pop(tmp) || tmp.value() != "in") this->sendError("p3", "keyword `in`", current.lineNumber());
 
-			f.forCondition = foreachCondition;
-			f.forStatements = this->parseBlock(depth+1);
+			f.forInitialization = this->expressionToRPN(lineBuffer);
+			f.forStatements = this->parseBlock(depth + 1);
 			this->variables.popVariables(f.forVariables);
 
-			hdFor.setValues(f);
+			hdForeach.setValues(f);
 			blockOutput.push(current);
-			blockOutput.push(this->hashify(hdFor));
+			blockOutput.push(this->hashify(hdForeach));
 		}
 		else if (current.value() == "function") {
 			// `function` declaration format:

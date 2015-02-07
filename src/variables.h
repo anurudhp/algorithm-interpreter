@@ -38,6 +38,7 @@ class Variable
 	// methods for objects:
 	bool addPair(Token, Variable);
 	bool deletePair(Token, Variable&);
+	String getKey(__SIZETYPE);
 	Function getMethod(String);
 
 	Token printValues(ostream& = cout);
