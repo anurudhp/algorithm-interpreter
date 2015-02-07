@@ -72,7 +72,7 @@ Token InbuiltFunctions::get(istream& in) {
 Token InbuiltFunctions::readLine(istream& in) {
     String s;
 	s.get(in, '\n');
-    return Lexer::toToken(s);
+    return Lexer::toToken(Lexer::stringToLiteral(s));
 }
 
 #endif /* COMPONENT_PARSER_IO_H */
