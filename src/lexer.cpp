@@ -25,7 +25,7 @@ Error& Error::operator= (const Error& e) {
 	this->_severity = e._severity;
 	return *this;
 }
-
+// accessors and properties
 String Error::code() const { return this->_code; }
 String Error::flag() const { return this->_flag; }
 bufferIndex Error::lineNumber() const { return this->_line; }
@@ -47,7 +47,7 @@ String Error::message() const {
 
 	return ret;
 }
-
+// mutator
 void Error::setLineNumber(bufferIndex ln) { this->_line = ln; }
 /*** END implementation: class Error ***/
 
@@ -112,6 +112,10 @@ Lexer::~Lexer() {
 
 /*** static members ***/
 
+// rules for valid identifiers:
+//   1) Length cannot be more than MAX_ID_LENGTH.
+//   2) should start only with _ or alphabet
+//   3) all other characters can be either _ or alphanumeric.
 bool Lexer::isValidIdentifier(String val) {
 	if (val.length() > MAX_ID_LENGTH) return false;
 	if (!isalpha(val[0]) && val[0] != '_') return false;
@@ -145,6 +149,7 @@ String Lexer::stringToLiteral(String val) {
 	return ret;
 }
 
+// returns the equivalent type name as a string.
 String Lexer::typeToString(tokenType ty) {
 	switch (ty) {
 		case STRING: return "string";
@@ -204,7 +209,7 @@ Token Lexer::toToken(String val) {
 	if (isValidIdentifier(val)) {
 		return Token(val, IDENTIFIER);
 	}
-
+	// unable to identify.
 	return Token(val);
 }
 
@@ -244,7 +249,7 @@ int Lexer::endLine() {
 	return (num);
 }
 
-// extracts a string: as '...' or "..."
+// string literal formats: '...' or "..."
 String Lexer::readString() {
 	char st = this->source.get(),
 		 tmp = 0;
@@ -273,7 +278,7 @@ String Lexer::readString() {
 	return ret;
 }
 
-// reads a numeric value: can contain utmost one decimal point.
+// reads a numeric value: can contain upto one decimal point.
 String Lexer::readNumber() {
 	String num;
 	bool isDeci = false;
@@ -301,7 +306,7 @@ String Lexer::readNumber() {
 
 // reads an identifier/keyword,
 // assuming the starting character in the buffer is a alpha or underscore.
-// does `not` check whether it is valid.
+// does NOT check whether it is valid.
 String Lexer::readIdentifier() {
 	String ret;
 	int len = 0;
@@ -342,13 +347,13 @@ String Lexer::readOperator() {
 
 Token Lexer::getToken() {
 	// check for a previously buffered token.
+	this->trim();
 	if (!this->innerBuffer.empty()) {
 		Token tmp;
 		this->innerBuffer.popfront(tmp);
 		return tmp;
 	}
 
-	this->trim();
 	char ch = this->source.peek();
 	if (this->source.eof()) return eofToken;
 
@@ -383,6 +388,8 @@ Token Lexer::getToken() {
 	return tok;
 }
 
+// returns a token back to the lexer.
+// any future getToken() call will first return this token.
 bool Lexer::putbackToken(Token a) { this->innerBuffer.pushfront(a); return true; }
 
 // extracts tokens till the delimiter.
@@ -400,10 +407,15 @@ Infix Lexer::getTokensTill(String delim) {
 
 Vector<Error> Lexer::getErrors() const { return this->errors; }
 
+// checks whether all tokens have been sent.
 bool Lexer::ended() {
 	return (this->source && this->source.eof() && this->innerBuffer.empty());
 }
 
+// Loads lexer data:
+// Keywords and constants, inbuilt functions, punctuators, operators
+// and sets the value of most static tokens.
+// @parameter datareader: a file object which has opened the lexerdata file in ios::in mode.
 bool importLexerData(ifstream& datareader) {
 	if (!datareader) return false;
 	String buff[8];
@@ -438,6 +450,9 @@ bool importLexerData(ifstream& datareader) {
 	return true;
 }
 
+// Loads error data:
+// codes and descriptions
+// @parameter ecreader: a file object which has opened the errordata file in ios::in mode.
 bool importErrorCodes(ifstream& ecreader) {
 	if (!ecreader) return false;
 	String buff; Vector<String> vs;
