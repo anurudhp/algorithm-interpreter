@@ -4,6 +4,9 @@
 
 // Included in "parser.h"
 
+/*****************************
+* Class Variable: stores data about a variable
+******************************/
 class Variable
 {
 	String _id;
@@ -20,9 +23,9 @@ class Variable
 	Variable(const Variable&);
 	Variable& operator= (const Variable&);
 
-	String id() const;
+	String id() const; // the identifier/name of the variable
 	tokenType type();
-	Token value() const;
+	Token value() const; // token value.
 	__SIZETYPE length() const;
 
 	// value access:
@@ -48,6 +51,11 @@ class Variable
 
 Variable nullVariableRef(";");
 
+/****************************
+* class VariableScope:
+* Stores data about a scope.
+* used to resolve variables, from top to bottom.
+*****************************/
 class VariableScope
 {
 	Vector< Vector<Variable> > varstack;
@@ -69,6 +77,11 @@ class VariableScope
 	__SIZETYPE depth() const;
 };
 
+/******************************
+* class Function:
+* Stores info about a function:
+*    parameters, statements, and local variables
+*******************************/
 class Function
 {
 	String _id;
@@ -99,6 +112,10 @@ class Function
 	bool setReturn(Token);
 };
 
+/**********************
+* Stores data about a class declaration or object declaration
+* Stores all methods.
+**********************/
 class Object
 {
 	String _id;

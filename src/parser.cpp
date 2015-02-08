@@ -81,6 +81,7 @@ Parser::~Parser() {
 }
 
 /*** Parser Interface ***/
+// adds an error to the vector of errors
 bool Parser::sendError(Error e) {
 	this->errors.pushback(e);
 	if (e.severity() == ERROR_FATAL) {
@@ -93,6 +94,7 @@ bool Parser::sendError(String cd, String msg, bufferIndex ln, int s) {
 	return this->sendError(Error(cd, msg, ln, s));
 }
 
+// displays the errors to the console/file.
 bool Parser::showErrors(ostream& out, bool clearAfterDisplay) {
 	if (this->errors.size() > 0) {
 		for (__SIZETYPE i = 0; i < this->errors.size(); i++) {
@@ -104,6 +106,7 @@ bool Parser::showErrors(ostream& out, bool clearAfterDisplay) {
 	return false;
 }
 
+// get a global function declared before.
 Function Parser::getFunction(String id) {
 	Function f;
 	for (__SIZETYPE i = 0; i < this->functions.size(); i++) {
@@ -113,6 +116,9 @@ Function Parser::getFunction(String id) {
 	return Function();
 }
 
+// stores the data in the hashes array,
+// and returns the index where it is stored
+// in a hashed format: "#index"
 Token Parser::hashify(HashedData& hd) {
 	long ind = this->hashes.size();
 	this->hashes.pushback(hd);
@@ -120,12 +126,16 @@ Token Parser::hashify(HashedData& hd) {
 	hash += integerToString(ind);
 	return Token(hash, DIRECTIVE, HASHED);
 }
+// get the hashed data corresponding to the given string hash.
 HashedData Parser::getHashedData(String hash) {
 	long ind = hash.substr(2).toNumber();
 	return this->hashes[ind];
 }
 
 /**** Parsing Procedures ****/
+// The main parsing procedure.
+// Parses the source code, and sets the status.
+// Displays errors on failure.
 bool Parser::parseSource() {
 	// some error checks before proceeding:
 	Vector<Error> lexerErrors = this->lexer->getErrors();
@@ -408,11 +418,9 @@ RPN Parser::parseBlock(bufferIndex depth) {
 	return blockOutput;
 }
 
+// procedure to parse variable initialisations, on declaration
+// Takes care of parsing arrays and hash tables.
 RPN Parser::parseDeclaration() {
-	// procedure to parse variable initialisations, on declaration
-	// accounts for parsing arrays and hash tables.
-	// errors can be directly caught. carefully call converting to RPN.
-
 	Token current;
 	RPN decl;
 	if (this->lexer->ended()) return decl;
@@ -498,7 +506,10 @@ RPN Parser::parseDeclaration() {
 	return decl;
 }
 
-/**** Static Parsing Procedures ****/
+/**** Common Parsing Procedures ****/
+// Converts a given Infix expression to RPN
+// supports: variable, function calls, operators, brackets
+// flags errors in case of unexpected or invalid tokens.
 RPN Parser::expressionToRPN(Infix args) {
 	if (args.empty()) return RPN();
 
@@ -665,6 +676,11 @@ RPN Parser::expressionToRPN(Infix args) {
 	return finalOutput;
 }
 
+// Checks whether a given RPN expression is valid
+// validation rules:
+//     1. Sufficient operands for operators
+//     2. valid operands for . ++ -- and assignment.
+//     3. in case of a block, gets the block, and checks each statement set in the block.
 bool Parser::validateRPN(RPN rpn) {
 	Stack<tokenType> vals;
 	Token curr;
@@ -788,6 +804,8 @@ bool Parser::validateRPN(RPN rpn) {
 	return success;
 }
 
+// converts a number into: "@args|<number>"
+// this is used as a directive to find the number of arguments for a function call.
 Token Parser::toArgsToken(__SIZETYPE num) {
 	String s = "@args|";
 	s += integerToString(num);

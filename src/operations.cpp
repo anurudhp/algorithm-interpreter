@@ -2,6 +2,13 @@
 #ifndef COMPONENT_PARSER_OPERATION_H
 #define COMPONENT_PARSER_OPERATION_H
 
+/********************************
+* Static processes for executing all operations
+* Supports: Math operators (+ - * / %),
+*           Logical operators (&& ||)
+*           Relational operators (== != > >= < <=)
+* Has function to check and compare priority of different operators.
+********************************/
 struct Operations {
 	static Token typecastToken(Token, tokenType = STRING);
 

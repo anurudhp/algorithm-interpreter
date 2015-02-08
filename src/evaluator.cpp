@@ -6,13 +6,11 @@ Evaluator::Evaluator(Parser *pr, String args) {
 }
 
 bool Evaluator::runProgram() {
-	// initialise the HEAP
+	// initialise the HEAP and the main code.
 	this->variables = this->parser->variables;
-
 	RPN primarySource = this->parser->output;
-	Vector<Token> rets;
 
-	this->evaluateRPN(primarySource, this->variables, &rets);
+	this->evaluateRPN(primarySource, this->variables);
 	if (this->failed) {
 		return this->showErrors(cerr);
 	}
@@ -25,6 +23,7 @@ bool Evaluator::sendError(Error e) {
 	this->failed = true;
 	return true;
 }
+// adds a runtime error.
 bool Evaluator::sendError(String cd, String msg, bufferIndex ln, int s) {
 	return this->sendError(Error(cd, msg, ln, s));
 }
@@ -41,6 +40,7 @@ bool Evaluator::showErrors(ostream& out, bool clearAfterDisplay) {
 }
 
 /*** Variable Caches and management ***/
+// returns the reference to a variable cached with the hash `id`.
 Variable& Evaluator::getCachedVariable(String id) {
 	if (id.substr(0, 2) == "#c") {
 		long index = id.substr(2).toInteger();
@@ -50,16 +50,19 @@ Variable& Evaluator::getCachedVariable(String id) {
 	return nullVariableRef;
 }
 
+// caches a variable, and returns the index as a hash.
 String Evaluator::cacheVariable(Variable v) {
 	Variable *ref = new Variable();
 	if (ref == NULL) forcequit();
 	ref->setValue(v);
 	return this->cacheVariableRef(ref);
 }
+// creates a new variable, and caches it.
 String Evaluator::cacheVariable() {
 	Variable *ref = new Variable();
 	return this->cacheVariableRef(ref);
 }
+// caches the reference. returns the hash.
 String Evaluator::cacheVariableRef(Variable *ref) {
 	if (ref == NULL) return "";
 	this->cache.pushback(ref);
@@ -69,6 +72,8 @@ String Evaluator::cacheVariableRef(Variable *ref) {
 	return hash;
 }
 
+// gets a variable from the scope,
+// if not found, then in the cache (if searchCache is true).
 Variable& Evaluator::getVariable(String id, VariableScope& scope, bool searchCache) {
 	if (scope.exists(id)) {
 		return scope.resolve(id);
@@ -79,6 +84,7 @@ Variable& Evaluator::getVariable(String id, VariableScope& scope, bool searchCac
 	}
 	return nullVariableRef;
 }
+// gets the token value of a variable, after resolving.
 Token Evaluator::getVariableValue(Token var, VariableScope& scope, bool searchCache) {
 	if (var.subtype() == VARIABLE) {
 		return this->getVariable(var.value(), scope, searchCache).value();
@@ -87,11 +93,16 @@ Token Evaluator::getVariableValue(Token var, VariableScope& scope, bool searchCa
 	return nullvalToken;
 }
 
+// returns reference to the evaluator globals.
 Vector<Variable>& Evaluator::getGlobals() {
 	return this->variables.getBaseVariables();
 }
 
-Token Evaluator::evaluateRPN(RPN source, VariableScope& scope, Vector<Token>* statementValues) {
+// The main process: evaluates RPN expression `source`.
+// In case of blocks, parses each statement set, after stacking the local variables.
+// Runtime errors: invalid operands or types for operator, undefined variables.
+// returns immediately if this->failed is true.
+Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
 	if (this->failed) return Token();
 	Token current;
 	Stack<Token> valuestack;
@@ -108,10 +119,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope, Vector<Token>* st
 		}
 
 		if (current.type() == LITERAL || current.subtype() == VARIABLE) valuestack.push(current);
-		else if (current.value() == ";") {
-			Token t;
-			// if (valuestack.pop(t) && statementValues != NULL) statementValues->pushback(t);
-		}
+		else if (current.value() == ";") continue;
 		else if (current.type() == DIRECTIVE) {
 			// directives that reach here: array and object initialisers
 			if (current.value() == "@init") {
@@ -541,10 +549,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope, Vector<Token>* st
 	}
 
 	Token ret;
-	if (!valuestack.pop(ret) && statementValues) {
-		statementValues->popback(ret);
-	}
-	while (valuestack.pop(current) && statementValues) statementValues->pushback(current);
+	valuestack.pop(ret);
 	return ret;
 }
 
