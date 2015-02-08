@@ -5,20 +5,29 @@ typedef Queue<Token> RPN;
 
 #include "variables.h"
 
+/*****************************
+* class HashedData
+* Stores statements and local variables, to be saved as blocks in the parser
+* Instead of the whole rpn being stored in a single vector,
+* storing them in blocks helps in easy access.
+*****************************/
 class HashedData
 {
-	Vector< RPN > statementSet;
-	Vector< Vector<Variable> > variableSet;
+	Vector < RPN > statementSet;
+	Vector < Vector<Variable> > variableSet;
 
 	public:
-
+	// stores data about a single `if` block.
+	// 
 	struct csIf {
-		RPN ifCondition,ifStatements,elseStatements;
-		Vector< Variable > ifVariables,elseVariables;
+		RPN ifCondition, ifStatements, elseStatements;
+		Vector <Variable> ifVariables, elseVariables;
 	};
+	// stores data about a single `for` block.
+	// counterVariables are the variables declared in the for block, but initialised only once.
 	struct csFor {
-		RPN forInitialization,forCondition,forUpdate,forStatements;
-		Vector< Variable > forVariables, counterVariables;
+		RPN forInitialization, forCondition, forUpdate, forStatements;
+		Vector <Variable> forVariables, counterVariables;
 	};
 
 	bool clearStatements();
@@ -42,15 +51,21 @@ class HashedData
 #define PARSE_STARTED 43
 #define PARSE_FAILED 44
 
+/********************************
+* The Parser class
+*  Takes tokens from a lexer object,
+*  and converts it into the Reverse Polish Notation
+*  Stores blocks in member `hashes`
+*********************************/
 class Parser
 {
 	private:
 	VariableScope variables; // stores globals.
-	Vector <Function> functions;
-	Vector <Error> errors;
-	Vector <HashedData> hashes;
-	RPN output;
-	int status;
+	Vector <Function> functions; // all global functions.
+	Vector <Error> errors; // parser errors
+	Vector <HashedData> hashes; // if, while, for, foreach blocks.
+	RPN output; // the main code
+	int status; // passed/failed
 
 	// lexer interaction interface:
 	Lexer *lexer;
@@ -59,7 +74,7 @@ class Parser
 	Parser(Lexer*, String = "");
 	~Parser();
 
-	// interface
+	// interface: Communication with the parser
 	bool sendError(Error);
 	bool sendError(String, String, bufferIndex = -1, int = ERROR_ERROR);
 	Vector<Error> getErrors();

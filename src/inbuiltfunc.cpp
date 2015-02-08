@@ -2,6 +2,9 @@
 #ifndef COMPONENT_PARSER_IO_H
 #define COMPONENT_PARSER_IO_H
 
+/*******************
+* Executes all global inbuilt functions
+******************/
 struct InbuiltFunctions {
 	// I/O functions:
 	static char INFCHAR;
@@ -13,6 +16,7 @@ struct InbuiltFunctions {
 
 char InbuiltFunctions::INFCHAR = 236;
 
+// write a token's value to the out stream.
 Token InbuiltFunctions::write(Token t, ostream& out) {
 	if (t.type() != LITERAL) return falseToken;
     if (t.subtype() == BOOLEAN || t.subtype() == CONSTANT) {
@@ -49,6 +53,7 @@ Token InbuiltFunctions::write(Token t, ostream& out) {
     return falseToken;
 }
 
+// read a value of type `t1`
 Token InbuiltFunctions::read(tokenType t1, istream& in) {
 	String s;
     if(t1 == NUMBER) {
@@ -63,12 +68,13 @@ Token InbuiltFunctions::read(tokenType t1, istream& in) {
 	return nullvalToken;
 }
 
+// gets a single char.
 Token InbuiltFunctions::get(istream& in) {
     char c = in.get();
     String val = Lexer::stringToLiteral(String(c));
     return  Lexer::toToken(val);
 }
-
+// gets a single line.
 Token InbuiltFunctions::readLine(istream& in) {
     String s;
 	s.get(in, '\n');

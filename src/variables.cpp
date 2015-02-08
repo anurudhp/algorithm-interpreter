@@ -44,13 +44,18 @@ String Variable::id() const {
 tokenType Variable::type() {
 	return _type;
 }
+// set the type of the variable.
 void Variable::setType(tokenType t) {
 	this->_type = t;
-	if (t == ARRAY || t == OBJECT) this->_value.setType(t);
+	this->_value.setType(t);
 }
 
 Token Variable::value() const { return this->_value; }
 
+// if ARRAY, length of the array
+// if OBJECT, number of pairs
+// if STRING, number of characters
+// else -1
 __SIZETYPE Variable::length() const {
 	if (_type == STRING) return (this->_value.value().length() - 2);
 	if (_type == ARRAY || _type == OBJECT) return this->_values.size();
@@ -71,6 +76,7 @@ bool Variable::setValue(const Variable& v) {
 	return true;
 }
 
+// checks whether it has a value at index/key
 bool Variable::hasValueAt(Token key) {
 	if (this->type() == ARRAY) {
 		key = Operations::typecastToken(key, NUMBER);
@@ -97,6 +103,7 @@ bool Variable::hasValueAt(Token key) {
 	return false;
 }
 
+// returns reference to the value at key.
 Variable& Variable::valueAt(Token key) {
 	if (!this->hasValueAt(key)) {
 		return nullVariableRef;
@@ -115,6 +122,7 @@ Variable& Variable::valueAt(Token key) {
 	return this->_values[index];
 }
 
+// sets the value at key to value
 bool Variable::setValueAt(Token key, Variable value) {
 	if (this->type() == ARRAY) {
 		key = Operations::typecastToken(key, NUMBER);
@@ -148,12 +156,15 @@ bool Variable::setValueAt(Token key, Variable value) {
 	return false;
 }
 
+// Methods for arrays
+// adds a variable to the array.
 bool Variable::pushValue(Variable v, bool isFront) {
 	if (this->_type != ARRAY) return false;
 	if (isFront) this->_values.pushfront(v);
 	else this->_values.pushback(v);
 	return true;
 }
+// pops a variable from the array, and returns it through the reference
 bool Variable::popValue(Variable& v, bool isFront) {
 	if (this->_type != ARRAY) return false;
 	if (isFront) this->_values.popfront(v);
@@ -161,10 +172,12 @@ bool Variable::popValue(Variable& v, bool isFront) {
 	return true;
 }
 // methods for objects:
+// adds a key-value pair
 bool Variable::addPair(Token key, Variable val) {
 	if (this->_type != OBJECT) return false;
 	return this->setValueAt(key, val);
 }
+// deletes a key (and corresponding value) from the list of keys
 bool Variable::deletePair(Token key, Variable& ref) {
 	if (this->_type != OBJECT) return false;
 	for (__SIZETYPE i = 0; i < this->_keys.size(); i++) {
@@ -177,16 +190,19 @@ bool Variable::deletePair(Token key, Variable& ref) {
 	}
 	return false;
 }
+// gets the key at index
 String Variable::getKey(__SIZETYPE index) {
 	if (this->_type != OBJECT || index >= this->length() || index < 0) return "";
 	return this->_keys[index];
 }
 
+// gets a member function
 Function Variable::getMethod(String funcId) {
 	if (this->type() != OBJECT || this->_object == NULL) return Function();
 	return this->_object->getPrototype(funcId);
 }
 
+// prints values to out
 Token Variable::printValues(ostream& out) {
 	if (_type == STRING || _type == BOOLEAN || _type == NUMBER || _type == CONSTANT) {
 		return InbuiltFunctions::write(_value);
@@ -274,6 +290,7 @@ bool VariableScope::exists(String id) {
 	}
 	return false;
 }
+// checks if the variable 'id' exists at the top of the scope (ie. current local variable)
 bool VariableScope::existsAtTop(String id) {
 	Vector<Variable>& vars = this->varstack[-1];
 	for (__SIZETYPE j = 0; j < vars.size(); j++) {
@@ -296,6 +313,7 @@ Variable& VariableScope::resolve(String id) {
 	return nullVariableRef;
 }
 
+// gets the `globals` of the scope.
 Vector<Variable>& VariableScope::getBaseVariables() {
 	if (this->varstack.size() == 0) this->stackVariables();
 	return this->varstack[0];
@@ -350,6 +368,10 @@ bool Function::setReturn(Token ret) {
 	return true;
 }
 
+// executes the function.
+// calls evaluateRPN() of the evaluator object,
+// after stacking the function variables, and parameters.
+// finally, after execution, returns the value of the returned token.
 Token Function::evaluate(Vector<Variable> args, Evaluator& eval) {
 	Vector<Variable> func_args;
 	Variable nullVar(nullvalToken);
