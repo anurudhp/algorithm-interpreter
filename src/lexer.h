@@ -38,6 +38,11 @@ typedef Vector<String> idList;
 #define ERROR_ERROR 32
 #define ERROR_FATAL 33
 
+/*******************************
+* Class Error
+* Stores information about an error, along with a flag.
+* member message() returns a user friendly format of the error as a string.
+********************************/
 class Error
 {
 	String _code, _flag;
@@ -69,6 +74,11 @@ idList Keywords,
        unaryOperators, 
        binaryOperators;
 
+/*******************************
+* Class Token:
+* 	Stores information about a single keyword/id/literal/operator
+*   
+*******************************/
 class Token
 {
 	private:
@@ -105,13 +115,18 @@ bool importErrorCodes(ifstream&);
 
 typedef Queue<Token> Infix;
 
+/******************************
+* The Lexer Class:
+* Takes source code from a file, and converts them into tokens.
+* member getToken(): extracts and returns the next token.
+*******************************/
 class Lexer
 {
 	private:
 	bufferIndex line, indent;
-	ifstream source;
-	Vector<Error> errors;
-	Deque<Token> innerBuffer;
+	ifstream source; // handles the source code file.
+	Vector<Error> errors; // stores all lexer errors
+	Deque<Token> innerBuffer; // stores tokens that have been sent back.
 
 	private:
 	int trim();
