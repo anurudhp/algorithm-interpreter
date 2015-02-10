@@ -1,5 +1,5 @@
 // Macros for debugging:
-int debugLevel = 1;
+int debugLevel = 0;
 #define DEB       if (debugLevel > 2) cerr << ">> REACHED <<\n";
 #define PRINT(i)  if (debugLevel > 1) cerr << ">> " << i << endl;
 #define PRINT2(i)  if (debugLevel > 1) cerr << ">>>>> " << i << endl;
@@ -10,59 +10,143 @@ int debugLevel = 1;
 
 #include "interface.h"
 
-bool loadData();
-void logRPN(RPN);
-
 int main()
 {
-	cerr << "Debug Level: ";
-	cin >> debugLevel; cin.get();
-	if (!loadData()) return 0;
-	
-	Lexer *lexer = new Lexer("../logs/test.alg");
-	Parser *parser = new Parser(lexer);
-	if (!parser->parseSource()) {
-		cerr << "\nParsing failed...\n";
-		return 0;
+	loadData();
+	String msg;
+	showConsole(true);
+	while (1) {
+		msg.get(cin, '\n');
+		if (msg == "quit") {
+			cout << "Thank you for using the interpreter.\n";
+			return 0;
+		}
+		parseCommand(msg);
 	}
-	LOGN("Parsing complete.\n");
-	logRPN(parser->getOutput());
-	
-	cout << "_________________________________________\n\n";
-	Evaluator *eval = new Evaluator(parser);
-	bool res = eval->runProgram();
-	cout << "\n_________________________________________\n";
-	if (!res) cerr << "\nEvaluation failed...\n";
 	return 0;
 }
 
+void parseCommand(String message) {
+	if (!message) {
+		showConsole();
+		return;
+	}
+
+	Vector<String> parts = strsplit(message, ' ');
+	String cmd(parts[0]);
+	parts.popfront();
+
+	if (cmd == "run") {
+		runProgram(parts);
+	}
+	else if (cmd == "clear") {
+		system("cls");
+	}
+	else if (cmd == "help") {
+		cout << help;
+	}
+	else if (cmd == "about" || cmd == "credits") {
+		cout << intro;
+	}
+	else if (cmd == "debug") {
+		String val = strjoin(parts);
+		if (val.isInteger()) {
+			debugLevel = val.toInteger();
+			cout << "Debug level set to " << debugLevel;
+		}
+	}
+	else if (cmd == "hotpatch") {
+		loadData();
+	}
+	else {
+		cout << "invalid command. type `help` to see list of commands.";
+	}
+
+	showConsole();
+}
+
+bool runProgram(Vector<String> args) {
+	if (args.size() < 1) {
+		cerr << "Invalid usage, expected filename.";
+		return false;
+	}
+
+	// spawn the lexer, parser and evaluator handles.
+	Lexer *lexer = new Lexer(args[0]);
+	Parser *parser = new Parser(lexer);
+	if (!parser->parseSource()) {
+		cerr << "\nParsing failed...\n";
+		delete lexer;
+		delete parser;
+		return false;
+	}
+	LOGN("Parsing complete.\n");
+	logRPN(parser->getOutput());
+
+	Evaluator *evaluator = new Evaluator(parser);
+	bool res = evaluator->runProgram();
+	if (!res) cerr << "\nEvaluation failed...\n";
+
+	delete lexer;
+	delete parser;
+	delete evaluator;
+
+	return res;
+}
+void showConsole(bool firsttime) {
+	if (firsttime) {
+		cout << startupmessage;
+	}
+	cout << "\nconsole> ";
+}
 bool loadData() {
+	bool success;
+	// Load the data required: lexer data and error codes.
 	ifstream fin;
-	
+
 	fin.open("data/lexerdata.txt");
 	LOG("Loading lexer data...");
 	if (!importLexerData(fin)) {
-		cerr << " unable to load\n";
-		fin.close();
-		return false;
+		LOGN(" unable to load");
+		success = false;
+	} else {
+		LOGN("done.");
 	}
-	LOGN("done.");
 	fin.close();
-	
+
 	fin.open("data/errorcodes.txt");
 	LOG("Loading error codes and descriptions...");
 	if (!importErrorCodes(fin)) {
-		cerr << " unable to load\n";
-		fin.close();
-		return false;
+		LOGN(" unable to load");
+		success =  false;
+	} else {
+		LOGN("done.");
 	}
-	LOGN("done.");
 	fin.close();
+
+	// load help/info data:
+	intro = readFile("data/intro.txt");
+	help = readFile("data/help.txt");
+	startupmessage = readFile("data/startup.txt");
+
+	// some parser settings.
+	nullVariableRef.setValue(nullvalToken);
+
+	return success;
+}
+
+String readFile(String fname) {
+	String ret, tmp;
+	ifstream fin(fname.c_str());
+	if (!fin) return ret;
 	
-	nullVariableRef.setValue(Token("null", LITERAL, CONSTANT));
-	
-	cerr << endl;
-	return true;
+	while (!fin.eof()) {
+		tmp.get(fin, '\n');
+		ret += tmp;
+		ret += '\n';
+	}
+	fin.close();
+	return ret;
 }
 
 void logRPN(RPN r) {

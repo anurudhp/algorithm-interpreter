@@ -81,18 +81,18 @@ bool Variable::hasValueAt(Token key) {
 	if (this->type() == ARRAY) {
 		key = Operations::typecastToken(key, NUMBER);
 		if (key.value() == "null") return false;
-		
+
 		if (!key.value().isInteger()) return false;
 		__SIZETYPE index = key.value().toInteger();
 		if (index < 0) index += this->_values.size();
-		
+
 		if (index < 0 || index >= this->_values.size()) return false;
 		return true;
 	}
 	else if (this->type() == OBJECT) {
 		key = Operations::typecastToken(key, STRING);
 		if (key.value() == "null") return false;
-		
+
 		if (this->_keys.indexOf(key.value()) == -1) {
 			this->_keys.pushback(key.value());
 			this->_values.pushback(Variable());
@@ -116,7 +116,7 @@ Variable& Variable::valueAt(Token key) {
 		if (index < 0) index += this->_values.size();
 	}
 	else if (this->type() == OBJECT) {
-		key = Operations::typecastToken(key, STRING);		
+		key = Operations::typecastToken(key, STRING);
 		index = _keys.indexOf(key.value());
 	}
 	return this->_values[index];
@@ -127,10 +127,10 @@ bool Variable::setValueAt(Token key, Variable value) {
 	if (this->type() == ARRAY) {
 		key = Operations::typecastToken(key, NUMBER);
 		if (key.value() == "null" || !key.value().isInteger()) return false;
-		
+
 		__SIZETYPE index = key.value().toInteger();
 		if (index < 0) index += this->_values.size();
-		
+
 		if (index < 0 || index > this->_values.size()) return false;
 		if (index == this->_values.size()) {
 			this->_values.pushback(Variable());
@@ -141,7 +141,7 @@ bool Variable::setValueAt(Token key, Variable value) {
 	else if (this->type() == OBJECT) {
 		key = Operations::typecastToken(key, STRING);
 		if (key.value() == "null") return false;
-		
+
 		__SIZETYPE index = _keys.indexOf(key.value());
 		if (index == -1) { // new key
 			_keys.pushback(key.value());
@@ -207,7 +207,7 @@ Token Variable::printValues(ostream& out) {
 	if (_type == STRING || _type == BOOLEAN || _type == NUMBER || _type == CONSTANT) {
 		return InbuiltFunctions::write(_value);
 	}
-	
+
 	Token res = trueToken, tmp;
 	if (_type == ARRAY) {
 		out << "[ ";
@@ -238,7 +238,7 @@ Token Variable::printValues(ostream& out) {
 }
 
 /*******************************
-* End Implementation: Variable 
+* End Implementation: Variable
 ********************************/
 
 /*********************************
@@ -323,7 +323,7 @@ Vector<Variable>& VariableScope::getBaseVariables() {
 __SIZETYPE VariableScope::depth() const { return this->varstack.size(); }
 
 /*******************************
-* End Implementation: VariableScope 
+* End Implementation: VariableScope
 ********************************/
 
 /*********************************
@@ -404,11 +404,11 @@ Token Function::evaluate(Vector<Variable> args, Evaluator& eval) {
 	return ret;
 }
 /*******************************
-* End Implementation: Function 
+* End Implementation: Function
 ********************************/
 
 /*******************************
-* Implementation: class Object 
+* Implementation: class Object
 ********************************/
 Object::Object() { isFundamental = false; }
 
