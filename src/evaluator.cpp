@@ -7,7 +7,7 @@ Evaluator::Evaluator(Parser *pr, String args) {
 
 bool Evaluator::runProgram() {
 	// initialise the HEAP and the main code.
-	this->variables = this->parser->variables;
+	this->parser->variables.popVariables(this->globals);
 	RPN primarySource = this->parser->output;
 
 	this->evaluateRPN(primarySource, this->variables);
@@ -78,6 +78,9 @@ Variable& Evaluator::getVariable(String id, VariableScope& scope, bool searchCac
 	if (scope.exists(id)) {
 		return scope.resolve(id);
 	}
+	for (__SIZETYPE i = 0; i < this->globals.size(); i++)
+		if (this->globals[i].id() == id) return this->globals[i];
+
 	if (searchCache) {
 		Variable& v = this->getCachedVariable(id);
 		return v;
