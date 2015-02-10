@@ -12,6 +12,7 @@ class Evaluator
 	private:
 	Vector <Error> errors;
 	VariableScope variables;
+	Vector<Variable> globals;
 	Vector<Variable*> cache;
 	Stack<Function> functionStack;
 	Parser *parser;

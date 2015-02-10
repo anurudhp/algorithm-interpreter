@@ -384,13 +384,10 @@ Token Function::evaluate(Vector<Variable> args, Evaluator& eval) {
 	}
 
 	VariableScope scope;
-	scope.stackVariables(eval.getGlobals());
 	scope.stackVariables(func_args);
 	scope.stackVariables(functionVariables);
 
 	eval.evaluateRPN(this->statements, scope);
-	// update the globals in the evaluator.
-	eval.getGlobals() = scope.getBaseVariables();
 
 	Token ret = this->returnVal;
 	if (!this->hasReturned()) ret = nullvalToken;
