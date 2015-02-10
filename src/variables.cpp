@@ -47,7 +47,8 @@ tokenType Variable::type() {
 // set the type of the variable.
 void Variable::setType(tokenType t) {
 	this->_type = t;
-	this->_value.setType(t);
+	if (_type == ARRAY || _type == OBJECT) this->_value.setType(t);
+	else this->_value.setSubtype(t);
 }
 
 Token Variable::value() const { return this->_value; }
