@@ -190,6 +190,8 @@ int Operations::comparePriority(Token a, Token b) {
 	// exception: unary `-` vs `typeof`
 	if (a.value() == "-" && a.subtype() == UNARYOP && b.value() == "typeof") return 1;
 	if (b.value() == "-" && b.subtype() == UNARYOP && a.value() == "typeof") return 0;
+	// exception: `=` : right associativity
+	if (pa == 2 && pb == 2) return -1;
 	return (pa - pb);
 }
 
