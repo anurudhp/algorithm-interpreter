@@ -1,0 +1,2 @@
+Welcome to the AlgoFlex CLI (Beta release)
+type `help` to see the list of commands

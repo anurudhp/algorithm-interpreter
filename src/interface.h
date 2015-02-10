@@ -24,4 +24,13 @@ class Object;
 #include "parser.cpp"
 #include "evaluator.cpp"
 
+String help, intro, startupmessage;
+
+void showConsole(bool = false);
+bool loadData();
+String readFile(String);
+void logRPN(RPN);
+void parseCommand(String);
+bool runProgram(Vector<String>);
+
 #endif /* COMPONENT_INTERFACE_H */

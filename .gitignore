@@ -23,3 +23,4 @@
 #log directory, and test algs
 /logs/
 /rc/*.pm
+*.alg

@@ -4,6 +4,7 @@
 l0: Unable to read source: 
 l1: String not terminated properly, expected 
 l2: Too many decimal points in numeric value 
+l3: unexpected character in source: 
 
 ####################
 # parser errors    #
@@ -35,6 +36,7 @@ ns: Not Supported
 # variables
 rv1: invalid left-hand side for assignment: 
 rv2: cannot find property of null 
+rv3: variable not declared: 
 ro1: invalid operands for 
 ro2: expected number for 
 

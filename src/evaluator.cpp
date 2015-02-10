@@ -263,10 +263,12 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
 
 				if (a.subtype() == VARIABLE) {
 					Variable& v1 = this->getVariable(a.value(), scope, true);
+					if (v1.id() == ";") this->sendError("rv3", a.value());
 					va = v1.value();
 				}
 				if (b.subtype() == VARIABLE) {
 					Variable& v2 = this->getVariable(b.value(), scope, true);
+					if (v2.id() == ";") this->sendError("rv3", b.value());
 					vb = v2.value();
 				}
 
