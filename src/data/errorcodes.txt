@@ -5,6 +5,7 @@ l0: Unable to read source:
 l1: String not terminated properly, expected 
 l2: Too many decimal points in numeric value 
 l3: unexpected character in source: 
+l4: unexpected over-indentation of statement
 
 ####################
 # parser errors    #
@@ -37,7 +38,8 @@ ns: Not Supported
 rv1: invalid left-hand side for assignment: 
 rv2: cannot find property of null 
 rv3: variable not declared: 
-ro1: invalid operands for 
+rv4: access out of bounds
+ro1: invalid operand(s) for 
 ro2: expected number for 
 
 rf1: unable to find function 

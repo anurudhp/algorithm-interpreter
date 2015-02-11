@@ -82,7 +82,7 @@ Parser::~Parser() {
 
 /*** Parser Interface ***/
 // adds an error to the vector of errors
-bool Parser::sendError(Error e) {
+bool Parser::addError(Error e) {
 	this->errors.pushback(e);
 	if (e.severity() == ERROR_FATAL) {
 		// a fatal error, so stop parsing further.
@@ -91,11 +91,12 @@ bool Parser::sendError(Error e) {
 	return true;
 }
 bool Parser::sendError(String cd, String msg, bufferIndex ln, int s) {
-	return this->sendError(Error(cd, msg, ln, s));
+	return this->addError(Error(cd, msg, ln, s));
 }
 
 // displays the errors to the console/file.
 bool Parser::showErrors(ostream& out, bool clearAfterDisplay) {
+	this->errors = sortErrors(this->errors);
 	if (this->errors.size() > 0) {
 		for (__SIZETYPE i = 0; i < this->errors.size(); i++) {
 			out << this->errors[i].message() << endl;
@@ -139,7 +140,7 @@ HashedData Parser::getHashedData(String hash) {
 bool Parser::parseSource() {
 	// some error checks before proceeding:
 	Vector<Error> lexerErrors = this->lexer->getErrors();
-	for (__SIZETYPE i = 0; i < lexerErrors.size(); i++) this->sendError(lexerErrors[i]);
+	for (__SIZETYPE i = 0; i < lexerErrors.size(); i++) this->addError(lexerErrors[i]);
 	if (this->showErrors(cerr)) {
 		this->status = PARSE_FAILED;
 		return false;
@@ -158,7 +159,7 @@ bool Parser::parseSource() {
 	this->validateRPN(this->output);
 
 	lexerErrors = this->lexer->getErrors();
-	for (__SIZETYPE i = 0; i < lexerErrors.size(); i++) this->sendError(lexerErrors[i]);
+	for (__SIZETYPE i = 0; i < lexerErrors.size(); i++) this->addError(lexerErrors[i]);
 
 	if (this->showErrors(cerr)) {
 		this->status = PARSE_FAILED;
@@ -179,7 +180,8 @@ RPN Parser::parseBlock(bufferIndex depth) {
 	Token current;
 	Infix lineBuffer;
 
-	Token eqTok = Lexer::toToken("=");
+	static Token eqTok = Lexer::toToken("="),
+	             statementEnd = Lexer::toToken(";");
 
 	variables.stackVariables(); // variables in this block.
 
@@ -188,8 +190,12 @@ RPN Parser::parseBlock(bufferIndex depth) {
 		if (current.value() == "$null") return RPN();
 		if (current.value() == "$eof") break;
 		if (current.value() == "$endline") continue;
-		if (current.indent() != depth) {
-			// block ended, break
+		if (current.indent() > depth) {
+			// unexpected over-indentation
+			this->sendError("l4", "", current.lineNumber());
+		}
+		if (current.indent() < depth) {
+			// block ended.
 			lexer->putbackToken(current);
 			break;
 		}
@@ -226,10 +232,6 @@ RPN Parser::parseBlock(bufferIndex depth) {
 					// now parse the declaration:
 					Token tmp; RPN decl;
 					if (lineBuffer.pop(tmp) && tmp.value() == "=") { // initialised.
-
-						// peek the next token for the type.
-						if (lineBuffer.empty()) this->sendError("p3", "expression after = for initialisation", current.lineNumber()); // expected
-
 						this->lexer->putbackToken(newlineToken);
 						Stack<Token> v2;
 						while (lineBuffer.pop(tmp)) v2.push(tmp);
@@ -238,7 +240,11 @@ RPN Parser::parseBlock(bufferIndex depth) {
 						decl = this->parseDeclaration();
 						blockOutput.push(vartok);
 						while (decl.pop(tmp)) blockOutput.push(tmp);
+						
+						eqTok.setLineNumber(current.lineNumber());
 						blockOutput.push(eqTok);
+						statementEnd.setLineNumber(current.lineNumber());
+						blockOutput.push(statementEnd);
 					}
 				}
 			}
@@ -320,11 +326,15 @@ RPN Parser::parseBlock(bufferIndex depth) {
 			res = this->expressionToRPN(lineBuffer);
 			f.forCondition.push(iter);
 			while (res.pop(tmp)) f.forCondition.push(tmp);
-			f.forCondition.push(Lexer::toToken((comp.value() == "to") ? "<=" : ">="));
+
+			tmp = Lexer::toToken((comp.value() == "to") ? "<=" : ">="); tmp.setLineNumber(current.lineNumber());
+			f.forCondition.push(tmp);
 
 			f.forUpdate.push(iter);
-			f.forUpdate.push(Lexer::toToken("1"));
-			f.forUpdate.push(Lexer::toToken((comp.value() == "to") ? "+=" : "-="));
+			tmp = Lexer::toToken("1"); tmp.setLineNumber(current.lineNumber());
+			f.forUpdate.push(tmp);
+			tmp = Lexer::toToken((comp.value() == "to") ? "+=" : "-="); tmp.setLineNumber(current.lineNumber());
+			f.forUpdate.push(tmp);
 
 			f.forStatements = this->parseBlock(depth + 1);
 			this->variables.popVariables(f.forVariables);
@@ -359,8 +369,8 @@ RPN Parser::parseBlock(bufferIndex depth) {
 			// `function` declaration format:
 			// function <name> ( <param1>, <param2>, <param3>)
 			Token funcname, tmp;
-			if (!lineBuffer.pop(funcname)) this->sendError("p", "after keyword function", current.lineNumber()); // expected
-			if (funcname.type() != IDENTIFIER) this->sendError("p", " valid function name", current.lineNumber()); // expected
+			if (!lineBuffer.pop(funcname)) this->sendError("p3", "after keyword function", current.lineNumber()); // expected
+			if (funcname.type() != IDENTIFIER) this->sendError("p3", " valid function name", current.lineNumber()); // expected
 			if (!!this->getFunction(funcname.value()).id()) this->sendError("p3.4", funcname.value(), current.lineNumber()); // re-declaration
 
 			Function func(funcname.value());
@@ -368,8 +378,8 @@ RPN Parser::parseBlock(bufferIndex depth) {
 			Vector<String> params;
 			// extract the parameter list:
 			if (!lineBuffer.pop(tmp) || tmp.value() != "(") this->sendError("p3", "( after function name", current.lineNumber()); // expected
-			if (!lineBuffer.pop(tmp)) this->sendError("p1", "closing ) ", current.lineNumber()); // expected
-			if (tmp.value() != ")") { // has non-void parameter list
+			if (!lineBuffer.pop(tmp)) this->sendError("p3", "closing ) in function declaration", current.lineNumber()); // expected
+			else if (tmp.value() != ")") { // has non-void parameter list
 				// first parameter is `tmp`
 				if (tmp.type() != IDENTIFIER) this->sendError("p4.2", tmp.value(), tmp.lineNumber());
 				else params.pushback(tmp.value());
@@ -377,10 +387,10 @@ RPN Parser::parseBlock(bufferIndex depth) {
 				while (lineBuffer.pop(tmp)) {
 					if (tmp.value() == ")") break;
 					if (tmp.value() != ",") this->sendError("p4.3", "", tmp.lineNumber()); // expected function arg separator ,
-					else if (!lineBuffer.pop(tmp) || tmp.type() != IDENTIFIER) this->sendError("p1", " identifier after ,", tmp.lineNumber()); // expected identifier after separator ,
+					else if (!lineBuffer.pop(tmp) || tmp.type() != IDENTIFIER) this->sendError("p3", " identifier after ,", tmp.lineNumber()); // expected identifier after separator ,
 					else params.pushback(tmp.value());
 				}
-				if (tmp.value() != ")") this->sendError("p1", " closing ) in function declaration", tmp.lineNumber());
+				if (tmp.value() != ")") this->sendError("p3", " closing ) in function declaration", tmp.lineNumber());
 			}
 
 			func.setParams(params);
@@ -534,11 +544,14 @@ RPN Parser::expressionToRPN(Infix args) {
 		if (current.value() == "$endline" || current.value() == ";") {
 			while (operstack.pop(current)) {
 				// check for unbalanced ( and [
-				if (current.value() == "(" || current.value() == "[") this->sendError(Error("p1", current.value(), current.lineNumber()));
+				if (current.value() == "(" || current.value() == "[") this->sendError("p1", current.value(), current.lineNumber());
 				output.push(current);
 			}
 			current = statementEnd;
 			output.push(statementEnd);
+			expected = true;
+		}
+		if (current.value() == "$null") {
 			expected = true;
 		}
 
@@ -555,7 +568,7 @@ RPN Parser::expressionToRPN(Infix args) {
 		if (current.subtype() == FUNCTION) {
 			operstack.push(current);
 			Token tmp;
-			if (!args.pop(tmp) || tmp.value() != "(") this->sendError(Error("p3.1", "", current.lineNumber())); // function call should be succeeded by a (
+			if (!args.pop(tmp) || tmp.value() != "(") this->sendError("p3.1", "", current.lineNumber()); // function call should be succeeded by a (
 			operstack.push(tmp);
 
 			// zero argument function call: in case next token is )
@@ -582,7 +595,7 @@ RPN Parser::expressionToRPN(Infix args) {
 							else {
 								// unable to find number of arguments: arglist is empty.
 								// should not happen.
-								this->sendError(Error("p3.2", "@args", current.lineNumber()));
+								this->sendError("p3.2", "@args", current.lineNumber());
 							}
 
 							if (!operstack.empty() && operstack.top().value() == ".") {
@@ -598,7 +611,7 @@ RPN Parser::expressionToRPN(Infix args) {
 					output.push(tmp);
 				}
 				if (tmp.value() != "(") {
-					this->sendError(Error("p1", ")", current.lineNumber())); // unbalanced )
+					this->sendError("p2", ")", current.lineNumber()); // unbalanced )
 				}
 			}
 			else if (current.value() == "]") {
@@ -606,7 +619,7 @@ RPN Parser::expressionToRPN(Infix args) {
 					if (tmp.value() == "[") break;
 					output.push(tmp);
 				}
-				if (tmp.value() != "[") this->sendError(Error("p1", "]", current.lineNumber())); // unbalanced ]
+				if (tmp.value() != "[") this->sendError("p2", "]", current.lineNumber()); // unbalanced ]
 				output.push(subscriptOp);
 			}
 			else if (current.value() == ",") {
@@ -622,7 +635,7 @@ RPN Parser::expressionToRPN(Infix args) {
 					if (tmp.value() == "?") break;
 					output.push(tmp);
 				}
-				if (tmp.value() != "?") this->sendError(Error("p2", ": without a ?", current.lineNumber())); // unexpected : without a ?
+				if (tmp.value() != "?") this->sendError("p2", ": without a ?", current.lineNumber()); // unexpected : without a ?
 				operstack.pop();
 				operstack.push(ternaryOp);
 			}
@@ -663,7 +676,7 @@ RPN Parser::expressionToRPN(Infix args) {
 	}
 	while (operstack.pop(current)) {
 		// check for unbalanced ( and [
-		if (current.value() == "(" || current.value() == "[") this->sendError(Error("p1", current.value(), current.lineNumber()));
+		if (current.value() == "(" || current.value() == "[") this->sendError("p1", current.value(), current.lineNumber());
 		output.push(current);
 	}
 
@@ -810,6 +823,23 @@ Token Parser::toArgsToken(__SIZETYPE num) {
 	String s = "@args|";
 	s += integerToString(num);
 	return Token(s, DIRECTIVE, FUNCTION);
+}
+
+// sort the errors based on line numbers:
+Vector<Error> Parser::sortErrors(Vector<Error> errors) {
+	__SIZETYPE sz = errors.size(), i, j;
+	Error tmp;
+	for (i = 0; i < sz; i++) {
+		for (j = i + 1; j < sz; j++) {
+			if (errors[j].lineNumber() < errors[i].lineNumber()) {
+				tmp = errors[i];
+				errors[i] = errors[j];
+				errors[j] = tmp;
+			}	
+		}
+	}
+
+	return errors;
 }
 /*** END implementation: class Parser ***/
 #endif

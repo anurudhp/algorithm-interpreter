@@ -37,6 +37,7 @@ typedef Vector<String> idList;
 #define ERROR_WARNING 31
 #define ERROR_ERROR 32
 #define ERROR_FATAL 33
+#define ERROR_RUNTIME 34
 
 /*******************************
 * Class Error

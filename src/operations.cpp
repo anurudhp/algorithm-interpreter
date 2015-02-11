@@ -42,7 +42,6 @@ Token Operations::typecastToken(Token tok, tokenType type) {
 		}
 		if (tok.subtype() == CONSTANT) {
 			if (tok.value() == "infinity" || tok.value() == "minusinfinity") return tok;
-			if (tok.value() == "null") return Lexer::toToken("1");
 		}
 	}
 	else if (type == STRING) {
@@ -99,6 +98,7 @@ Token Operations::add(Token t1, Token t2) {
 		return Lexer::toToken(numberToString(a1 + a2));
 	}
 	if (t1.value() == "infinity" || t2.value() == "infinity") return Lexer::toToken("infinity");
+	if (t1.value() == "minusinfinity" || t2.value() == "minusinfinity") return Lexer::toToken("minusinfinity");
 	return nullvalToken;
 }
 
@@ -237,6 +237,7 @@ Token Operations::compare(String op, Token t1, Token t2) {
 	// > >= < <= : only for numbers (boolean converted to equivalent numbers)
 	t1 = typecastToken(t1, NUMBER);
 	t2 = typecastToken(t2, NUMBER);
+	if (t1.value() == "null" || t2.value() == "null") return falseToken;
 	if (op == "<") {
 		if (t1.value() == "infinity" || t2.value() == "minusinfinity") return falseToken;
 		if (t2.value() == "infinity" || t1.value() == "minusinfinity") return trueToken;
