@@ -18,14 +18,14 @@ bool Evaluator::runProgram() {
 }
 
 /*** interface ***/
-bool Evaluator::sendError(Error e) {
+bool Evaluator::addError(Error e) {
 	this->errors.pushback(e);
 	this->failed = true;
 	return true;
 }
 // adds a runtime error.
-bool Evaluator::sendError(String cd, String msg, bufferIndex ln, int s) {
-	return this->sendError(Error(cd, msg, ln, s));
+bool Evaluator::sendError(String cd, String msg, bufferIndex ln) {
+	return this->addError(Error(cd, msg, ln, ERROR_RUNTIME));
 }
 
 bool Evaluator::showErrors(ostream& out, bool clearAfterDisplay) {
@@ -186,7 +186,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
 						long ind = b.value().toInteger();
 						String str = Lexer::tokenToString(a);
 						if (ind < 0 || ind >= str.length()) {
-							this->sendError(Error("r")); // invalid index
+							this->sendError("rv4", "", a.lineNumber()); // invalid index
 							valuestack.push(nullvalToken);
 						}
 						else {
@@ -204,7 +204,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
 							long ind = b.value().toInteger();
 							String str = Lexer::tokenToString(a);
 							if (ind < 0 || ind >= str.length()) {
-								this->sendError(Error("r")); // invalid index
+								this->sendError("rv4", "", a.lineNumber()); // invalid index
 								valuestack.push(nullvalToken);
 							}
 							else {
@@ -219,14 +219,16 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
 							Variable& prop = var.valueAt(b);
 							String hash = this->cacheVariableRef(&prop);
 							valuestack.push(Token(hash, DIRECTIVE, VARIABLE));
-							valid = true;
+						} else {
+							this->sendError("rv4", "", a.lineNumber()); // invalid index
 						}
+						valid = true;
 					}
 				}
 
 				if (!valid) {
 					// only display types for operands.
-					this->sendError(Error("ro1", current.value() + " : " + a.value() + " and " + b.value())); // invalid types for []
+					this->sendError("ro1", current.value() + " : " + a.value() + " and " + b.value()); // invalid types for []
 				}
 			}
 			else if (current.subtype() == UNARYOP) {
@@ -266,17 +268,19 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
 
 				if (a.subtype() == VARIABLE) {
 					Variable& v1 = this->getVariable(a.value(), scope, true);
-					if (v1.id() == ";") this->sendError("rv3", a.value());
+					if (v1.id() == ";") this->sendError("rv3", a.value(), current.lineNumber());
 					va = v1.value();
 				}
 				if (b.subtype() == VARIABLE) {
 					Variable& v2 = this->getVariable(b.value(), scope, true);
-					if (v2.id() == ";") this->sendError("rv3", b.value());
+					if (v2.id() == ";") this->sendError("rv3", b.value(), current.lineNumber());
 					vb = v2.value();
 				}
 
 				if (oper == "=") res = b;
-				else res = Operations::binaryOperator(oper, va, vb);
+				else {
+					res = Operations::binaryOperator(oper, va, vb);
+				}
 
 				if (isAssign) {
 					Variable& v = this->getVariable(a.value(), scope, true);
@@ -298,7 +302,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
 				valuestack.pop(tok);
 
 				Variable& v = this->getVariable(tok.value(), scope, true);
-				if (v.type() != NUMBER) this->sendError("ro2", current.value()); // ++ and -- work only on numbers
+				if (v.type() != NUMBER) this->sendError("ro2", current.value(), current.lineNumber()); // ++ and -- work only on numbers
 
 				val = v.value(); // the old value.
 				res = Operations::binaryOperator(current.value().substr(0, 1), val, Lexer::toToken("1")); // after inc/dec
@@ -480,6 +484,12 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
 							res = trueToken;
 						}
 						else if (current.value().substr(0, 4) == "read") { // readInteger, readString, readLine
+							for (__SIZETYPE i = 0; i < args.size(); i++) {
+								if (args[i].type() == LITERAL) InbuiltFunctions::write(args[i]);
+								else if (args[i].subtype() == VARIABLE) {
+									this->getVariable(args[i].value(), scope, true).printValues(cout);
+								}
+							}
 							if (current.value() == "readLine") {
 								res = InbuiltFunctions::readLine();
 							}
@@ -543,7 +553,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
 							tmp = this->functionStack.top().evaluate(argVars, *this);
 							this->functionStack.pop();
 						} else {
-							this->sendError("rf1", current.value()); // unable to find function.
+							this->sendError("rf1", current.value(), current.lineNumber()); // unable to find function.
 						}
 						valuestack.push(tmp);
 					}

@@ -75,8 +75,8 @@ class Parser
 	~Parser();
 
 	// interface: Communication with the parser
-	bool sendError(Error);
-	bool sendError(String, String, bufferIndex = -1, int = ERROR_ERROR);
+	bool addError(Error);
+	bool sendError(String, String = "", bufferIndex = -1, int = ERROR_ERROR);
 	Vector<Error> getErrors();
 	bool showErrors(ostream&, bool = false);
 	Function getFunction(String);
@@ -96,6 +96,7 @@ class Parser
 	bool validateRPN(RPN);
 	
 	static Token toArgsToken(__SIZETYPE);
+	static Vector<Error> sortErrors(Vector<Error>);
 	friend class Evaluator;RPN getOutput(){return output;}
 };
 

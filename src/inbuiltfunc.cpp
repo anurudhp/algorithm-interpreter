@@ -58,11 +58,11 @@ Token InbuiltFunctions::read(tokenType t1, istream& in) {
 	String s;
     if(t1 == NUMBER) {
         double number;
-        in >> number;
+        in >> number; in.get();
         return Lexer::toToken(numberToString(number));
     }
     if(t1 == STRING) {
-        in >> s;
+        in >> s; in.get();
         return Lexer::toToken(Lexer::stringToLiteral(s));
     }
 	return nullvalToken;

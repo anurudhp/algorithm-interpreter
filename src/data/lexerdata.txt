@@ -1,6 +1,6 @@
 var global typeof delete and or not equals
 if else while until do for foreach function return
-print printLine readNumber readString readLine String Number Boolean Array
+print printLine readNumber readString readLine String Number Boolean Array Object
 null infinity minusinfinity true false
 ()[]{},:;
 + += - -= * *= / /= % %= = == === != !== > >= < <= && || ? . []

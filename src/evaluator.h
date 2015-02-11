@@ -22,8 +22,8 @@ class Evaluator
 	Evaluator(Parser*, String = "");
 	
 	// interface:
-	bool sendError(Error);
-	bool sendError(String, String, bufferIndex = -1, int = ERROR_ERROR);
+	bool addError(Error);
+	bool sendError(String, String = "", bufferIndex = -1);
 	bool showErrors(ostream&, bool = false);
 
 	// variable caches

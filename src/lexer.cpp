@@ -34,8 +34,8 @@ int Error::severity() const { return this->_severity; }
 String Error::message() const {
 	__SIZETYPE i;
 	String ret;
+	if (this->_severity == ERROR_RUNTIME) ret += "(Runtime Error) ";
 	if (this->_line >= 0) ret = ret + "Line " + integerToString(this->_line) + ": ";
-	else ret = ret + "(Runtime) ";
 
 	if (this->_severity == ERROR_FATAL) ret += "FATAL Error: ";
 	else if (this->_severity == ERROR_ERROR) ret += "Error: ";
