@@ -31,14 +31,23 @@ struct Operations {
 Token Operations::typecastToken(Token tok, tokenType type) {
 	if (tok.subtype() == type) return tok;
 
-	if (type == NUMBER) {
+	if (type == NUMBER || type == INTEGER) {
+		if (tok.subtype() == NUMBER) {
+			// type is INTEGER
+			long val = long(tok.value().toNumber());
+			return Lexer::toToken(integerToString(val));
+		}
 		if (tok.subtype() == BOOLEAN) {
 			if (tok.value() == "true") return Lexer::toToken("1");
 			if (tok.value() == "false") return Lexer::toToken("0");
 		}
 		if (tok.subtype() == STRING) {
 			String val = Lexer::tokenToString(tok);
-			if (val.isNumber()) return Lexer::toToken(val);
+			if (type == INTEGER) {
+				if (val.isInteger()) return Lexer::toToken(val);
+			} else {
+				if (val.isNumber()) return Lexer::toToken(val);
+			}
 		}
 		if (tok.subtype() == CONSTANT) {
 			if (tok.value() == "infinity" || tok.value() == "minusinfinity") return tok;
