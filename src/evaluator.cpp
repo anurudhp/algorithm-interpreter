@@ -506,9 +506,12 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
 							Variable& v = this->getVariable(hash, scope, true);
 							v.setType(ARRAY);
 
-							Token arrSize; args.popfront(arrSize);
-							if (arrSize.subtype() == VARIABLE) arrSize = this->getVariable(arrSize.value(), scope, true).value();
-							long asize = arrSize.value().toInteger();
+							Token arrSize;
+							long asize = 0;
+							if (args.popfront(arrSize)) {
+								if (arrSize.subtype() == VARIABLE) arrSize = this->getVariable(arrSize.value(), scope, true).value();
+								asize = arrSize.value().toInteger();
+							}
 
 							for (__SIZETYPE i = 0; i < asize; i++)
 								v.setValueAt(Lexer::toToken(integerToString(i)), nullvalVariable);
@@ -520,11 +523,12 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
 							v.setType(OBJECT);
 							res = Token(hash, DIRECTIVE, VARIABLE);
 						}
-						else if (current.value() == "String" || current.value() == "Number" || current.value() == "Boolean") {
+						else if (current.value() == "String" || current.value() == "Number" || current.value() == "Boolean" || current.value() == "Integer") {
 							tokenType ty = UNKNOWN;
 							if (current.value() == "String") ty = STRING;
 							else if (current.value() == "Number") ty = NUMBER;
 							else if (current.value() == "Boolean") ty = BOOLEAN;
+							else if (current.value() == "Integer") ty = INTEGER;
 							Token val;
 							if (!args.empty()) {
 								val = args[0];
