@@ -111,7 +111,7 @@ Token eofToken, nullToken, newlineToken;
 // Literal tokens
 Token trueToken, falseToken, nullvalToken;
 // module to install the reserved words, and other lexer data
-bool importLexerData(ifstream&);
+bool loadLexerData();
 bool importErrorCodes(ifstream&);
 
 typedef Queue<Token> Infix;

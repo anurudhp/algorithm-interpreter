@@ -104,15 +104,13 @@ bool loadData() {
 	// Load the data required: lexer data and error codes.
 	ifstream fin;
 
-	fin.open("data/lexerdata.txt");
 	LOG("Loading lexer data...");
-	if (!importLexerData(fin)) {
+	if (!loadLexerData()) {
 		LOGN(" unable to load");
 		success = false;
 	} else {
 		LOGN("done.");
 	}
-	fin.close();
 
 	fin.open("data/errorcodes.txt");
 	LOG("Loading error codes and descriptions...");
