@@ -416,26 +416,21 @@ bool Lexer::ended() {
 // Keywords and constants, inbuilt functions, punctuators, operators
 // and sets the value of most static tokens.
 // @parameter datareader: a file object which has opened the lexerdata file in ios::in mode.
-bool importLexerData(ifstream& datareader) {
-	if (!datareader) return false;
-	String buff[8];
-	int i;
-	for(i = 0; i < 8; i++) {
-		if (datareader.eof()) break;
-		buff[i].get(datareader, '\n');
-	}
-	i = 0;
-	Keywords.clear();
-	Keywords.append(strsplit(buff[i++], ' '));
-	Keywords.append(strsplit(buff[i++], ' '));
-	InbuiltFunctionList = strsplit(buff[i++], ' ');
-	Constants = strsplit(buff[i++], ' ');
+bool loadLexerData() {
+	Keywords = strsplit("var global typeof delete and or not equals", ' ');
+	Keywords.append(strsplit("if else while until do for foreach function return", ' '));
+
+	InbuiltFunctionList = strsplit("print printLine readNumber readString readLine", ' ');
+	InbuiltFunctionList.append(strsplit("String Number Boolean Array Object Integer", ' '));
+
+	Constants = strsplit("null infinity minusinfinity true false", ' ');
 	Keywords.append(Constants);
-	Punctuators = strsplit(buff[i++]);
+
+	Punctuators = strsplit("()[]{},:;");
 	// operators.
-	binaryOperators = strsplit(buff[i++], ' ');
-	unaryOperators = strsplit(buff[i++], ' ');
-	Opstarts = strsplit(buff[i++]);
+	binaryOperators = strsplit("+ += - -= * *= / /= % %= = == === != !== > >= < <= && || ? . []", ' ');
+	unaryOperators = strsplit("! ++ --", ' ');
+	Opstarts = strsplit("+-*/%=?&|<>!.");
 
 	// setup the directive tokens:
 	eofToken = Token("$eof", DIRECTIVE);
