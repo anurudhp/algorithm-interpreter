@@ -1,2 +1,0 @@
-Algo Flex Interpreter (Version 1.0.0 (beta))
-Developed by P Sai Anurudh Reddy and V Thejas

@@ -1,9 +1,0 @@
-AlgoFlex Interpreter console.
-commands:
-	help        : displays this help
-	about       : displays the credits
-	run <file>  : compiles and runs `file`
-	clear       : clears the screen
-	quit        : clears the data, and shuts down the console.
-
-Report bugs at https://github.com/codelegend/algorithm-compiler.git/
