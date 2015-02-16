@@ -1,12 +1,12 @@
 // Macros for debugging:
 int debugLevel = 0;
-#define DEB       if (debugLevel > 2) cerr << ">> REACHED <<\n";
-#define PRINT(i)  if (debugLevel > 1) cerr << ">> " << i << endl;
-#define PRINT2(i)  if (debugLevel > 1) cerr << ">>>>> " << i << endl;
-#define DEBUG(i)  if (debugLevel > 2) cerr << ">> " << #i << " = " << i << endl;
-#define DEBUG2(i) if (debugLevel > 2) cerr << ">>>> " << #i << " = " << i << endl;
-#define LOG(i)    if (debugLevel > 0) cerr << i;
-#define LOGN(i)   if (debugLevel > 0) cerr << i << endl;
+#define DEB          if (debugLevel >= 3) cerr << ">> REACHED <<\n";
+#define PRINT(i)     if (debugLevel >= 2) cerr << ">> " << i << endl;
+#define PRINT2(i)    if (debugLevel >= 2) cerr << ">>>>> " << i << endl;
+#define DEBUG(i)     if (debugLevel >= 3) cerr << ">> " << #i << " = " << i << endl;
+#define DEBUG2(i)    if (debugLevel >= 3) cerr << ">>>> " << #i << " = " << i << endl;
+#define LOG(i)       if (debugLevel >= 1) cerr << i;
+#define LOGN(i)      if (debugLevel >= 1) cerr << i << endl;
 
 #include "interface.h"
 
@@ -43,10 +43,18 @@ void parseCommand(String message) {
 		system("cls");
 	}
 	else if (cmd == "help") {
-		cout << help;
+		cout << "AlgoFlex Interpreter console.\n"
+		     << "commands:\n"
+			 << "help        : displays this help\n"
+			 << "about       : displays the credits\n"
+			 << "run <file>  : compiles and runs `file`\n"
+			 << "clear       : clears the screen\n"
+			 << "quit        : clears the data, and shuts down the console.\n"
+			 << "\nReport bugs at https://github.com/codelegend/algorithm-compiler.git/\n";
 	}
 	else if (cmd == "about" || cmd == "credits") {
-		cout << intro;
+		cout << "Algo Flex Interpreter (Version 1.0.0 (beta))\n"
+		     << "Developed by P Sai Anurudh Reddy and V Thejas\n";
 	}
 	else if (cmd == "debug") {
 		String val = strjoin(parts);
@@ -81,7 +89,7 @@ bool runProgram(Vector<String> args) {
 		return false;
 	}
 	LOGN("Parsing complete.\n");
-	logRPN(parser->getOutput());
+	if (debugLevel >= 1) logRPN(parser->getOutput());
 
 	Evaluator *evaluator = new Evaluator(parser);
 	bool res = evaluator->runProgram();
@@ -95,12 +103,13 @@ bool runProgram(Vector<String> args) {
 }
 void showConsole(bool firsttime) {
 	if (firsttime) {
-		cout << startupmessage;
+		cout << "Welcome to the AlgoFlex CLI (Beta release)\n"
+		     << "type `help` to see the list of commands\n";
 	}
 	cout << "\nconsole> ";
 }
 bool loadData() {
-	bool success;
+	bool success = true;
 	// Load the data required: lexer data and error codes.
 	ifstream fin;
 
@@ -122,29 +131,10 @@ bool loadData() {
 	}
 	fin.close();
 
-	// load help/info data:
-	intro = readFile("data/intro.txt");
-	help = readFile("data/help.txt");
-	startupmessage = readFile("data/startup.txt");
-
 	// some parser settings.
 	nullVariableRef.setValue(nullvalToken);
 
 	return success;
-}
-
-String readFile(String fname) {
-	String ret, tmp;
-	ifstream fin(fname.c_str());
-	if (!fin) return ret;
-	
-	while (!fin.eof()) {
-		tmp.get(fin, '\n');
-		ret += tmp;
-		ret += '\n';
-	}
-	fin.close();
-	return ret;
 }
 
 void logRPN(RPN r) {
