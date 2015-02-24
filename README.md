@@ -1,5 +1,8 @@
 A simple interpretive programming language.
 =========
+[![Build Status](https://travis-ci.org/codelegend/algorithm-compiler.svg?branch=master)](https://travis-ci.org/codelegend/algorithm-compiler)
+
+
 Paradigms:
 ----
 - Simple and minimal. Mainly for writing algorithms.
