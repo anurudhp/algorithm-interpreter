@@ -2,7 +2,7 @@
 int debugLevel = 0;
 #define DEB          if (debugLevel >= 3) cerr << ">> REACHED <<\n";
 #define PRINT(i)     if (debugLevel >= 2) cerr << ">> " << i << endl;
-#define PRINT2(i)    if (debugLevel >= 2) cerr << ">>>>> " << i << endl;
+#define PRINT2(i)    if (debugLevel >= 2) cerr << ">>>> " << i << endl;
 #define DEBUG(i)     if (debugLevel >= 3) cerr << ">> " << #i << " = " << i << endl;
 #define DEBUG2(i)    if (debugLevel >= 3) cerr << ">>>> " << #i << " = " << i << endl;
 #define LOG(i)       if (debugLevel >= 1) cerr << i;
@@ -98,7 +98,6 @@ bool runProgram(Vector<String> args) {
 	delete lexer;
 	delete parser;
 	delete evaluator;
-
 	return res;
 }
 void showConsole(bool firsttime) {
