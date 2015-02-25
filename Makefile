@@ -1,7 +1,8 @@
-all: std
-test: std clang
+CC=gcc
+CXX=g++
+
+all: build
+test: build
 	
-std:
-	g++ -o algoflex src/interface.cpp	
-clang:
-	clang++ -stdlib=libstdc++ src/interface.cpp
+build:
+	$(CXX) -o algoflex src/interface.cpp
