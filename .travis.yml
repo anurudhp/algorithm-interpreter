@@ -3,3 +3,11 @@ compiler:
   - gcc
   - clang
 script: make test -e
+
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/9487d191be8d6aaa0a76
+    on_success: change
+    on_failure: always
+    on_start: false
