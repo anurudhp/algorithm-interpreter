@@ -4,4 +4,4 @@ test: std clang
 std:
 	g++ -o algoflex src/interface.cpp	
 clang:
-	clang src/interface.cpp
+	clang++ -stdlib=libstdc++ src/interface.cpp
