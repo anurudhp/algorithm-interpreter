@@ -1,8 +1,8 @@
 A simple interpretive programming language.
 =========
 
-[![Join the chat at https://gitter.im/codelegend/algorithm-compiler](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/codelegend/algorithm-compiler?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/codelegend/algorithm-compiler.svg?branch=master)](https://travis-ci.org/codelegend/algorithm-compiler)
+[![Join the chat at https://gitter.im/codelegend/algorithm-compiler](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/codelegend/algorithm-compiler?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 
 Paradigms:
@@ -14,11 +14,11 @@ Paradigms:
 
 Usage
 ---
-`cd ./src/`  
-`g++ -o serv -Wall interface.cpp`  
-`./serv`
+`make && ./algoflex`
 
-For instructions on how to write code in the interpreter's language, see the manual (manual.md)
+For instructions on how to write code in the interpreter's language, see the manual.md
+
+
 Credits
 ---
 Owners:

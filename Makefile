@@ -1,4 +1,5 @@
-all: std clang
+all: std
+test: std clang
 	
 std:
 	g++ -o algoflex src/interface.cpp	
