@@ -5,27 +5,27 @@
 #define DIRECTIVE -1
 #define UNKNOWN 0
 #define KEYWORD 1
-	#define CONSTANT 11
+  #define CONSTANT 11
 #define OPERATOR 2
-	#define UNARYOP  21
-	#define BINARYOP 22
-	#define MULTINARYOP 23
-	#define POST 24
-	#define PRE 25
+  #define UNARYOP  21
+  #define BINARYOP 22
+  #define MULTINARYOP 23
+  #define POST 24
+  #define PRE 25
 #define PUNCTUATOR 3
 #define IDENTIFIER 4
-	#define VARIABLE 41
-	#define FUNCTION 42
-	#define CLASS    43
-	#define ARRAY    44
-	#define OBJECT   45
+  #define VARIABLE 41
+  #define FUNCTION 42
+  #define CLASS    43
+  #define ARRAY    44
+  #define OBJECT   45
 #define LITERAL 5
-	#define STRING 51
-	#define NUMBER 52
-	#define BOOLEAN 53
-	#define INTEGER 54
+  #define STRING 51
+  #define NUMBER 52
+  #define BOOLEAN 53
+  #define INTEGER 54
 #define HASHED 6
-	
+  
 #define TABLEN 4
 #define MAX_ID_LENGTH 18
 
@@ -46,22 +46,22 @@ typedef Vector<String> idList;
 ********************************/
 class Error
 {
-	String _code, _flag;
-	bufferIndex _line;
-	int _severity;
+  String _code, _flag;
+  bufferIndex _line;
+  int _severity;
 
-	public:
-	Error(String = "", String = "", bufferIndex = -1, int = ERROR_ERROR);
-	Error(const Error&);
-	Error& operator= (const Error&);
+  public:
+  Error(String = "", String = "", bufferIndex = -1, int = ERROR_ERROR);
+  Error(const Error&);
+  Error& operator= (const Error&);
 
-	String code() const;
-	String flag() const;
-	String message() const;
-	bufferIndex lineNumber() const;
-	int severity() const;
+  String code() const;
+  String flag() const;
+  String message() const;
+  bufferIndex lineNumber() const;
+  int severity() const;
 
-	void setLineNumber(bufferIndex);
+  void setLineNumber(bufferIndex);
 };
 
 idList errorCodes, errorDesc;
@@ -77,33 +77,33 @@ idList Keywords,
 
 /*******************************
 * Class Token:
-* 	Stores information about a single keyword/id/literal/operator
+*   Stores information about a single keyword/id/literal/operator
 *   
 *******************************/
 class Token
 {
-	private:
-	tokenType _type, _subtype;
-	bufferIndex _line, _indent;
-	String _value;
-	public:
-	// constructors
-	Token (const Token&);
-	Token (String = "", tokenType = UNKNOWN, tokenType = UNKNOWN, bufferIndex = -1, bufferIndex = 0);
-	Token operator= (const Token&);
+  private:
+  tokenType _type, _subtype;
+  bufferIndex _line, _indent;
+  String _value;
+  public:
+  // constructors
+  Token (const Token&);
+  Token (String = "", tokenType = UNKNOWN, tokenType = UNKNOWN, bufferIndex = -1, bufferIndex = 0);
+  Token operator= (const Token&);
 
-	// properties
-	tokenType type() const;
-	tokenType subtype() const;
-	bufferIndex lineNumber() const;
-	bufferIndex indent() const;
-	String value() const;
-	//mutators
-	void setType(tokenType);
-	void setSubtype(tokenType);
-	void setLineNumber(bufferIndex);
-	void setIndent(bufferIndex);
-	void setValue(String);
+  // properties
+  tokenType type() const;
+  tokenType subtype() const;
+  bufferIndex lineNumber() const;
+  bufferIndex indent() const;
+  String value() const;
+  //mutators
+  void setType(tokenType);
+  void setSubtype(tokenType);
+  void setLineNumber(bufferIndex);
+  void setIndent(bufferIndex);
+  void setValue(String);
 };
 
 // Directive Tokens
@@ -123,38 +123,38 @@ typedef Queue<Token> Infix;
 *******************************/
 class Lexer
 {
-	private:
-	bufferIndex line, indent;
-	ifstream source; // handles the source code file.
-	Vector<Error> errors; // stores all lexer errors
-	Deque<Token> innerBuffer; // stores tokens that have been sent back.
+  private:
+  bufferIndex line, indent;
+  ifstream source; // handles the source code file.
+  Vector<Error> errors; // stores all lexer errors
+  Deque<Token> innerBuffer; // stores tokens that have been sent back.
 
-	private:
-	int trim();
-	int endLine();
-	String readString();
-	String readNumber();
-	String readIdentifier();
-	String readOperator();
+  private:
+  int trim();
+  int endLine();
+  String readString();
+  String readNumber();
+  String readIdentifier();
+  String readOperator();
 
-	public :
-	Lexer(String);
-	~Lexer();
+  public :
+  Lexer(String);
+  ~Lexer();
 
-	Vector<Error> getErrors() const;
-	Token getToken();
-	bool putbackToken(Token);
-	Infix getTokensTill(String);
-	bool ended();
+  Vector<Error> getErrors() const;
+  Token getToken();
+  bool putbackToken(Token);
+  Infix getTokensTill(String);
+  bool ended();
 
-	// static members:
-	static Token toToken(String);
-	static bool isValidIdentifier(String);
-	static String entityMap(String);
-	static String matchBracket(String);
-	static String tokenToString(Token);
-	static String stringToLiteral(String);
-	static String typeToString(tokenType);
+  // static members:
+  static Token toToken(String);
+  static bool isValidIdentifier(String);
+  static String entityMap(String);
+  static String matchBracket(String);
+  static String tokenToString(Token);
+  static String stringToLiteral(String);
+  static String typeToString(tokenType);
 };
 
 #endif /* COMPONENT_LEXER_H */

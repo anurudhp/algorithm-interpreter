@@ -19,15 +19,15 @@ template <class T> class Stack;
 template <class T> class Queue;
 
 void forcequit(int ecode = 1){
-	cerr<<"FORCE QUIT : ";
-	switch (ecode) {
-		case 10: cerr << "string|heap exhausted"; break;
-		case 11: cerr << "string|too long"; break;
-		case 20: cerr << "vector|heap exhausted"; break;
-		case 21: cerr << "vector|segfault"; break;
-		case 30: cerr << "deque|underflow"; break;
-	}
-	exit(ecode);
+  cerr<<"FORCE QUIT : ";
+  switch (ecode) {
+    case 10: cerr << "string|heap exhausted"; break;
+    case 11: cerr << "string|too long"; break;
+    case 20: cerr << "vector|heap exhausted"; break;
+    case 21: cerr << "vector|segfault"; break;
+    case 30: cerr << "deque|underflow"; break;
+  }
+  exit(ecode);
 }
 
 #endif /* CUSTOM_DEPENDENCIES_H */

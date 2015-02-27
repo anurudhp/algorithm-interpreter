@@ -9,36 +9,36 @@
 ********************************/
 class Evaluator
 {
-	private:
-	Vector <Error> errors;
-	VariableScope variables;
-	Vector<Variable> globals;
-	Vector<Variable*> cache;
-	Stack<Function> functionStack;
-	Parser *parser;
-	bool failed;
-	
-	public:
-	Evaluator(Parser*, String = "");
-	
-	// interface:
-	bool addError(Error);
-	bool sendError(String, String = "", bufferIndex = -1);
-	bool showErrors(ostream&, bool = false);
+  private:
+  Vector <Error> errors;
+  VariableScope variables;
+  Vector<Variable> globals;
+  Vector<Variable*> cache;
+  Stack<Function> functionStack;
+  Parser *parser;
+  bool failed;
+  
+  public:
+  Evaluator(Parser*, String = "");
+  
+  // interface:
+  bool addError(Error);
+  bool sendError(String, String = "", bufferIndex = -1);
+  bool showErrors(ostream&, bool = false);
 
-	// variable caches
-	Variable& getCachedVariable(String);
-	String cacheVariable(Variable);
-	String cacheVariable();
-	String cacheVariableRef(Variable*);
-	// variable access.
-	Variable& getVariable(String, VariableScope&, bool = false);
-	Token getVariableValue(Token, VariableScope&, bool = false);
-	Vector<Variable>& getGlobals();
-	
-	// procedures
-	bool runProgram();
-	Token evaluateRPN(RPN, VariableScope&);
+  // variable caches
+  Variable& getCachedVariable(String);
+  String cacheVariable(Variable);
+  String cacheVariable();
+  String cacheVariableRef(Variable*);
+  // variable access.
+  Variable& getVariable(String, VariableScope&, bool = false);
+  Token getVariableValue(Token, VariableScope&, bool = false);
+  Vector<Variable>& getGlobals();
+  
+  // procedures
+  bool runProgram();
+  Token evaluateRPN(RPN, VariableScope&);
 };
 
 #endif /* COMPONENT_EVALUATOR_H */
