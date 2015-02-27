@@ -1,22 +1,8 @@
-env:
-  global:
-  # coverity scan
-   - secure: "B94l5IKVKLik6/STO7/fuzPj1TM/ovLRy8Q/b4+STk1RfG8IV0fQ4BfDXLCdzWaQJTA0v0lZovW7L6QlG8RHKwueqRfAzbp6qPooor6sYgHLwFBJNUoO8un03hx7z8RHbpi25PCKk5XUeDihdw951D9Svkr+tbjlAsohd/5dYaI="
-
 language: cpp
 compiler: 
   - gcc
   - clang
 script: make test -e
-
-addons:
-  coverity_scan:
-    project:
-      name: "codelegend/algorithm-compiler"
-      description: "A simple, interpretive language"
-    notification_email: blazikenmask@gmail.com
-    build_command:   "make"
-    branch_pattern: coverity_scan
 
 notifications:
   webhooks:
