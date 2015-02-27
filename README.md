@@ -16,7 +16,7 @@ Usage
 ---
 `make && ./algoflex`
 
-For instructions on how to write code in the interpreter's language, see the manual.md
+For instructions on how to write code in the interpreter's language, see the [manual](https://github.com/codelegend/algorithm-compiler/blob/master/docs/manual.md)
 
 
 Credits
