@@ -51,7 +51,6 @@ public:
   String trim() const;
 
   __SIZETYPE indexOf(const String& ) const;
-  __SIZETYPE countOccurences(const String& ) const;
   
   // 3.2. advanced type checks and conversion
   bool isNumber() const;
