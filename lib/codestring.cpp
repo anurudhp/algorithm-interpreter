@@ -224,25 +224,6 @@ __SIZETYPE String::indexOf(const String& s ) const {
   return -1;
 }
 
-// numOccurences : gives the number of times s appears in the given string ( without overlaps )
-__SIZETYPE String::countOccurences(const String& find ) const {
-  __SIZETYPE tot = 0;
-  int flen = find.length();
-  for( int i = 0; i<_len-flen ; i++ ){
-    bool match = false;
-    for( int j = 0; j<flen ; j++ )
-      if( _data[i+j] != find[j] ){
-        match = false;
-        break;
-      }
-    if( match ){
-      tot++;
-      i += flen-1;
-    }
-  }
-  return tot;
-}
-
 /**********************************
 * 3.2. Advanced type checks and
 *      conversions
