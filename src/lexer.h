@@ -90,7 +90,7 @@ class Token
   // constructors
   Token (const Token&);
   Token (String = "", tokenType = UNKNOWN, tokenType = UNKNOWN, bufferIndex = -1, bufferIndex = 0);
-  Token operator= (const Token&);
+  Token& operator= (const Token&);
 
   // properties
   tokenType type() const;

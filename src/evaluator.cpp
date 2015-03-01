@@ -235,7 +235,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
         Token a;
         valuestack.pop(a);
         if (current.value() == "typeof") {
-          tokenType ty;
+          tokenType ty = UNKNOWN;
           if (a.subtype() == VARIABLE) {
             ty = this->getVariable(a.value(), scope, true).type();
           }

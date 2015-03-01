@@ -6,17 +6,16 @@
 * Implementation: Class Variable
 *********************************/
 
-Variable::Variable() {
+Variable::Variable() :_id(), _value(), _keys(), _values() {
   this->_type = UNKNOWN;
   this->_object = NULL;
 }
-Variable::Variable(String id) {
-  this->_id = id;
+Variable::Variable(String id) :_id(id), _value(), _keys(), _values() {
   this->_type = UNKNOWN;
   this->_object = NULL;
 }
 
-Variable::Variable(Token val) {
+Variable::Variable(Token val) :_id(), _value(), _keys(), _values() {
   this->_type = UNKNOWN;
   if (val.type() == IDENTIFIER) {
     _id = val.value();
@@ -27,12 +26,11 @@ Variable::Variable(Token val) {
   }
   this->_object = NULL;
 }
-Variable::Variable(const Variable& v) {
-  _id = v._id;
+Variable::Variable(const Variable& v) :_id(v._id) {
   this->setValue(v);
 }
 Variable& Variable::operator= (const Variable& v) {
-  _id = v._id;
+   _id = v._id; 
   this->setValue(v);
   return *this;
 }
@@ -331,25 +329,22 @@ __SIZETYPE VariableScope::depth() const { return this->varstack.size(); }
 * Implementation: Class Function
 *********************************/
 
-Function::Function() {
+Function::Function() :returnVal() {
   hasRet = false;
 }
 
-Function::Function(String id) {
-  this->_id = id;
+Function::Function(String id) :_id(id), returnVal() {
   hasRet = false;
 }
-Function::Function(String id, Vector<String> params, RPN st) {
-  this->_id = id;
-  this->parameters = params;
-  this->statements = st;
+Function::Function(String id, Vector<String> params, RPN st)
+  :_id(id), parameters(params), statements(st), returnVal() {
   hasRet = false;
 }
-Function::Function(const Function& f) {
-  this->_id = f._id;
-  this->parameters = f.parameters;
-  this->statements = f.statements;
-  this->functionVariables = f.functionVariables;
+Function::Function(const Function& f)
+  :_id(f._id),
+   parameters(f.parameters),
+   functionVariables(f.functionVariables),
+   statements(f.statements) {
   hasRet = false;
 }
 
@@ -410,8 +405,7 @@ Token Function::evaluate(Vector<Variable> args, Evaluator& eval) {
 ********************************/
 Object::Object() { isFundamental = false; }
 
-Object::Object(String name, bool f) {
-  this->_id = name;
+Object::Object(String name, bool f) :_id(name) {
   this->isFundamental = f;
 }
 

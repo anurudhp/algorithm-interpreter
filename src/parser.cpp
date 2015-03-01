@@ -764,10 +764,11 @@ bool Parser::validateRPN(RPN rpn) {
     else if (curr.type() == DIRECTIVE) {
       if (curr.value() == "@init") {
         // array/object primitive:
-        Token length; tokenType t;
+        Token length;
         rpn.pop(length);
         long len = length.value().substr(6).toInteger();
         if (curr.subtype() == ARRAY) {
+          tokenType t = UNKNOWN;
           while (len--) vals.pop(t);
           vals.push(OBJECT);
         }
@@ -782,9 +783,10 @@ bool Parser::validateRPN(RPN rpn) {
         long ind = curr.value().substr(6).toInteger();
         vals.pop(); // function token
         while (ind--) vals.pop(); // args
-        Token inv; tokenType t1;
+        Token inv;
         rpn.pop(inv);
         if (inv.value() == ".") {
+          tokenType t1;
           if (!vals.pop(t1)) {
             this->sendError("p3.3", inv.value(), inv.lineNumber());
             success = false;
@@ -795,6 +797,7 @@ bool Parser::validateRPN(RPN rpn) {
             success = false;
             t1 = VARIABLE; // prevent further errors
           }
+          vals.push(t1);
           rpn.pop(inv);
         }
         vals.push(OBJECT);

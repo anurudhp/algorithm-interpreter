@@ -200,27 +200,26 @@ String String::toupper() const {
 // trim : removes all preceding and trailing spaces
 String String::trim() const {
   __SIZETYPE st,en;
-  for( st = 0; _data[st] == ' ' && st < _len; st++);
-  if( st == _len ) return String();
+  for (st = 0; st < _len && _data[st] == ' '; st++) {}
+  if (st == _len) return String();
 
-  for( en = _len-1; _data[en] == ' ' && en >= 0; en--);
-  return this->substr( st, en-st+1 );
+  for (en = _len-1; en >= 0 && _data[en] == ' '; en--) {}
+  return this->substr(st, en-st+1);
 }
 
 // indexOf :  gives index of first occurrance of s
 __SIZETYPE String::indexOf(const String& s ) const {
   __SIZETYPE tlen = s.length();
-  bool isfound ;
 
   for( __SIZETYPE i = 0; i < _len-tlen+1 ; ++i ){
-    isfound = true;
+    bool isfound = true;
     for( __SIZETYPE j = 0; j < tlen ; ++j ){
       if( s[j] != _data[i+j] ){
         isfound = false;
         break;
       }
     }
-    if( isfound ) return i;
+    if (isfound) return i;
   }
   return -1;
 }

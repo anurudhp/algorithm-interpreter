@@ -6,18 +6,11 @@
 * Implementation: class Error      **
 *************************************/
 
-Error::Error(String cd, String fg, bufferIndex ln, int s) {
-  this->_code = cd;
-  this->_flag = fg;
-  this->_line = ln;
-  this->_severity = s;
-}
-Error::Error(const Error& e) {
-  this->_code = e._code;
-  this->_flag = e._flag;
-  this->_line = e._line;
-  this->_severity = e._severity;
-}
+Error::Error(String cd, String fg, bufferIndex ln, int s)
+  :_code(cd), _flag(fg), _line(ln), _severity(s) {}
+Error::Error(const Error& e)
+  :_code(e._code), _flag(e._flag), _line(e._line), _severity(e._severity) {}
+
 Error& Error::operator= (const Error& e) {
   this->_code = e._code;
   this->_flag = e._flag;
@@ -56,21 +49,21 @@ void Error::setLineNumber(bufferIndex ln) { this->_line = ln; }
 *********************************/
 
 // constructors
-Token::Token(String val, tokenType t, tokenType st, bufferIndex ln, bufferIndex in) {
-  this->_value = val;
+Token::Token(String val, tokenType t, tokenType st, bufferIndex ln, bufferIndex in)
+  :_value(val) {
   this->_type = t;
   this->_subtype = st;
   this->_line = ln;
   this->_indent = in;
 }
-Token::Token(const Token& t) {
-  this->_value = t._value;
+Token::Token(const Token& t)
+  :_value(t._value) {
   this->_type = t._type;
   this->_subtype = t._subtype;
   this->_line = t._line;
   this->_indent = t._indent;
 }
-Token Token::operator= (const Token& t) {
+Token& Token::operator= (const Token& t) {
   this->_value = t._value;
   this->_type = t._type;
   this->_subtype = t._subtype;
