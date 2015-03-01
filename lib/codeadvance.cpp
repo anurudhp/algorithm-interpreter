@@ -18,9 +18,9 @@ Vector<String> strsplit(String str,  String spl = "") {
       ret.pushback(str[i]);
     return ret;
   }
-  __SIZETYPE index;
+
   while (!!str) {
-    index = str.indexOf(spl);
+    __SIZETYPE index = str.indexOf(spl);
     if (index == -1) {
       ret.pushback(str);
       return ret;

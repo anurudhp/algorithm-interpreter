@@ -200,6 +200,8 @@ bool Vector<T>::remove(__SIZETYPE index) {
 
   node *n = head;
   while (index-- && n) n = n->next;
+  if (!n) return false;
+
   node *left = n->prev, *right = n->next;
   left->next = right;
   right->prev = left;
