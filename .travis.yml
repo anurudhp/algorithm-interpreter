@@ -5,12 +5,16 @@ before_install:
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -qq
   - git clone -b master https://github.com/danmar/cppcheck.git cppcheck_src
+  - export PATH=$PATH
 install:
   - sudo apt-get install -qq g++-4.8
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
-  - cd ./cppcheck_src && make SRCDIR=build CFGDIR=cfg && cd ..
+  - cd ./cppcheck_src 
+  - g++-4.8 -DCFGDIR=\"cppcheck_src/cfg\" -o cppcheck -std=c++0x -include lib/cxx11emu.h -Iexternals/tinyxml -Ilib cli/*.cpp lib/*.cpp externals/tinyxml/*.cpp
+  - cd ..
 
 before_script:
+  - gcc --version
   - export CPPCHECK="./cppcheck_src/cppcheck"
 script: make test -e
 
