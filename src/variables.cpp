@@ -19,8 +19,7 @@ Variable::Variable(Token val) :_id(), _value(), _keys(), _values() {
   this->_type = UNKNOWN;
   if (val.type() == IDENTIFIER) {
     _id = val.value();
-  }
-  else if (val.type() == LITERAL) {
+  } else if (val.type() == LITERAL) {
     this->_value = val;
     this->_type = val.subtype();
   }
@@ -30,7 +29,7 @@ Variable::Variable(const Variable& v) :_id(v._id) {
   this->setValue(v);
 }
 Variable& Variable::operator= (const Variable& v) {
-   _id = v._id; 
+  _id = v._id;
   this->setValue(v);
   return *this;
 }
@@ -45,8 +44,11 @@ tokenType Variable::type() {
 // set the type of the variable.
 void Variable::setType(tokenType t) {
   this->_type = t;
-  if (_type == ARRAY || _type == OBJECT) this->_value.setType(t);
-  else this->_value.setSubtype(t);
+  if (_type == ARRAY || _type == OBJECT) {
+    this->_value.setType(t);
+  } else {
+    this->_value.setSubtype(t);
+  }
 }
 
 Token Variable::value() const { return this->_value; }
@@ -87,8 +89,7 @@ bool Variable::hasValueAt(Token key) {
 
     if (index < 0 || index >= this->_values.size()) return false;
     return true;
-  }
-  else if (this->type() == OBJECT) {
+  } else if (this->type() == OBJECT) {
     key = Operations::typecastToken(key, STRING);
     if (key.value() == "null") return false;
 
@@ -113,8 +114,7 @@ Variable& Variable::valueAt(Token key) {
     key = Operations::typecastToken(key, NUMBER);
     index = key.value().toInteger();
     if (index < 0) index += this->_values.size();
-  }
-  else if (this->type() == OBJECT) {
+  } else if (this->type() == OBJECT) {
     key = Operations::typecastToken(key, STRING);
     index = _keys.indexOf(key.value());
   }
@@ -136,18 +136,16 @@ bool Variable::setValueAt(Token key, Variable value) {
     }
     this->_values[index].setValue(value);
     return true;
-  }
-  else if (this->type() == OBJECT) {
+  } else if (this->type() == OBJECT) {
     key = Operations::typecastToken(key, STRING);
     if (key.value() == "null") return false;
 
     __SIZETYPE index = _keys.indexOf(key.value());
-    if (index == -1) { // new key
+    if (index == -1) {  // new key
       _keys.pushback(key.value());
       _values.pushback(Variable());
       _values[-1].setValue(value);
-    }
-    else { // update existing value
+    } else {  // update existing value
       _values[index].setValue(value);
     }
     return true;
@@ -159,15 +157,21 @@ bool Variable::setValueAt(Token key, Variable value) {
 // adds a variable to the array.
 bool Variable::pushValue(Variable v, bool isFront) {
   if (this->_type != ARRAY) return false;
-  if (isFront) this->_values.pushfront(v);
-  else this->_values.pushback(v);
+  if (isFront) {
+    this->_values.pushfront(v);
+  } else {
+    this->_values.pushback(v);
+  }
   return true;
 }
 // pops a variable from the array, and returns it through the reference
 bool Variable::popValue(Variable& v, bool isFront) {
   if (this->_type != ARRAY) return false;
-  if (isFront) this->_values.popfront(v);
-  else this->_values.popback(v);
+  if (isFront) {
+    this->_values.popfront(v);
+  } else {
+    this->_values.popback(v);
+  }
   return true;
 }
 // methods for objects:
@@ -212,8 +216,11 @@ Token Variable::printValues(ostream& out) {
     out << "[ ";
     bool first = true;
     for (__SIZETYPE i = 0; i < _values.size(); i++) {
-      if (first) first = false;
-      else out << ", ";
+      if (first) {
+        first = false;
+      } else {
+        out << ", ";
+      }
       tmp = _values[i].printValues(out);
       res = Operations::logical("&&", res, tmp);
     }
@@ -224,8 +231,11 @@ Token Variable::printValues(ostream& out) {
     out << "{ ";
     bool first = true;
     for (__SIZETYPE i = 0; i < _values.size(); i++) {
-      if (first) first = false;
-      else out << ", ";
+      if (first) {
+        first = false;
+      } else {
+        out << ", ";
+      }
       out << _keys[i] << ": ";
       tmp = _values[i].printValues(out);
       res = Operations::logical("&&", res, tmp);
@@ -342,9 +352,9 @@ Function::Function(String id, Vector<String> params, RPN st)
 }
 Function::Function(const Function& f)
   :_id(f._id),
-   parameters(f.parameters),
-   functionVariables(f.functionVariables),
-   statements(f.statements) {
+  parameters(f.parameters),
+  functionVariables(f.functionVariables),
+  statements(f.statements) {
   hasRet = false;
 }
 

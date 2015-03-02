@@ -14,15 +14,15 @@ class VariableScope;
 class Function;
 class Object;
 
-#include "lexer.h"
-#include "parser.h"
-#include "evaluator.h"
+#include "./lexer.h"
+#include "./parser.h"
+#include "./evaluator.h"
 
-#include "lexer.cpp"
-#include "operations.cpp"
-#include "inbuiltfunc.cpp"
-#include "parser.cpp"
-#include "evaluator.cpp"
+#include "./lexer.cpp"
+#include "./operations.cpp"
+#include "./inbuiltfunc.cpp"
+#include "./parser.cpp"
+#include "./evaluator.cpp"
 
 void showConsole(bool = false);
 bool loadData();

@@ -19,20 +19,28 @@ char InbuiltFunctions::INFCHAR = 236;
 // write a token's value to the out stream.
 Token InbuiltFunctions::write(Token t, ostream& out) {
   if (t.type() != LITERAL) return falseToken;
-    if (t.subtype() == BOOLEAN || t.subtype() == CONSTANT) {
-    if (t.value() == "infinity") cout << INFCHAR;
-    else if (t.value() == "minusinfinity") cout << '-' << INFCHAR;
-        else out << t.value();
-        return trueToken;
+
+  if (t.subtype() == BOOLEAN || t.subtype() == CONSTANT) {
+    if (t.value() == "infinity") {
+      cout << INFCHAR;
+    } else if (t.value() == "minusinfinity") {
+      cout << '-' << INFCHAR;
+    } else {
+      out << t.value();
     }
+    return trueToken;
+  }
   if (t.subtype() == NUMBER) {
     String val(t.value().trim());
-    if (val.isInteger()) out << val.toInteger();
-    else out << val.toNumber();
-        return trueToken;
+    if (val.isInteger()) {
+      out << val.toInteger();
+    } else {
+      out << val.toNumber();
+    }
+    return trueToken;
   }
-    if (t.subtype() == STRING) {
-        String val = Lexer::tokenToString(t);
+  if (t.subtype() == STRING) {
+    String val = Lexer::tokenToString(t);
     for (__SIZETYPE i = 0; i < val.length(); i++) {
       if (val.charAt(i) == '\\') {
         // escape special chars
@@ -45,26 +53,27 @@ Token InbuiltFunctions::write(Token t, ostream& out) {
         }
         out << c;
         i++;
+      } else {
+        out << val.charAt(i);
       }
-      else out << val.charAt(i);
     }
-        return trueToken;
-    }
-    return falseToken;
+    return trueToken;
+  }
+  return falseToken;
 }
 
 // read a value of type `t1`
 Token InbuiltFunctions::read(tokenType t1, istream& in) {
   String s;
-    if(t1 == NUMBER) {
-        double number;
-        in >> number; in.get();
-        return Lexer::toToken(numberToString(number));
-    }
-    if(t1 == STRING) {
-        in >> s; in.get();
-        return Lexer::toToken(Lexer::stringToLiteral(s));
-    }
+  if (t1 == NUMBER) {
+    double number;
+    in >> number; in.get();
+    return Lexer::toToken(numberToString(number));
+  }
+  if (t1 == STRING) {
+    in >> s; in.get();
+    return Lexer::toToken(Lexer::stringToLiteral(s));
+  }
   return nullvalToken;
 }
 

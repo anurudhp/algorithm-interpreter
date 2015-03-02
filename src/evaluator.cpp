@@ -121,9 +121,11 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
       if (this->functionStack.top().hasReturned()) return Token();
     }
 
-    if (current.type() == LITERAL || current.subtype() == VARIABLE) valuestack.push(current);
-    else if (current.value() == ";") continue;
-    else if (current.type() == DIRECTIVE) {
+    if (current.type() == LITERAL || current.subtype() == VARIABLE) {
+      valuestack.push(current);
+    } else if (current.value() == ";") {
+      continue;
+    } else if (current.type() == DIRECTIVE) {
       // directives that reach here: array and object initialisers
       if (current.value() == "@init") {
         Token dataSize, res, key, val;
@@ -140,8 +142,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
             v.pushValue((val.subtype() == VARIABLE) ? this->getVariable(val.value(), scope, true) : Variable(val), true);
           }
           res = Token(hash, DIRECTIVE, VARIABLE);
-        }
-        else if (current.subtype() == OBJECT) {
+        } else if (current.subtype() == OBJECT) {
           String hash = this->cacheVariable();
           Variable& v = this->getVariable(hash, scope, true);
           v.setType(OBJECT);
@@ -155,22 +156,21 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
         }
         valuestack.push(res);
       }
-    }
-    else if (current.type() == OPERATOR) {
+    } else if (current.type() == OPERATOR) {
       if (current.value() == ".") {
         Token vartok, prop;
         valuestack.pop(prop);
         valuestack.pop(vartok);
 
         Variable &var = this->getVariable(vartok.value(), scope, true);
-        if (var.type() != OBJECT) this->sendError("ro1", ". : LHS must be an object", vartok.lineNumber());
-        else {
+        if (var.type() != OBJECT) {
+          this->sendError("ro1", ". : LHS must be an object", vartok.lineNumber());
+        } else {
           prop = Operations::typecastToken(prop, STRING);
           String hash = this->cacheVariableRef(&var.valueAt(prop));
           valuestack.push(Token(hash, DIRECTIVE, VARIABLE));
         }
-      }
-      else if (current.value() == "[]") {
+      } else if (current.value() == "[]") {
         // subscripting operator:
         // string[index] or array[index] or object[key]
         Token a, b;
@@ -186,17 +186,15 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
             long ind = b.value().toInteger();
             String str = Lexer::tokenToString(a);
             if (ind < 0 || ind >= str.length()) {
-              this->sendError("rv4", "", a.lineNumber()); // invalid index
+              this->sendError("rv4", "", a.lineNumber());  // invalid index
               valuestack.push(nullvalToken);
-            }
-            else {
+            } else {
               str = Lexer::stringToLiteral(str.substr(ind, 1));
               valuestack.push(Lexer::toToken(str));
             }
             valid = true;
           }
-        }
-        else if (a.subtype() == VARIABLE) {
+        } else if (a.subtype() == VARIABLE) {
           Variable& var = this->getVariable(a.value(), scope, true);
           if (var.type() == STRING) {
             if (b.value().isInteger()) {
@@ -204,23 +202,21 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
               long ind = b.value().toInteger();
               String str = Lexer::tokenToString(a);
               if (ind < 0 || ind >= str.length()) {
-                this->sendError("rv4", "", a.lineNumber()); // invalid index
+                this->sendError("rv4", "", a.lineNumber());  // invalid index
                 valuestack.push(nullvalToken);
-              }
-              else {
+              } else {
                 str = Lexer::stringToLiteral(str.substr(ind, 1));
                 valuestack.push(Lexer::toToken(str));
               }
               valid = true;
             }
-          }
-          else if (var.type() == ARRAY || var.type() == OBJECT) {
+          } else if (var.type() == ARRAY || var.type() == OBJECT) {
             if (var.hasValueAt(b)) {
               Variable& prop = var.valueAt(b);
               String hash = this->cacheVariableRef(&prop);
               valuestack.push(Token(hash, DIRECTIVE, VARIABLE));
             } else {
-              this->sendError("rv4", "", a.lineNumber()); // invalid index
+              this->sendError("rv4", "", a.lineNumber());  // invalid index
             }
             valid = true;
           }
@@ -228,29 +224,25 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
 
         if (!valid) {
           // only display types for operands.
-          this->sendError("ro1", current.value() + " : " + a.value() + " and " + b.value()); // invalid types for []
+          this->sendError("ro1", current.value() + " : " + a.value() + " and " + b.value());  // invalid types for []
         }
-      }
-      else if (current.subtype() == UNARYOP) {
+      } else if (current.subtype() == UNARYOP) {
         Token a;
         valuestack.pop(a);
         if (current.value() == "typeof") {
           tokenType ty = UNKNOWN;
           if (a.subtype() == VARIABLE) {
             ty = this->getVariable(a.value(), scope, true).type();
-          }
-          else if (a.type() == LITERAL) {
+          } else if (a.type() == LITERAL) {
             ty = a.subtype();
           }
           String typeStr = Lexer::typeToString(ty);
           valuestack.push(Lexer::toToken(Lexer::stringToLiteral(typeStr)));
-        }
-        else {
+        } else {
           a = this->getVariableValue(a, scope, true);
           valuestack.push(Operations::unaryOperator(current.value(), a));
         }
-      }
-      else if (current.subtype() == BINARYOP) {
+      } else if (current.subtype() == BINARYOP) {
         // check if it is assignment operator:
         String oper = current.value();
 
@@ -277,7 +269,9 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
           vb = v2.value();
         }
 
-        if (oper == "=") res = b;
+        if (oper == "=") {
+          res = b;
+        }
         else {
           res = Operations::binaryOperator(oper, va, vb);
         }
@@ -286,8 +280,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
           Variable& v = this->getVariable(a.value(), scope, true);
           if (v.id() == ";") {
             this->sendError("rv1", a.value());
-          }
-          else { // a = res
+          } else {  // a = res
             if (res.subtype() == VARIABLE) {
               v.setValue(this->getVariable(res.value(), scope, true));
             } else {
@@ -302,10 +295,10 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
         valuestack.pop(tok);
 
         Variable& v = this->getVariable(tok.value(), scope, true);
-        if (v.type() != NUMBER) this->sendError("ro2", current.value(), current.lineNumber()); // ++ and -- work only on numbers
+        if (v.type() != NUMBER) this->sendError("ro2", current.value(), current.lineNumber());  // ++ and -- work only on numbers
 
-        val = v.value(); // the old value.
-        res = Operations::binaryOperator(current.value().substr(0, 1), val, Lexer::toToken("1")); // after inc/dec
+        val = v.value();  // the old value.
+        res = Operations::binaryOperator(current.value().substr(0, 1), val, Lexer::toToken("1"));  // after inc/dec
         v.setValue(res);
 
         valuestack.push((current.subtype() == PRE) ? res : val);
@@ -420,13 +413,13 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
         Token argtok, inv, tmp;
         source.pop(argtok); source.pop(inv);
 
-        long numOfArgs = argtok.value().substr(6).toInteger(); // argtok.value(): @args|<int>
+        long numOfArgs = argtok.value().substr(6).toInteger();  // argtok.value(): @args|<int>
         Vector<Token> args;
         while (numOfArgs--) {
           if (valuestack.pop(tmp)) args.pushfront(tmp);
         }
 
-        if (inv.value() == ".") { // dereference the method.
+        if (inv.value() == ".") {  // dereference the method.
           Token vartok;
           valuestack.pop(vartok);
           Token val = this->getVariableValue(vartok, scope, true);
@@ -440,7 +433,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
               }
             }
           }
-          else { // for a variable:
+          else {  // for a variable:
             Variable& v = this->getVariable(vartok.value(), scope, true);
 
             if (v.type() == ARRAY) {
@@ -464,13 +457,10 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
               else if (current.value() == "length") {
                 valuestack.push(Lexer::toToken(integerToString(v.length())));
               }
-              else {
-
-              }
             }
           }
         }
-        else { // global function:
+        else {  // global function:
           if (InbuiltFunctionList.indexOf(current.value()) >= 0) {
             Token res;
             if (current.value() == "print" || current.value() == "printLine") {
@@ -483,7 +473,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
               if (current.value() == "printLine") InbuiltFunctions::write(Lexer::toToken("\"\\n\""));
               res = trueToken;
             }
-            else if (current.value().substr(0, 4) == "read") { // readInteger, readString, readLine
+            else if (current.value().substr(0, 4) == "read") {  // readInteger, readString, readLine
               for (__SIZETYPE i = 0; i < args.size(); i++) {
                 if (args[i].type() == LITERAL) InbuiltFunctions::write(args[i]);
                 else if (args[i].subtype() == VARIABLE) {
@@ -557,7 +547,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
               tmp = this->functionStack.top().evaluate(argVars, *this);
               this->functionStack.pop();
             } else {
-              this->sendError("rf1", current.value(), current.lineNumber()); // unable to find function.
+              this->sendError("rf1", current.value(), current.lineNumber());  // unable to find function.
             }
             valuestack.push(tmp);
           }
@@ -572,4 +562,4 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
   return ret;
 }
 
-#endif // COMPONENT_EVALUATOR_H
+#endif  // COMPONENT_EVALUATOR_H

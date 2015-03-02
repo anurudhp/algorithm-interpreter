@@ -25,7 +25,7 @@
   #define BOOLEAN 53
   #define INTEGER 54
 #define HASHED 6
-  
+
 #define TABLEN 4
 #define MAX_ID_LENGTH 18
 
@@ -44,13 +44,12 @@ typedef Vector<String> idList;
 * Stores information about an error, along with a flag.
 * member message() returns a user friendly format of the error as a string.
 ********************************/
-class Error
-{
+class Error {
   String _code, _flag;
   bufferIndex _line;
   int _severity;
 
-  public:
+ public:
   Error(String = "", String = "", bufferIndex = -1, int = ERROR_ERROR);
   Error(const Error&);
   Error& operator= (const Error&);
@@ -68,28 +67,27 @@ idList errorCodes, errorDesc;
 
 // global to store all reserved words, and symbols.
 idList Keywords,
-       Constants, // stores all predefined literal constant keywords
-       InbuiltFunctionList, // stores all inbuilt functions. 
-       Punctuators, // all symbols which separate lexer input.
+       Constants,  // stores all predefined literal constant keywords
+       InbuiltFunctionList,  // stores all inbuilt functions.
+       Punctuators,  // all symbols which separate lexer input.
        Opstarts,
-       unaryOperators, 
+       unaryOperators,
        binaryOperators;
 
 /*******************************
 * Class Token:
 *   Stores information about a single keyword/id/literal/operator
-*   
+*
 *******************************/
-class Token
-{
-  private:
+class Token {
+ private:
   tokenType _type, _subtype;
   bufferIndex _line, _indent;
   String _value;
-  public:
+ public:
   // constructors
-  Token (const Token&);
-  Token (String = "", tokenType = UNKNOWN, tokenType = UNKNOWN, bufferIndex = -1, bufferIndex = 0);
+  Token(const Token&);
+  Token(String = "", tokenType = UNKNOWN, tokenType = UNKNOWN, bufferIndex = -1, bufferIndex = 0);
   Token& operator= (const Token&);
 
   // properties
@@ -98,7 +96,7 @@ class Token
   bufferIndex lineNumber() const;
   bufferIndex indent() const;
   String value() const;
-  //mutators
+  // mutators
   void setType(tokenType);
   void setSubtype(tokenType);
   void setLineNumber(bufferIndex);
@@ -121,15 +119,14 @@ typedef Queue<Token> Infix;
 * Takes source code from a file, and converts them into tokens.
 * member getToken(): extracts and returns the next token.
 *******************************/
-class Lexer
-{
-  private:
+class Lexer {
+ private:
   bufferIndex line, indent;
-  ifstream source; // handles the source code file.
-  Vector<Error> errors; // stores all lexer errors
-  Deque<Token> innerBuffer; // stores tokens that have been sent back.
+  ifstream source;  // handles the source code file.
+  Vector<Error> errors;  // stores all lexer errors
+  Deque<Token> innerBuffer;  // stores tokens that have been sent back.
 
-  private:
+ private:
   int trim();
   int endLine();
   String readString();
@@ -137,7 +134,7 @@ class Lexer
   String readIdentifier();
   String readOperator();
 
-  public :
+ public :
   Lexer(String);
   ~Lexer();
 

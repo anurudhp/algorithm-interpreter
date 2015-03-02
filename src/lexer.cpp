@@ -91,7 +91,7 @@ void Token::setValue(String s) { this->_value = s; }
 ****************************************/
 
 // constructors, and dynamic data managers.
-Lexer::Lexer (String data) {
+Lexer::Lexer(String data) {
   this->source.open(data.c_str());
   if (!this->source) this->errors.pushback(Error("l0", data, -1, ERROR_FATAL));
   this->line = 1;
@@ -112,7 +112,9 @@ Lexer::~Lexer() {
 bool Lexer::isValidIdentifier(String val) {
   if (val.length() > MAX_ID_LENGTH) return false;
   if (!isalpha(val[0]) && val[0] != '_') return false;
-  for (__SIZETYPE i = 0; i < val.length(); i++) if (!isalnum(val[i]) && val[i] != '_') return false;
+  for (__SIZETYPE i = 0; i < val.length(); i++) {
+    if (!isalnum(val[i]) && val[i] != '_') return false;
+  }
   return true;
 }
 // maps a keyword to a corresponding operator.
@@ -167,7 +169,7 @@ Token Lexer::toToken(String val) {
     return Token(val, LITERAL, STRING);
   }
   // numeric literal
-  if ((val[0] >= '0' && val[0] <= '9') || 
+  if ((val[0] >= '0' && val[0] <= '9') ||
       (val[0] == '-' && val.length() > 1 && val.substr(1).isNumber())) {
     return Token(val, LITERAL, NUMBER);
   }
@@ -217,7 +219,7 @@ int Lexer::trim() {
     sp++;
   }
   if (this->source.peek() == '#') {
-    while (this->source.get() != '\n' && !this->source.eof()); // ignore the rest of the line.
+    while (this->source.get() != '\n' && !this->source.eof()) {}  // ignore the rest of the line.
     this->endLine();
     return this->trim();
   }
@@ -263,8 +265,11 @@ String Lexer::readString() {
       // escape: get the next character.
       ret += '\\';
       tmp = this->source.get();
-      if (tmp == '\n') this->endLine();
-      else esc = true;
+      if (tmp == '\n') {
+        this->endLine();
+      } else {
+        esc = true;
+      }
     }
     ret += tmp;
   }
@@ -331,7 +336,7 @@ String Lexer::readOperator() {
     if ((ch == '=' || ch == '!') && (this->source.peek() == '=')) {
       ret += this->source.get();
     }
-  } else if (ch == '+' || ch == '-' || ch == '&' || ch == '|') { // operators ++ -- && ||
+  } else if (ch == '+' || ch == '-' || ch == '&' || ch == '|') {  // operators ++ -- && ||
     if (this->source.peek() == ch) ret += (this->source.get());
   }
 
@@ -360,17 +365,17 @@ Token Lexer::getToken() {
   }
 
   if (ch == '\'' || ch == '\"') {
-    val = this->readString(); // string literal
+    val = this->readString();  // string literal
   } else if (isalpha(ch) || ch == '_') {
-    val = this->readIdentifier(); // identifier/keyword
+    val = this->readIdentifier();  // identifier/keyword
   } else if (isdigit(ch)) {
-    val = this->readNumber(); // numeric constant
+    val = this->readNumber();  // numeric constant
   } else if (Punctuators.indexOf(ch) >= 0) {
-    val = ch; // punctuator. keep it as it is.";
+    val = ch;  // punctuator. keep it as it is.";
     this->source.get();
   } else if (Opstarts.indexOf(ch) >= 0) {
     val = this->readOperator();
-  } else { // just ignore the character, as of now. This should flag an unknown character error.
+  } else {  // just ignore the character, as of now. This should flag an unknown character error.
     val = ch;
     this->source.get();
   }
@@ -441,7 +446,7 @@ bool loadLexerData() {
 // Loads error data:
 // codes and descriptions
 // @parameter ecreader: a file object which has opened the errordata file in ios::in mode.
-bool importErrorCodes(ifstream& ecreader) {
+bool importErrorCodes(ifstream& ecreader) {  // NOLINT
   if (!ecreader) return false;
   String buff; Vector<String> vs;
 
