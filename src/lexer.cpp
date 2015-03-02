@@ -388,7 +388,7 @@ Token Lexer::getToken() {
 
 // returns a token back to the lexer.
 // any future getToken() call will first return this token.
-bool Lexer::putbackToken(Token a) { this->innerBuffer.pushfront(a); return true; }
+bool Lexer::putbackToken(Token tok) { this->innerBuffer.pushfront(tok); return true; }
 
 // extracts tokens till the delimiter.
 // NOTE: does not return the delimiter token.

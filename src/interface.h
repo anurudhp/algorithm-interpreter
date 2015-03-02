@@ -24,10 +24,10 @@ class Object;
 #include "./parser.cpp"
 #include "./evaluator.cpp"
 
-void showConsole(bool = false);
+void showConsole(bool firsttime = false);
 bool loadData();
-void logRPN(RPN);
-void parseCommand(String);
-bool runProgram(Vector<String>);
+void logRPN(RPN r);
+void parseCommand(String message);
+bool runProgram(Vector<String> args);
 
 #endif  // SRC_INTERFACE_H_

@@ -8,10 +8,10 @@
 struct InbuiltFunctions {
   // I/O functions:
   static char INFCHAR;
-  static Token write(Token, ostream& = cout);
-  static Token read(tokenType, istream& = cin);
-  static Token get(istream& = cin);
-  static Token readLine(istream& = cin);
+  static Token write(Token t, ostream &out = cout);
+  static Token read(tokenType t1, istream &in = cin);
+  static Token get(istream &in = cin);
+  static Token readLine(istream &in = cin);
 };
 
 char InbuiltFunctions::INFCHAR = 236;
