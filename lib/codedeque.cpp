@@ -54,7 +54,7 @@ Deque<T>& Deque<T>::pushfront(const T& val) {
 }
 
 template<class T>
-bool Deque<T>::popback(){
+bool Deque<T>::popback() {
   return data.popback();
 }
 template<class T>
@@ -62,7 +62,7 @@ bool Deque<T>::popfront() {
   return data.popfront();
 }
 template<class T>
-bool Deque<T>::popback(T& ref){
+bool Deque<T>::popback(T& ref) {
   if (!data.empty()) ref = this->rear();
   return data.popback();
 }
@@ -74,7 +74,7 @@ bool Deque<T>::popfront(T& ref) {
 
 template<class T>
 bool Deque<T>::clear() {
-  while (popback());
+  while (popback()) {}
   return true;
 }
 
@@ -124,17 +124,17 @@ Stack<T>& Stack<T>::push(const T& val) {
   return *this;
 }
 template<class T>
-bool Stack<T>::pop(){
+bool Stack<T>::pop() {
   return data.popback();
 }
 template<class T>
-bool Stack<T>::pop(T& ref){
+bool Stack<T>::pop(T& ref) {
   if (!this->empty()) ref = this->top();
   return data.popback();
 }
 template<class T>
 bool Stack<T>::clear() {
-  while (pop());
+  while (pop()) {}
   return true;
 }
 // End : implementation - Stack
@@ -183,17 +183,17 @@ Queue<T>& Queue<T>::push(const T& val) {
   return *this;
 }
 template<class T>
-bool Queue<T>::pop(){
+bool Queue<T>::pop() {
   return data.popfront();
 }
 template<class T>
-bool Queue<T>::pop(T& ref){
+bool Queue<T>::pop(T& ref) {
   if (!this->empty()) ref = this->front();
   return data.popfront();
 }
 template<class T>
 bool Queue<T>::clear() {
-  while (pop());
+  while (pop()) {}
   return true;
 }
 // End : implementation - Queue

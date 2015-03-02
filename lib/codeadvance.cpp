@@ -1,12 +1,12 @@
-#include "codestring.h"
-#include "codevector.h"
+#include "./codestring.h"
+#include "./codevector.h"
 
 // Set of functions for advanced manipulation on strings and vectors.
 // forward declarations:
 Vector<String> strsplit(String, String);
 String strjoin(Vector<String>, String);
-String integerToString(long);
-String numberToString(double);
+String integerToString(__SIZETYPE val);
+String numberToString(double val);
 
 /** Implementation **/
 // splits a string into parts, by spl.
@@ -47,7 +47,7 @@ String strjoin(Vector<String> vs, String join = "") {
 }
 
 // conversions to string
-String integerToString(long val) {
+String integerToString(__SIZETYPE val) {
   char str[100];
   sprintf(str, "%ld", val);
   return String(str);

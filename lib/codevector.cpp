@@ -33,12 +33,12 @@ template<class T>
 Vector<T>::Vector(__SIZETYPE len, T val) {
   length = 0;
   head = tail = NULL;
-  for( __SIZETYPE i = 0; i<len; i++)
+  for (__SIZETYPE i = 0; i < len; i++)
     pushback(val);
 }
 template<class T>
 bool Vector<T>::clear() {
-  while( popback() );
+  while (popback()) {}
   return true;
 }
 template<class T>
@@ -81,7 +81,7 @@ bool Vector<T>::allocate(__SIZETYPE len, const T& val) {
   clear();
   length = 0;
   head = tail = NULL;
-  for( __SIZETYPE i = 0; i<len; i++)
+  for (__SIZETYPE i = 0; i < len; i++)
     pushback(val);
   return true;
 }
@@ -90,39 +90,39 @@ template<class T>
 bool Vector<T>::pushback(const T& val) {
   node *n = NULL;
   n = new node;
-  if(!n) forcequit(20);
+  if (!n) forcequit(20);
 
   length++;
   n->value = val;
   n->next = NULL;
   n->prev = tail;
-  if(tail != NULL) tail->next = n;
+  if (tail != NULL) tail->next = n;
   tail = n;
-  if(length == 1) head = n;
+  if (length == 1) head = n;
   return true;
 }
 
 template<class T>
-bool Vector<T>::pushfront( const T& val){
+bool Vector<T>::pushfront(const T& val) {
   node *n = NULL;
   n = new node;
-  if(!n) forcequit(20);
+  if (!n) forcequit(20);
 
   length++;
   n->value = val;
   n->next = head;
   n->prev = NULL;
-  if(head != NULL) head->prev = n;
+  if (head != NULL) head->prev = n;
   head = n;
-  if(length == 1) tail = head;
+  if (length == 1) tail = head;
   return true;
 }
 
 template<class T>
-bool Vector<T>::popback(){
-  if(length == 0) return false;
+bool Vector<T>::popback() {
+  if (length == 0) return false;
 
-  if(length == 1) {
+  if (length == 1) {
     delete head;
     head = tail = NULL;
   } else {
@@ -137,9 +137,9 @@ bool Vector<T>::popback(){
 
 template<class T>
 bool Vector<T>::popfront() {
-  if(length == 0) return false;
+  if (length == 0) return false;
 
-  if(length==1) {
+  if (length == 1) {
     delete head;
     head = tail = NULL;
   } else {
@@ -154,13 +154,13 @@ bool Vector<T>::popfront() {
 }
 template<class T>
 bool Vector<T>::popback(T& ref) {
-  if(length == 0) return false;
+  if (length == 0) return false;
   ref = tail->value;
   return popback();
 }
 template<class T>
 bool Vector<T>::popfront(T& ref) {
-  if(length == 0) return false;
+  if (length == 0) return false;
   ref = head->value;
   return popfront();
 }

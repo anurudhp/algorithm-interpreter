@@ -1,6 +1,6 @@
 // Implementation file for String functions, include this file in string.h
 // DO NOT INCLUDE/COMPILE THIS FILE SEPARATELY.
-#ifdef CODE_STRING_H
+#ifdef LIB_CODESTRING_H_
 
 /*******************************
 * 1. Constructors and operator =
@@ -18,8 +18,8 @@ String::String(const String& s) {
   _len = s.length();
   _data = NULL;
   _data = new char[_len];
-  if( !_data ) forcequit(10);
-  for(int i=0; i<_len; i++)
+  if (!_data) forcequit(10);
+  for (int i=0; i < _len; i++)
     _data[i] = s.charAt(i);
 }
 
@@ -28,8 +28,8 @@ String::String(const char *s) {
   _len = strlen(s);
   _data = NULL;
   _data = new char[ _len ];
-  if( !_data ) forcequit(10);
-  for( __SIZETYPE i=0; i<_len; i++)
+  if (!_data) forcequit(10);
+  for (__SIZETYPE i=0; i < _len; i++)
     _data[i] = s[i];
 }
 
@@ -38,7 +38,7 @@ String::String(char ch) {
   _len = 1;
   _data = NULL;
   _data = new char[1];
-  if( !_data ) forcequit(10);
+  if (!_data) forcequit(10);
   _data[0] = ch;
 }
 
@@ -47,27 +47,27 @@ String& String::operator= (const String& s) {
   clear();
   _len = s.length();
   _data = new char[_len];
-  if( !_data ) forcequit(10);
-  for(int i=0; i<_len; i++)
+  if (!_data) forcequit(10);
+  for (int i=0; i < _len; i++)
     _data[i] = s.charAt(i);
   return *this;
 }
 
-String& String::operator= (const char* s ) {
+String& String::operator= (const char* s) {
   clear();
   _len = strlen(s);
   _data = new char[_len];
-  if( !_data ) forcequit(10);
-  for(int i=0; i<_len; i++)
+  if (!_data) forcequit(10);
+  for (int i=0; i < _len; i++)
     _data[i] = s[i];
   return *this;
 }
 
-String& String::operator=(char ch ) {
+String& String::operator=(char ch) {
   clear();
   _len = 1;
   _data = new char[1];
-  if( !_data ) forcequit(10);
+  if (!_data) forcequit(10);
   _data[0] = ch;
   return *this;
 }
@@ -90,7 +90,7 @@ char* String::c_str() {
   delete []_data2;
   _data2 = NULL;
   _data2 = new char[_len + 1];
-  for(__SIZETYPE i=0; i<_len; i++) _data2[i] = _data[i];
+  for (__SIZETYPE i=0; i < _len; i++) _data2[i] = _data[i];
   _data2[_len] = '\0';
   return _data2;
 }
@@ -99,23 +99,23 @@ char* String::c_str() {
 * 2. Read properties/data of a given string
 **************************/
 
-//size() : returns the size of the string
+// size() : returns the size of the string
 __SIZETYPE String::length() const {
   return _len;
 }
 
 // return the character at an index
 char String::charAt(__SIZETYPE index) const {
-  if( index < 0 ) index += _len;
-  if( index >= _len || index < 0 ) return 0;
+  if (index < 0) index += _len;
+  if (index >= _len || index < 0) return 0;
   return _data[index];
 }
 
 // operator [] : gives reference to char at index .
-char String::zerochar = 0; // returned on erraneous requests(out of bounds)
-char& String::operator[] (__SIZETYPE index ) const {
-  if( index < 0 ) index += _len;
-  if( index > _len || index < 0 ) {
+char String::zerochar = 0;  // returned on erraneous requests(out of bounds)
+char& String::operator[] (__SIZETYPE index) const {
+  if (index < 0) index += _len;
+  if (index > _len || index < 0) {
     zerochar = 0;
     return zerochar;
   }
@@ -127,22 +127,23 @@ char& String::operator[] (__SIZETYPE index ) const {
 ********************************/
 
 // Operator +
-String String::operator+ (const String& r ) const {
+String String::operator+ (const String& r) const {
   int tlen = r.length();
-  char tmp[_len+ tlen +1];
-  for(__SIZETYPE i=0; i<_len; i++)
+  String c;
+  char *tmp = new char[_len+ tlen];
+  for (__SIZETYPE i = 0; i < _len; i++)
     tmp[i] = _data[i];
-  for(__SIZETYPE j=0; j<tlen; j++)
+  for (__SIZETYPE j = 0; j < tlen; j++)
     tmp[j+_len] = r[j];
-  tmp[_len+ tlen]= '\0';
 
-  String c(tmp);
+  c._data = tmp;
+  c._len = _len + tlen;
   return c;
 }
 
 // shorthand operator +=
 String String::operator+= (const String& s) {
-  return ( *this = *this + s );
+  return (*this = *this + s);
 }
 
 // substring : returns the substring from index st , and length len.
@@ -150,17 +151,17 @@ String String::operator+= (const String& s) {
 // if st is negative, it is counted from the end of the string.
 String String::substr(__SIZETYPE st, __SIZETYPE  len) const {
   String ret;
-  if( st < 0 ) st += _len;
-  if( st < 0 ) st = 0;
-  if( st + len > _len || len == -1 ) len = _len - st;
+  if (st < 0) st += _len;
+  if (st < 0) st = 0;
+  if (st + len > _len || len == -1) len = _len - st;
 
-  char s[ len+1 ];
+  char *s = new char[len];
 
-  for( __SIZETYPE i=0 ; i<len ; ++i ){
-    s[i] = _data[ st+i ];
+  for (__SIZETYPE i=0 ; i < len ; ++i) {
+    s[i] = _data[st+i];
   }
-  s[len] = '\0';
-  ret = s;
+  ret._data = s;
+  ret._len = len;
   return ret;
 }
 
@@ -170,9 +171,9 @@ String String::replace(const String& find, const String& rep) const {
 
   __SIZETYPE repPos = ch.indexOf(find),
              flen = find.length();
-  while( repPos >= 0 ) {
-    tmp += ch.substr(0,repPos) + rep;
-    ch = ch.substr(repPos+flen);
+  while (repPos >= 0) {
+    tmp += ch.substr(0, repPos) + rep;
+    ch = ch.substr(repPos + flen);
     repPos = ch.indexOf(find);
   }
   tmp += ch;
@@ -181,25 +182,25 @@ String String::replace(const String& find, const String& rep) const {
 
 // tolower : converts all alphabet values to lower case.
 String String::tolower() const {
-  String ret(*this );
-  for( __SIZETYPE i=0; i<ret.length(); i++)
-    if( ret[i] >= 'A' && ret[i] <= 'Z' )
+  String ret(*this);
+  for (__SIZETYPE i=0; i < ret.length(); i++)
+    if (ret[i] >= 'A' && ret[i] <= 'Z')
       ret[i] = ret[i] - 'A' + 'a';
   return ret;
 }
 
 // toupper : converts all alphabet values to upper case.
 String String::toupper() const {
-  String ret( *this );
-  for( __SIZETYPE i=0; i<ret.length(); i++)
-    if( ret[i] >= 'a' && ret[i] <= 'z' )
+  String ret(*this);
+  for (__SIZETYPE i=0; i < ret.length(); i++)
+    if (ret[i] >= 'a' && ret[i] <= 'z')
       ret[i] = ret[i] - 'a' + 'A';
   return ret;
 }
 
 // trim : removes all preceding and trailing spaces
 String String::trim() const {
-  __SIZETYPE st,en;
+  __SIZETYPE st, en;
   for (st = 0; st < _len && _data[st] == ' '; st++) {}
   if (st == _len) return String();
 
@@ -208,13 +209,13 @@ String String::trim() const {
 }
 
 // indexOf :  gives index of first occurrance of s
-__SIZETYPE String::indexOf(const String& s ) const {
+__SIZETYPE String::indexOf(const String& s) const {
   __SIZETYPE tlen = s.length();
 
-  for( __SIZETYPE i = 0; i < _len-tlen+1 ; ++i ){
+  for (__SIZETYPE i = 0; i < _len-tlen+1 ; ++i) {
     bool isfound = true;
-    for( __SIZETYPE j = 0; j < tlen ; ++j ){
-      if( s[j] != _data[i+j] ){
+    for (__SIZETYPE j = 0; j < tlen ; ++j) {
+      if (s[j] != _data[i+j]) {
         isfound = false;
         break;
       }
@@ -232,7 +233,7 @@ __SIZETYPE String::indexOf(const String& s ) const {
 bool String::isInteger() const {
   if (!this->isNumber()) return false;
   double s = this->toNumber();
-  return (s == (double(int(s))));
+  return (s == (static_cast<double>(static_cast<int>(s))));
 }
 bool String::isNumber() const {
   __SIZETYPE i;
@@ -240,18 +241,18 @@ bool String::isNumber() const {
   for (i = 0; i < _len; i++) {
     if (_data[i] == '-') {
       if (i != 0) return false;
-      else continue;
-    }
-    if (_data[i] == '.') {
+      continue;
+    } else if (_data[i] == '.') {
       if (isDeci) return false;
       isDeci = true;
+    } else if (!(_data[i] >= '0' && _data[i] <= '9')) {
+      return false;
     }
-    else if (!(_data[i] >= '0' && _data[i] <= '9')) return false;
   }
   return true;
 }
 
-long String::toInteger() const {
+__SIZETYPE String::toInteger() const {
   String tmp(*this);
   return atol(tmp.c_str());
 }
@@ -269,19 +270,19 @@ bool String::operator!() const {
   return !_len;
 }
 bool String::equals(const String& s) const {
-  if( _len != s.length() ) return false;
-  for( __SIZETYPE it = 0; it < _len ; it++ )
-    if( _data[it] != s[it] )
+  if (_len != s.length()) return false;
+  for (__SIZETYPE it = 0; it < _len ; it++)
+    if (_data[it] != s[it])
       return false;
   return true;
 }
-// operator == : returns true if both strings are equal( each char matches )
+// operator == : returns true if both strings are equal(each char matches)
 bool String::operator==(const String& s) const {
   return equals(s);
 }
 
 // operator != : returns true if both strings are not equal
-bool String::operator!=(const String& s ) const {
+bool String::operator!=(const String& s) const {
   return !(equals(s));
 }
 
@@ -294,12 +295,13 @@ ostream& operator<<(ostream& output, const String& str) {
   return output;
 }
 bool String::print(ostream& output) const {
-  for( __SIZETYPE i=0; i<_len; ++i) output<<_data[i];
+  for (__SIZETYPE i=0; i < _len; ++i)
+    output << _data[i];
   return true;
 }
 
 // this is the global input buffer for all strings.
-char *String::stringInputBuffer = new char[ MAX_STRING_LENGTH ];
+char *String::stringInputBuffer = new char[MAX_STRING_LENGTH];
 
 bool String::get(istream& input, char delim) {
   input.getline(stringInputBuffer, MAX_STRING_LENGTH, delim);
@@ -312,4 +314,4 @@ istream& operator>>(istream& input, String& str) {
   return input;
 }
 
-#endif /* CODE_STRING_H */
+#endif  // LIB_CODESTRING_H_
