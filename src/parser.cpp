@@ -121,7 +121,7 @@ Function Parser::getFunction(String id) {
 // and returns the index where it is stored
 // in a hashed format: "#index"
 Token Parser::hashify(HashedData& hd) {
-  long ind = this->hashes.size();
+  __SIZETYPE ind = this->hashes.size();
   this->hashes.pushback(hd);
   String hash("#d");
   hash += integerToString(ind);
@@ -129,7 +129,7 @@ Token Parser::hashify(HashedData& hd) {
 }
 // get the hashed data corresponding to the given string hash.
 HashedData Parser::getHashedData(String hash) {
-  long ind = hash.substr(2).toNumber();
+  __SIZETYPE ind = hash.substr(2).toNumber();
   return this->hashes[ind];
 }
 
@@ -440,7 +440,7 @@ RPN Parser::parseDeclaration() {
   current = this->lexer->getToken();
 
   if (current.value() == "{") {  // parse a hash-table (object primitive)
-    long depth = 0, index = 0;
+    __SIZETYPE depth = 0, index = 0;
     Infix args, objdecl;
     Token key, tmp, tmp2;
 
@@ -470,7 +470,7 @@ RPN Parser::parseDeclaration() {
     decl.push(Token("@init", DIRECTIVE, OBJECT));
     decl.push(this->toArgsToken(index));
   } else if (current.value() == "[") {  // parse array (primitive)
-    long depthP = 0, depthB = 0, index = 0;
+    __SIZETYPE depthP = 0, depthB = 0, index = 0;
     Infix args;
     Token tmp, tmp2;
 
@@ -499,7 +499,7 @@ RPN Parser::parseDeclaration() {
     decl.push(Token("@init", DIRECTIVE, ARRAY));
     decl.push(this->toArgsToken(index));
   } else {  // parse an expression.
-    long depth = 0;
+    __SIZETYPE depth = 0;
     Infix args;
     Token tmp;
     this->lexer->putbackToken(current);
@@ -760,7 +760,7 @@ bool Parser::validateRPN(RPN rpn) {
         // array/object primitive:
         Token length;
         rpn.pop(length);
-        long len = length.value().substr(6).toInteger();
+        __SIZETYPE len = length.value().substr(6).toInteger();
         if (curr.subtype() == ARRAY) {
           tokenType t = UNKNOWN;
           while (len--) vals.pop(t);
@@ -773,7 +773,7 @@ bool Parser::validateRPN(RPN rpn) {
         }
       }
       if (curr.value().substr(0, 6) == "@args|") {
-        long ind = curr.value().substr(6).toInteger();
+        __SIZETYPE ind = curr.value().substr(6).toInteger();
         vals.pop();  // function token
         while (ind--) vals.pop();  // args
         Token inv;

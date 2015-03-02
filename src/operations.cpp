@@ -34,7 +34,7 @@ Token Operations::typecastToken(Token tok, tokenType type) {
   if (type == NUMBER || type == INTEGER) {
     if (tok.subtype() == NUMBER) {
       // type is INTEGER
-      long val = long(tok.value().toNumber());
+      __SIZETYPE val = tok.value().toNumber();
       return Lexer::toToken(integerToString(val));
     }
     if (tok.subtype() == BOOLEAN) {
@@ -137,7 +137,7 @@ Token Operations::divide(Token t1, Token t2) {
 
 Token Operations::modulo(Token t1, Token t2) {
   if (!(t1.value().isInteger() && t2.value().isInteger())) return nullvalToken;
-  long a1 = t1.value().toInteger(),
+  __SIZETYPE a1 = t1.value().toInteger(),
      a2 = t2.value().toInteger();
   if (a2 == 0) return nullvalToken;
   return Lexer::toToken(integerToString(a1 % a2));
