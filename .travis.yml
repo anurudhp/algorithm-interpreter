@@ -1,7 +1,17 @@
 language: cpp
-compiler: 
-  - gcc
-  - clang
+compiler: gcc
+
+before_install:
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+  - sudo apt-get update -qq
+  - git clone -b master https://github.com/danmar/cppcheck.git cppcheck_src
+install:
+  - sudo apt-get install -qq g++-4.8
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+  - cd ./cppcheck_src && make SRCDIR=build CFGDIR=cfg && cd ..
+
+before_script:
+  - export CPPCHECK="./cppcheck_src/cppcheck"
 script: make test -e
 
 notifications:
