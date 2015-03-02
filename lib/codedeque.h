@@ -1,21 +1,21 @@
-#ifndef CODE_DEQUE_H
-#define CODE_DEQUE_H
+#ifndef LIB_CODEDEQUE_H_
+#define LIB_CODEDEQUE_H_
 
-#include "dependencies.h"
-#include "codevector.h"
+#include "./dependencies.h"
+#include "./codevector.h"
 
 // Deque is a container adapter.
 // It uses the template class Vector to store data.
 template <class T>
 class Deque {
-  private:
+ private:
   Vector<T> data;
 
-  public:
+ public:
   // constructors,destructor and operator =
   Deque();
-  Deque(const Deque<T>& );
-  Deque<T>& operator= (const Deque<T>& );
+  Deque(const Deque<T>&);
+  Deque<T>& operator= (const Deque<T>&);
   ~Deque();
 
   // properties
@@ -24,8 +24,8 @@ class Deque {
   T& rear() const;
 
   // basic manipulation
-  Deque<T>& pushback(const T& );
-  Deque<T>& pushfront(const T& );
+  Deque<T>& pushback(const T&);
+  Deque<T>& pushfront(const T&);
   bool popback();
   bool popfront();
   bool popback(T&);
@@ -36,22 +36,22 @@ class Deque {
 // Template Class Stack : adapts deque.
 template <class T>
 class Stack {
-  private:
+ private:
   Deque<T> data;
 
-  public:
+ public:
   // constructors,destructor and operator =
   Stack();
-  Stack( const Stack<T>& );
-  Stack<T>& operator= (const Stack<T>& );
-  Stack<T>& operator= (const Deque<T>& );
+  Stack(const Stack<T>&);
+  Stack<T>& operator= (const Stack<T>&);
+  Stack<T>& operator= (const Deque<T>&);
   ~Stack();
   bool clear();
 
   // members
   bool empty() const;
   T& top() const;
-  Stack<T>& push(const T& );
+  Stack<T>& push(const T&);
   bool pop();
   bool pop(T&);
 };
@@ -59,26 +59,26 @@ class Stack {
 // Template Class Queue : adapts deque
 template <class T>
 class Queue {
-  private:
+ private:
   Deque<T> data;
 
-  public:
+ public:
   // constructors,destructor and operator =
   Queue();
-  Queue(const Queue<T>& );
-  Queue<T>& operator= (const Queue<T>& );
-  Queue<T>& operator= (const Deque<T>& );
+  Queue(const Queue<T>&);
+  Queue<T>& operator= (const Queue<T>&);
+  Queue<T>& operator= (const Deque<T>&);
   ~Queue();
   bool clear();
 
   // members
   bool empty() const;
   T& front() const;
-  Queue<T>& push(const T& );
+  Queue<T>& push(const T&);
   bool pop();
   bool pop(T&);
 };
 
 #include "codedeque.cpp"
 
-#endif /* CODE_DEQUE_H */
+#endif  // LIB_CODEDEQUE_H_

@@ -1,13 +1,13 @@
-#ifndef __CODE_LIB_H
-#define __CODE_LIB_H
+#ifndef LIB_CODELIB_H_
+#define LIB_CODELIB_H_
 
 // The Template Library:
 // contains: String, Vector, Deque, Queue, Stack.
 
-#include "dependencies.h"
-#include "codestring.h"
-#include "codevector.h"
-#include "codedeque.h"
-#include "codeadvance.cpp"
+#include "./dependencies.h"
+#include "./codestring.h"
+#include "./codevector.h"
+#include "./codedeque.h"
+#include "./codeadvance.cpp"
 
-#endif /* __CODE_LIB_H */
+#endif  // LIB_CODELIB_H_
