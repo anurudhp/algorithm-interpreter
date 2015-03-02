@@ -17,8 +17,8 @@ class Variable {
 
  public:
   Variable();
-  Variable(String);
-  Variable(Token);
+  explicit Variable(String);
+  explicit Variable(Token);
   Variable(const Variable&);
   Variable& operator= (const Variable&);
 
@@ -91,7 +91,7 @@ class Function {
 
  public:
   Function();
-  Function(String);
+  explicit Function(String);
   Function(String, Vector<String>, RPN);
   Function(const Function&);
 

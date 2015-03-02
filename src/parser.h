@@ -68,7 +68,7 @@ class Parser {
   Lexer *lexer;
 
  public:
-  Parser(Lexer*, String = "");
+  explicit Parser(Lexer*, String = "");
   ~Parser();
 
   // interface: Communication with the parser

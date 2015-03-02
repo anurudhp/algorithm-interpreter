@@ -79,6 +79,7 @@ bool Variable::setValue(const Variable& v) {
 
 // checks whether it has a value at index/key
 bool Variable::hasValueAt(Token key) {
+  Variable nullVar = Variable(nullvalToken);
   if (this->type() == ARRAY) {
     key = Operations::typecastToken(key, NUMBER);
     if (key.value() == "null") return false;
@@ -96,7 +97,7 @@ bool Variable::hasValueAt(Token key) {
     if (this->_keys.indexOf(key.value()) == -1) {
       this->_keys.pushback(key.value());
       this->_values.pushback(Variable());
-      this->_values[-1].setValue(nullvalToken);
+      this->_values[-1].setValue(nullVar);
     }
     return true;
   }
@@ -354,7 +355,8 @@ Function::Function(const Function& f)
   :_id(f._id),
   parameters(f.parameters),
   functionVariables(f.functionVariables),
-  statements(f.statements) {
+  statements(f.statements),
+  returnVal() {
   hasRet = false;
 }
 

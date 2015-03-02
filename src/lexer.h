@@ -50,7 +50,7 @@ class Error {
   int _severity;
 
  public:
-  Error(String = "", String = "", bufferIndex = -1, int = ERROR_ERROR);
+  explicit Error(String = "", String = "", bufferIndex = -1, int = ERROR_ERROR);
   Error(const Error&);
   Error& operator= (const Error&);
 
@@ -87,7 +87,7 @@ class Token {
  public:
   // constructors
   Token(const Token&);
-  Token(String = "", tokenType = UNKNOWN, tokenType = UNKNOWN, bufferIndex = -1, bufferIndex = 0);
+  explicit Token(String = "", tokenType = UNKNOWN, tokenType = UNKNOWN, bufferIndex = -1, bufferIndex = 0);
   Token& operator= (const Token&);
 
   // properties
@@ -135,7 +135,7 @@ class Lexer {
   String readOperator();
 
  public :
-  Lexer(String);
+  explicit Lexer(String);
   ~Lexer();
 
   Vector<Error> getErrors() const;
