@@ -1,5 +1,5 @@
-#ifndef COMPONENT_INTERFACE_H
-#define COMPONENT_INTERFACE_H
+#ifndef SRC_INTERFACE_H_
+#define SRC_INTERFACE_H_
 
 #include "../lib/codelib.h"
 
@@ -30,4 +30,4 @@ void logRPN(RPN);
 void parseCommand(String);
 bool runProgram(Vector<String>);
 
-#endif /* COMPONENT_INTERFACE_H */
+#endif  // SRC_INTERFACE_H_

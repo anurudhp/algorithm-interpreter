@@ -1,6 +1,6 @@
-#ifdef COMPONENT_PARSER_H
-#ifndef COMPONENT_PARSER_IO_H
-#define COMPONENT_PARSER_IO_H
+#ifdef SRC_PARSER_H_
+#ifndef SRC_PARSER_INBUILTFUNC_CPP_
+#define SRC_PARSER_INBUILTFUNC_CPP_
 
 /*******************
 * Executes all global inbuilt functions
@@ -90,5 +90,5 @@ Token InbuiltFunctions::readLine(istream& in) {
     return Lexer::toToken(Lexer::stringToLiteral(s));
 }
 
-#endif /* COMPONENT_PARSER_IO_H */
-#endif /* COMPONENT_PARSER_H */
+#endif  // SRC_PARSER_INBUILTFUNC_CPP_
+#endif  // SRC_PARSER_H_
