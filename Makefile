@@ -4,9 +4,9 @@ CPPCHECK=cppcheck
 
 all: build
 test: lint
-	$(CXX) -o algoflex_test -Wall -g --std=c++11 src/interface.cpp
+	$(CXX) -o algoflex_test -Wall -g -std=c++11 src/interface.cpp
 build:
-	$(CXX) -o algoflex --std=c++11 src/interface.cpp
+	$(CXX) -o algoflex -std=c++11 src/interface.cpp
 	
 lint:
 	$(CPPCHECK) --error-exitcode=2 --enable=all --language=c++ --std=c++11 --suppress=*:lib/codestring.cpp:46 src/interface.cpp
