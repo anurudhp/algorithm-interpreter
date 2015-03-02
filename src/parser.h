@@ -3,7 +3,7 @@
 
 typedef Queue<Token> RPN;
 
-#include "variables.h"
+#include "./variables.h"
 
 /*****************************
 * class HashedData
@@ -11,14 +11,12 @@ typedef Queue<Token> RPN;
 * Instead of the whole rpn being stored in a single vector,
 * storing them in blocks helps in easy access.
 *****************************/
-class HashedData
-{
+class HashedData {
   Vector < RPN > statementSet;
   Vector < Vector<Variable> > variableSet;
 
-  public:
+ public:
   // stores data about a single `if` block.
-  // 
   struct csIf {
     RPN ifCondition, ifStatements, elseStatements;
     Vector <Variable> ifVariables, elseVariables;
@@ -34,13 +32,13 @@ class HashedData
   bool clearVariables();
   bool addStatements(RPN);
   bool addVariables(Vector<Variable>);
-  
+
   void setValues(csIf);
   void setValues(csFor);
 
   csIf getIf();
   csFor getFor();
-  
+
   Vector<RPN> getStatements();
 };
 
@@ -57,20 +55,19 @@ class HashedData
 *  and converts it into the Reverse Polish Notation
 *  Stores blocks in member `hashes`
 *********************************/
-class Parser
-{
-  private:
-  VariableScope variables; // stores globals.
-  Vector <Function> functions; // all global functions.
-  Vector <Error> errors; // parser errors
-  Vector <HashedData> hashes; // if, while, for, foreach blocks.
-  RPN output; // the main code
-  int status; // passed/failed
+class Parser {
+ private:
+  VariableScope variables;  // stores globals.
+  Vector <Function> functions;  // all global functions.
+  Vector <Error> errors;  // parser errors
+  Vector <HashedData> hashes;  // if, while, for, foreach blocks.
+  RPN output;  // the main code
+  int status;  // passed/failed
 
   // lexer interaction interface:
   Lexer *lexer;
 
-  public:
+ public:
   Parser(Lexer*, String = "");
   ~Parser();
 
@@ -80,7 +77,7 @@ class Parser
   Vector<Error> getErrors();
   bool showErrors(ostream&, bool = false);
   Function getFunction(String);
-  
+
   Token hashify(HashedData&);
   HashedData getHashedData(String);
 
@@ -94,10 +91,11 @@ class Parser
   RPN expressionToRPN(Infix);
   // checks whether the RPN is valid.
   bool validateRPN(RPN);
-  
+
   static Token toArgsToken(__SIZETYPE);
   static Vector<Error> sortErrors(Vector<Error>);
-  friend class Evaluator;RPN getOutput(){return output;}
+  friend class Evaluator;
+  RPN getOutput() { return output; }  // TODO(codelegend): should be removed.
 };
 
 #endif /* COMPONENT_PARSER_H */

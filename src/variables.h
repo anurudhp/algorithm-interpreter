@@ -7,8 +7,7 @@
 /*****************************
 * Class Variable: stores data about a variable
 ******************************/
-class Variable
-{
+class Variable {
   String _id;
   Token _value;
   Vector<String> _keys;
@@ -16,16 +15,16 @@ class Variable
   tokenType _type;
   Object *_object;
 
-  public:
+ public:
   Variable();
   Variable(String);
   Variable(Token);
   Variable(const Variable&);
   Variable& operator= (const Variable&);
 
-  String id() const; // the identifier/name of the variable
+  String id() const;  // the identifier/name of the variable
   tokenType type();
-  Token value() const; // token value.
+  Token value() const;  // token value.
   __SIZETYPE length() const;
 
   // value access:
@@ -34,7 +33,7 @@ class Variable
   bool hasValueAt(Token);
   Variable& valueAt(Token);
   bool setValueAt(Token, Variable);
-  
+
   // methods for arrays:
   bool pushValue(Variable, bool = false);
   bool popValue(Variable&, bool = false);
@@ -56,11 +55,10 @@ Variable nullVariableRef(";");
 * Stores data about a scope.
 * used to resolve variables, from top to bottom.
 *****************************/
-class VariableScope
-{
+class VariableScope {
   Vector< Vector<Variable> > varstack;
 
-  public:
+ public:
   VariableScope();
   VariableScope& operator= (const VariableScope&);
 
@@ -82,8 +80,7 @@ class VariableScope
 * Stores info about a function:
 *    parameters, statements, and local variables
 *******************************/
-class Function
-{
+class Function {
   String _id;
   Vector<String> parameters;
   Vector<Variable> functionVariables;
@@ -92,7 +89,7 @@ class Function
   Token returnVal;
   bool hasRet;
 
-  public:
+ public:
   Function();
   Function(String);
   Function(String, Vector<String>, RPN);
@@ -116,14 +113,13 @@ class Function
 * Stores data about a class declaration or object declaration
 * Stores all methods.
 **********************/
-class Object
-{
+class Object {
   String _id;
   Function constructor;
   Vector<Function> prototypes;
   bool isFundamental;
 
-  public:
+ public:
   Object();
   Object(String, bool);
 

@@ -7,9 +7,8 @@
 * Uses a function stack to handle recursive calls.
 *   Exits on the first time it encounters a runtime error.
 ********************************/
-class Evaluator
-{
-  private:
+class Evaluator {
+ private:
   Vector <Error> errors;
   VariableScope variables;
   Vector<Variable> globals;
@@ -17,10 +16,10 @@ class Evaluator
   Stack<Function> functionStack;
   Parser *parser;
   bool failed;
-  
-  public:
+
+ public:
   Evaluator(Parser*, String = "");
-  
+
   // interface:
   bool addError(Error);
   bool sendError(String, String = "", bufferIndex = -1);
@@ -35,7 +34,7 @@ class Evaluator
   Variable& getVariable(String, VariableScope&, bool = false);
   Token getVariableValue(Token, VariableScope&, bool = false);
   Vector<Variable>& getGlobals();
-  
+
   // procedures
   bool runProgram();
   Token evaluateRPN(RPN, VariableScope&);

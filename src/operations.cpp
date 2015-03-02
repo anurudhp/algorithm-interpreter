@@ -52,13 +52,11 @@ Token Operations::typecastToken(Token tok, tokenType type) {
     if (tok.subtype() == CONSTANT) {
       if (tok.value() == "infinity" || tok.value() == "minusinfinity") return tok;
     }
-  }
-  else if (type == STRING) {
+  } else if (type == STRING) {
     String val = tok.value();
     if (val.isInteger()) val = integerToString(val.toInteger());
     return Lexer::toToken(Lexer::stringToLiteral(val));
-  }
-  else if (type == BOOLEAN) {
+  } else if (type == BOOLEAN) {
     if (tok.subtype() == NUMBER) {
       if (tok.value().toNumber() != 0.0) return trueToken;
       return falseToken;
@@ -99,7 +97,7 @@ Token Operations::add(Token t1, Token t2) {
   if (t1.subtype() == NUMBER || t2.subtype() == NUMBER || t1.subtype() == BOOLEAN || t2.subtype() == BOOLEAN) {
     if (t1.value() == "infinity" || t2.value() == "infinity") return Lexer::toToken("infinity");
     if (t1.value() == "minusinfinity" || t2.value() == "minusinfinity") return Lexer::toToken("minusinfinity");
-    
+
     t1 = typecastToken(t1, NUMBER);
     t2 = typecastToken(t2, NUMBER);
     double a1 = t1.value().toNumber(),
@@ -151,11 +149,11 @@ Token Operations::logical(String op, Token t1, Token t2) {
   t2 = typecastToken(t2, BOOLEAN);
 
   if (op == "&&") {
-    if(t1.value() == "true" && t2.value() == "true") return trueToken;
+    if (t1.value() == "true" && t2.value() == "true") return trueToken;
     return falseToken;
   }
   if (op == "||") {
-    if(t1.value() == "true" || t2.value() == "true") return trueToken;
+    if (t1.value() == "true" || t2.value() == "true") return trueToken;
     return falseToken;
   }
   return nullvalToken;
@@ -171,7 +169,7 @@ Token Operations::unaryOperator(String op, Token tok) {
   if (op == "-") {
     if (tok.value() == "infinity") return Lexer::toToken("minusinfinity");
     if (tok.value() == "minusinfinity") return Lexer::toToken("infinity");
-    
+
     tok = typecastToken(tok, NUMBER);
     double num = -(tok.value().toNumber());
     return Lexer::toToken(numberToString(num));
@@ -208,7 +206,7 @@ Token Operations::compare(String op, Token t1, Token t2) {
   // == === != !== : for all types.
   if (t1.type() != LITERAL || t2.type() != LITERAL) return nullvalToken;
 
-  if (op == "=="){
+  if (op == "==") {
     if (t1.subtype() == BOOLEAN) t1 = typecastToken(t1, NUMBER);
     if (t2.subtype() == BOOLEAN) t2 = typecastToken(t2, NUMBER);
 
@@ -225,21 +223,21 @@ Token Operations::compare(String op, Token t1, Token t2) {
 
     if (t1.subtype() == NUMBER) {
       if (t1.value().toNumber() == t2.value().toNumber()) return trueToken;
-    }
-    else if (t1.subtype() == STRING) {
-      if (t1.value() == t2.value()) {return trueToken;}
+    } else if (t1.subtype() == STRING) {
+      if (t1.value() == t2.value()) {
+        return trueToken;
+      }
     }
     return falseToken;
-
   }
-  if (op == "!="){
+  if (op == "!=") {
     return unaryOperator("!", compare("==", t1, t2));
   }
-  if (op == "==="){
-    if(t1.subtype() != t2.subtype()) return falseToken;
+  if (op == "===") {
+    if (t1.subtype() != t2.subtype()) return falseToken;
     return compare("==", t1, t2);
   }
-  if (op == "!=="){
+  if (op == "!==") {
     return unaryOperator("!", compare("===", t1, t2));
   }
 
@@ -260,11 +258,11 @@ Token Operations::compare(String op, Token t1, Token t2) {
     return unaryOperator("!", logical("||", compare("==", t1, t2), compare("<", t1, t2)));
   }
   if (op == "<=") {
-        if(t1.value().toNumber()==t2.value().toNumber()) return trueToken;
+        if (t1.value().toNumber() == t2.value().toNumber()) return trueToken;
     return compare("<", t1, t2);
   }
   if (op == ">=") {
-      if(t1.value().toNumber()==t2.value().toNumber()) return trueToken;
+      if (t1.value().toNumber() == t2.value().toNumber()) return trueToken;
     return compare(">", t1, t2);
   }
 
