@@ -1,5 +1,5 @@
-#ifndef COMPONENT_LEXER_H
-#define COMPONENT_LEXER_H
+#ifndef SRC_LEXER_H_
+#define SRC_LEXER_H_
 
 // Token types:
 #define DIRECTIVE -1
@@ -154,4 +154,4 @@ class Lexer {
   static String typeToString(tokenType);
 };
 
-#endif /* COMPONENT_LEXER_H */
+#endif  // SRC_LEXER_H_

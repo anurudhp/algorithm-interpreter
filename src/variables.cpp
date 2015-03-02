@@ -1,4 +1,4 @@
-#ifdef COMPONENT_PARSER_H
+#ifdef SRC_VARIABLES_H_
 
 // included in "parser.cpp"
 
@@ -444,4 +444,4 @@ Variable Object::construct(Vector<Variable> initArgs) {
   return v;
 }
 
-#endif /* COMPONENT_PARSER_H */
+#endif  // SRC_VARIABLES_H_

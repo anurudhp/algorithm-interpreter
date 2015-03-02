@@ -1,5 +1,5 @@
-#ifndef COMPONENT_EVALUATOR_H
-#define COMPONENT_EVALUATOR_H
+#ifndef SRC_EVALUATOR_H_
+#define SRC_EVALUATOR_H_
 
 /*******************************
 * The evaluator class
@@ -40,4 +40,4 @@ class Evaluator {
   Token evaluateRPN(RPN, VariableScope&);
 };
 
-#endif /* COMPONENT_EVALUATOR_H */
+#endif  // SRC_EVALUATOR_H_

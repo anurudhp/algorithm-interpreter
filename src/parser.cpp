@@ -1,4 +1,4 @@
-#ifdef COMPONENT_PARSER_H
+#ifdef SRC_PARSER_H_
 // do not include this file directly.
 // use parser.h instead.
 
@@ -205,9 +205,11 @@ RPN Parser::parseBlock(bufferIndex depth) {
     if (current.value() == "var" || current.value() == "global") {
       Token vartok;
 
-      if (!lineBuffer.pop(vartok)) this->sendError("p3", "after var", current.lineNumber());  // expected identifier
-      else if (vartok.type() != IDENTIFIER) this->sendError("p4.2", vartok.value(), vartok.lineNumber());  // invalid identifier
-      else {
+      if (!lineBuffer.pop(vartok)) {
+        this->sendError("p3", "after var", current.lineNumber());  // expected identifier
+      } else if (vartok.type() != IDENTIFIER) {
+        this->sendError("p4.2", vartok.value(), vartok.lineNumber());  // invalid identifier
+      } else {
         bool reDec = false;
         if (current.value() == "global") {
           Vector<Variable>& globs = variables.getBaseVariables();
@@ -387,7 +389,7 @@ RPN Parser::parseBlock(bufferIndex depth) {
         while (lineBuffer.pop(tmp)) {
           if (tmp.value() == ")") {
             break;
-          } if (tmp.value() != ",") {
+          } else if (tmp.value() != ",") {
             this->sendError("p4.3", "", tmp.lineNumber());  // expected function arg separator ,
           } else if (!lineBuffer.pop(tmp) || tmp.type() != IDENTIFIER) {
             this->sendError("p3", " identifier after ,", tmp.lineNumber());  // expected identifier after separator ,
@@ -833,4 +835,4 @@ Vector<Error> Parser::sortErrors(Vector<Error> errors) {
   return errors;
 }
 /*** END implementation: class Parser ***/
-#endif
+#endif  // SRC_PARSER_H_

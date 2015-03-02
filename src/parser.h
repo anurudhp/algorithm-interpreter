@@ -1,5 +1,5 @@
-#ifndef COMPONENT_PARSER_H
-#define COMPONENT_PARSER_H
+#ifndef SRC_PARSER_H_
+#define SRC_PARSER_H_
 
 typedef Queue<Token> RPN;
 
@@ -98,4 +98,4 @@ class Parser {
   RPN getOutput() { return output; }  // TODO(codelegend): should be removed.
 };
 
-#endif /* COMPONENT_PARSER_H */
+#endif  // SRC_PARSER_H_

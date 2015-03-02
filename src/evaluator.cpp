@@ -1,4 +1,4 @@
-#ifdef COMPONENT_EVALUATOR_H
+#ifdef SRC_EVALUATOR_H_
 
 Evaluator::Evaluator(Parser *pr, String args) {
   this->parser = pr;
@@ -534,7 +534,9 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
             valuestack.push(tmp);
           }
         }
-      } else if (current.subtype() == VARIABLE) valuestack.push(current);
+      } else if (current.subtype() == VARIABLE) {
+        valuestack.push(current);
+      }
     }
   }
 
@@ -543,4 +545,4 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
   return ret;
 }
 
-#endif  // COMPONENT_EVALUATOR_H
+#endif  // SRC_EVALUATOR_H_

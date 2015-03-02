@@ -1,4 +1,4 @@
-#ifdef COMPONENT_LEXER_H
+#ifdef SRC_LEXER_H_
 // do not include this file directly.
 // use lexer.h instead.
 
@@ -464,4 +464,4 @@ bool importErrorCodes(ifstream& ecreader) {  // NOLINT
   return true;
 }
 
-#endif
+#endif  // SRC_LEXER_H_

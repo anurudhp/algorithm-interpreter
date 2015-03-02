@@ -1,6 +1,6 @@
-#ifdef COMPONENT_PARSER_H
-#ifndef COMPONENT_PARSER_OPERATION_H
-#define COMPONENT_PARSER_OPERATION_H
+#ifdef SRC_PARSER_H_
+#ifndef SRC_PARSER_OPERATIONS_CPP_
+#define SRC_PARSER_OPERATIONS_CPP_
 
 /********************************
 * Static processes for executing all operations
@@ -269,5 +269,5 @@ Token Operations::compare(String op, Token t1, Token t2) {
   return nullvalToken;
 }
 
-#endif /* COMPONENT_PARSER_OPERATION_H */
-#endif /* COMPONENT_PARSER_H */
+#endif  // SRC_PARSER_OPERATIONS_CPP_
+#endif  // SRC_PARSER_H_

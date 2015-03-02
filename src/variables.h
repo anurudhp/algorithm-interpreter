@@ -1,6 +1,6 @@
-#ifdef COMPONENT_PARSER_H
-#ifndef COMPONENT_PARSER_VARIABLES_H
-#define COMPONENT_PARSER_VARIABLES_H
+#ifndef SRC_VARIABLES_H_
+#define SRC_VARIABLES_H_
+#ifdef SRC_PARSER_H_
 
 // Included in "parser.h"
 
@@ -130,5 +130,5 @@ class Object {
   Variable construct(Vector<Variable>);
 };
 
-#endif /* COMPONENT_PARSER_VARIABLES_H */
-#endif /* COMPONENT_PARSER_H */
+#endif  // SRC_PARSER_H_
+#endif  // SRC_VARIABLES_H_
