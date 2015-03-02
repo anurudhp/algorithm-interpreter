@@ -17,10 +17,10 @@ class Variable {
 
  public:
   Variable();
-  explicit Variable(String);
-  explicit Variable(Token);
-  Variable(const Variable&);
-  Variable& operator= (const Variable&);
+  explicit Variable(String id);
+  explicit Variable(Token val);
+  Variable(const Variable &v);
+  Variable& operator= (const Variable &v);
 
   String id() const;  // the identifier/name of the variable
   tokenType type();
@@ -28,22 +28,22 @@ class Variable {
   __SIZETYPE length() const;
 
   // value access:
-  void setType(tokenType);
-  bool setValue(const Variable&);
-  bool hasValueAt(Token);
-  Variable& valueAt(Token);
-  bool setValueAt(Token, Variable);
+  void setType(tokenType ty);
+  bool setValue(const Variable &v);
+  bool hasValueAt(Token key);
+  Variable& valueAt(Token key);
+  bool setValueAt(Token key, Variable value);
 
   // methods for arrays:
-  bool pushValue(Variable, bool = false);
-  bool popValue(Variable&, bool = false);
+  bool pushValue(Variable v, bool isFront = false);
+  bool popValue(Variable &v, bool isFront = false);
   // methods for objects:
-  bool addPair(Token, Variable);
-  bool deletePair(Token, Variable&);
-  String getKey(__SIZETYPE);
-  Function getMethod(String);
+  bool addPair(Token key, Variable val);
+  bool deletePair(Token key, Variable &ref);
+  String getKey(__SIZETYPE index);
+  Function getMethod(String funcId);
 
-  Token printValues(ostream& = cout);
+  Token printValues(ostream& out = cout);
 
   friend class Object;
 };
@@ -60,17 +60,17 @@ class VariableScope {
 
  public:
   VariableScope();
-  VariableScope& operator= (const VariableScope&);
+  VariableScope& operator= (const VariableScope &sc);
 
   bool stackVariables();
-  bool stackVariables(Vector<Variable>&);
-  bool addVariable(Variable&);
+  bool stackVariables(Vector<Variable> &vars);
+  bool addVariable(Variable &var);
   bool popVariables();
-  bool popVariables(Vector<Variable>&);
+  bool popVariables(Vector<Variable> &vars);
 
-  bool exists(String);
-  bool existsAtTop(String);
-  Variable& resolve(String);
+  bool exists(String id);
+  bool existsAtTop(String id);
+  Variable& resolve(String id);
   Vector<Variable>& getBaseVariables();
   __SIZETYPE depth() const;
 };
@@ -91,22 +91,22 @@ class Function {
 
  public:
   Function();
-  explicit Function(String);
-  Function(String, Vector<String>, RPN);
-  Function(const Function&);
+  explicit Function(String id);
+  Function(String id, Vector<String> params, RPN st);
+  Function(const Function& f);
 
   __SIZETYPE paramsSize() const;
   String id() const;
   RPN getStatements() const;
 
   // parsing:
-  void setParams(Vector<String>);
-  void setStatements(RPN);
-  void setVariables(Vector<Variable>);
+  void setParams(Vector<String> p);
+  void setStatements(RPN st);
+  void setVariables(Vector<Variable> fv);
   // evaluating:
-  Token evaluate(Vector<Variable>, Evaluator&);
+  Token evaluate(Vector<Variable> args, Evaluator &eval);
   bool hasReturned() const;
-  bool setReturn(Token);
+  bool setReturn(Token ret);
 };
 
 /**********************
@@ -121,13 +121,13 @@ class Object {
 
  public:
   Object();
-  Object(String, bool);
+  Object(String name, bool f);
 
   String id();
   Function getConstructor();
-  bool hasPrototype(String);
-  Function getPrototype(String);
-  Variable construct(Vector<Variable>);
+  bool hasPrototype(String funcid);
+  Function getPrototype(String funcid);
+  Variable construct(Vector<Variable> initArgs);
 };
 
 #endif  // SRC_PARSER_H_

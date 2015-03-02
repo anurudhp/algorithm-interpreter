@@ -50,9 +50,9 @@ class Error {
   int _severity;
 
  public:
-  explicit Error(String = "", String = "", bufferIndex = -1, int = ERROR_ERROR);
-  Error(const Error&);
-  Error& operator= (const Error&);
+  explicit Error(String cd = "", String fg = "", bufferIndex ln = -1, int s = ERROR_ERROR);
+  Error(const Error &e);
+  Error& operator= (const Error &e);
 
   String code() const;
   String flag() const;
@@ -60,7 +60,7 @@ class Error {
   bufferIndex lineNumber() const;
   int severity() const;
 
-  void setLineNumber(bufferIndex);
+  void setLineNumber(bufferIndex ln);
 };
 
 idList errorCodes, errorDesc;
@@ -86,9 +86,9 @@ class Token {
   String _value;
  public:
   // constructors
-  Token(const Token&);
-  explicit Token(String = "", tokenType = UNKNOWN, tokenType = UNKNOWN, bufferIndex = -1, bufferIndex = 0);
-  Token& operator= (const Token&);
+  Token(const Token &t);
+  explicit Token(String val = "", tokenType t = UNKNOWN, tokenType st = UNKNOWN, bufferIndex ln = -1, bufferIndex in = 0);
+  Token& operator= (const Token &t);
 
   // properties
   tokenType type() const;
@@ -97,11 +97,11 @@ class Token {
   bufferIndex indent() const;
   String value() const;
   // mutators
-  void setType(tokenType);
-  void setSubtype(tokenType);
-  void setLineNumber(bufferIndex);
-  void setIndent(bufferIndex);
-  void setValue(String);
+  void setType(tokenType t);
+  void setSubtype(tokenType st);
+  void setLineNumber(bufferIndex ln);
+  void setIndent(bufferIndex in);
+  void setValue(String s);
 };
 
 // Directive Tokens
@@ -110,7 +110,7 @@ Token eofToken, nullToken, newlineToken;
 Token trueToken, falseToken, nullvalToken;
 // module to install the reserved words, and other lexer data
 bool loadLexerData();
-bool importErrorCodes(ifstream&);
+bool importErrorCodes(ifstream& ecreader);
 
 typedef Queue<Token> Infix;
 
@@ -135,23 +135,22 @@ class Lexer {
   String readOperator();
 
  public :
-  explicit Lexer(String);
+  explicit Lexer(String data);
   ~Lexer();
 
   Vector<Error> getErrors() const;
   Token getToken();
-  bool putbackToken(Token);
-  Infix getTokensTill(String);
+  bool putbackToken(Token tok);
+  Infix getTokensTill(String delim);
   bool ended();
 
   // static members:
-  static Token toToken(String);
-  static bool isValidIdentifier(String);
-  static String entityMap(String);
-  static String matchBracket(String);
-  static String tokenToString(Token);
-  static String stringToLiteral(String);
-  static String typeToString(tokenType);
+  static Token toToken(String val);
+  static bool isValidIdentifier(String val);
+  static String entityMap(String val);
+  static String tokenToString(Token t);
+  static String stringToLiteral(String val);
+  static String typeToString(tokenType ty);
 };
 
 #endif  // SRC_LEXER_H_

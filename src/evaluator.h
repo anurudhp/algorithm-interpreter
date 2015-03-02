@@ -18,26 +18,26 @@ class Evaluator {
   bool failed;
 
  public:
-  explicit Evaluator(Parser*, String = "");
+  explicit Evaluator(Parser *pr, String args = "");
 
   // interface:
-  bool addError(Error);
-  bool sendError(String, String = "", bufferIndex = -1);
-  bool showErrors(ostream&, bool = false);
+  bool addError(Error e);
+  bool sendError(String cd, String msg = "", bufferIndex ln = -1);
+  bool showErrors(ostream &out, bool clearAfterDisplay = false);
 
   // variable caches
-  Variable& getCachedVariable(String);
-  String cacheVariable(Variable);
+  Variable& getCachedVariable(String id);
+  String cacheVariable(Variable v);
   String cacheVariable();
-  String cacheVariableRef(Variable*);
+  String cacheVariableRef(Variable *ref);
   // variable access.
-  Variable& getVariable(String, VariableScope&, bool = false);
-  Token getVariableValue(Token, VariableScope&, bool = false);
+  Variable& getVariable(String id, VariableScope &scope, bool searchCache = false);
+  Token getVariableValue(Token var, VariableScope &scope, bool searchCache = false);
   Vector<Variable>& getGlobals();
 
   // procedures
   bool runProgram();
-  Token evaluateRPN(RPN, VariableScope&);
+  Token evaluateRPN(RPN source, VariableScope &scope);
 };
 
 #endif  // SRC_EVALUATOR_H_

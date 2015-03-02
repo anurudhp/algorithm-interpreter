@@ -30,11 +30,11 @@ class HashedData {
 
   bool clearStatements();
   bool clearVariables();
-  bool addStatements(RPN);
-  bool addVariables(Vector<Variable>);
+  bool addStatements(RPN st);
+  bool addVariables(Vector<Variable> v);
 
-  void setValues(csIf);
-  void setValues(csFor);
+  void setValues(csIf i);
+  void setValues(csFor f);
 
   csIf getIf();
   csFor getFor();
@@ -68,32 +68,32 @@ class Parser {
   Lexer *lexer;
 
  public:
-  explicit Parser(Lexer*, String = "");
+  explicit Parser(Lexer *ref, String args = "");
   ~Parser();
 
   // interface: Communication with the parser
-  bool addError(Error);
-  bool sendError(String, String = "", bufferIndex = -1, int = ERROR_ERROR);
+  bool addError(Error e);
+  bool sendError(String cd, String msg = "", bufferIndex ln = -1, int s = ERROR_ERROR);
   Vector<Error> getErrors();
-  bool showErrors(ostream&, bool = false);
-  Function getFunction(String);
+  bool showErrors(ostream &out, bool clearAfterDisplay = false);
+  Function getFunction(String id);
 
-  Token hashify(HashedData&);
-  HashedData getHashedData(String);
+  Token hashify(HashedData &hd);
+  HashedData getHashedData(String hash);
 
   // parsing procedures:
   bool parseSource();
 
-  RPN parseBlock(bufferIndex = 0);
+  RPN parseBlock(bufferIndex depth = 0);
   RPN parseDeclaration();
 
   // assumes that the tokens have already been read.
-  RPN expressionToRPN(Infix);
+  RPN expressionToRPN(Infix args);
   // checks whether the RPN is valid.
-  bool validateRPN(RPN);
+  bool validateRPN(RPN rpn);
 
-  static Token toArgsToken(__SIZETYPE);
-  static Vector<Error> sortErrors(Vector<Error>);
+  static Token toArgsToken(__SIZETYPE num);
+  static Vector<Error> sortErrors(Vector<Error> errors);
   friend class Evaluator;
   RPN getOutput() { return output; }  // TODO(codelegend): should be removed.
 };

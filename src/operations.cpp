@@ -10,22 +10,22 @@
 * Has function to check and compare priority of different operators.
 ********************************/
 struct Operations {
-  static Token typecastToken(Token, tokenType = STRING);
+  static Token typecastToken(Token tok, tokenType type = STRING);
 
-  static Token add(Token, Token);
-  static Token subtract(Token, Token);
-  static Token multiply(Token, Token);
-  static Token divide(Token, Token);
-  static Token modulo(Token, Token);
+  static Token add(Token t1, Token t2);
+  static Token subtract(Token t1, Token t2);
+  static Token multiply(Token t1, Token t2);
+  static Token divide(Token t1, Token t2);
+  static Token modulo(Token t1, Token t2);
 
-  static Token compare(String, Token, Token);
-  static Token logical(String, Token, Token);
+  static Token compare(String op, Token t1, Token t2);
+  static Token logical(String op, Token t1, Token t2);
 
-  static Token unaryOperator(String, Token);
-  static Token binaryOperator(String, Token, Token);
+  static Token unaryOperator(String op, Token tok);
+  static Token binaryOperator(String op, Token t1, Token t2);
 
-  static int priority(String);
-  static int comparePriority(Token, Token);
+  static int priority(String op);
+  static int comparePriority(Token a, Token b);
 };
 
 Token Operations::typecastToken(Token tok, tokenType type) {
