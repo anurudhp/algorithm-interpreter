@@ -124,7 +124,7 @@ bool loadData() {
   fin.close();
 
   // some parser settings.
-  nullVariableRef.setValue(nullvalToken);
+  nullVariableRef.setValue(Variable(nullvalToken));
 
   return success;
 }

@@ -18,7 +18,7 @@ class Evaluator {
   bool failed;
 
  public:
-  Evaluator(Parser*, String = "");
+  explicit Evaluator(Parser*, String = "");
 
   // interface:
   bool addError(Error);

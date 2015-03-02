@@ -112,7 +112,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
 
   Vector<String> assignmentOp(strsplit("= += -= *= /= %=", ' '));
   Variable nullvalVariable("$");
-  nullvalVariable.setValue(nullvalToken);
+  nullvalVariable.setValue(Variable(nullvalToken));
   nullvalVariable.setType(CONSTANT);
 
   while (source.pop(current)) {
@@ -297,7 +297,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
 
         val = v.value();  // the old value.
         res = Operations::binaryOperator(current.value().substr(0, 1), val, Lexer::toToken("1"));  // after inc/dec
-        v.setValue(res);
+        v.setValue(Variable(res));
 
         valuestack.push((current.subtype() == PRE) ? res : val);
       }
@@ -390,7 +390,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
           for (__SIZETYPE index = 0; index < obj.length(); index++) {
             if (obj.type() == ARRAY) itertok = Lexer::toToken(integerToString(index));
             else if (obj.type() == OBJECT) itertok = Lexer::toToken(obj.getKey(index));
-            iter.setValue(itertok);
+            iter.setValue(Variable(itertok));
 
             scope.stackVariables(foreachSet.forVariables);
             this->evaluateRPN(foreachSet.forStatements, scope);
