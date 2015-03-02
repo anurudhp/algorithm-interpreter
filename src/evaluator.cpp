@@ -271,8 +271,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
 
         if (oper == "=") {
           res = b;
-        }
-        else {
+        } else {
           res = Operations::binaryOperator(oper, va, vb);
         }
 
@@ -289,8 +288,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
           }
         }
         valuestack.push(res);
-      }
-      else if (current.subtype() == PRE || current.subtype() == POST) {
+      } else if (current.subtype() == PRE || current.subtype() == POST) {
         Token tok, val, res;
         valuestack.pop(tok);
 
@@ -303,8 +301,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
 
         valuestack.push((current.subtype() == PRE) ? res : val);
       }
-    }
-    else if (current.type() == KEYWORD) {
+    } else if (current.type() == KEYWORD) {
       if (current.value() == "return") {
         // function stack shouldn't be empty.
         // set the return for the top of the stack, and break the evaluation.
@@ -314,8 +311,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
           this->functionStack.top().setReturn(ret);
           break;
         }
-      }
-      else if (current.value() == "if") {
+      } else if (current.value() == "if") {
         Token hashtok;
         source.pop(hashtok);
         HashedData hd = this->parser->getHashedData(hashtok.value());
@@ -329,14 +325,12 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
           scope.stackVariables(ifSet.ifVariables);
           evaluateRPN(ifSet.ifStatements, scope);
           scope.popVariables();
-        }
-        else {
+        } else {
           scope.stackVariables(ifSet.elseVariables);
           evaluateRPN(ifSet.elseStatements, scope);
           scope.popVariables();
         }
-      }
-      else if (current.value() == "while" || current.value() == "until") {
+      } else if (current.value() == "while" || current.value() == "until") {
         Token hashtok;
         source.pop(hashtok);
         HashedData hd = this->parser->getHashedData(hashtok.value());
@@ -356,8 +350,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
           if (val.subtype() == VARIABLE) val = this->getVariable(val.value(), scope, true).value();
           val = Operations::typecastToken(val, BOOLEAN);
         }
-      }
-      else if (current.value() == "for") {
+      } else if (current.value() == "for") {
         Token hashtok;
         source.pop(hashtok);
         HashedData hd = this->parser->getHashedData(hashtok.value());
@@ -380,8 +373,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
           val = Operations::typecastToken(val, BOOLEAN);
         }
         scope.popVariables();
-      }
-      else if (current.value() == "foreach") {
+      } else if (current.value() == "foreach") {
         Token hashtok;
         source.pop(hashtok);
         HashedData hd = this->parser->getHashedData(hashtok.value());
@@ -407,8 +399,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
         }
         scope.popVariables();
       }
-    }
-    else if (current.type() == IDENTIFIER) {
+    } else if (current.type() == IDENTIFIER) {
       if (current.subtype() == FUNCTION) {
         Token argtok, inv, tmp;
         source.pop(argtok); source.pop(inv);
@@ -432,8 +423,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
                 valuestack.push(Lexer::toToken(integerToString(str.length())));
               }
             }
-          }
-          else {  // for a variable:
+          } else {  // for a variable:
             Variable& v = this->getVariable(vartok.value(), scope, true);
 
             if (v.type() == ARRAY) {
@@ -441,57 +431,53 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
                 Variable pushvar; Token arg;
                 while (!args.empty()) {
                   args.popfront(arg);
-                  if (arg.subtype() == VARIABLE) pushvar.setValue(this->getVariable(arg.value(), scope, true));
-                  else pushvar.setValue(Variable(arg));
-
+                  if (arg.subtype() == VARIABLE) {
+                    pushvar.setValue(this->getVariable(arg.value(), scope, true));
+                  } else {
+                    pushvar.setValue(Variable(arg));
+                  }
                   v.pushValue(pushvar, (current.value() == "unshift"));
                 }
                 valuestack.push(Lexer::toToken(integerToString(v.length())));
-              }
-              else if (current.value() == "pop" || current.value() == "shift") {
+              } else if (current.value() == "pop" || current.value() == "shift") {
                 Variable popvar;
                 v.popValue(popvar, (current.value() == "shift"));
                 String pophash = this->cacheVariable(popvar);
                 valuestack.push(Token(pophash, DIRECTIVE, VARIABLE));
-              }
-              else if (current.value() == "length") {
+              } else if (current.value() == "length") {
                 valuestack.push(Lexer::toToken(integerToString(v.length())));
               }
             }
           }
-        }
-        else {  // global function:
+        } else {  // global function:
           if (InbuiltFunctionList.indexOf(current.value()) >= 0) {
             Token res;
             if (current.value() == "print" || current.value() == "printLine") {
               for (__SIZETYPE i = 0; i < args.size(); i++) {
-                if (args[i].type() == LITERAL) InbuiltFunctions::write(args[i]);
-                else if (args[i].subtype() == VARIABLE) {
+                if (args[i].type() == LITERAL) {
+                  InbuiltFunctions::write(args[i]);
+                } else if (args[i].subtype() == VARIABLE) {
                   this->getVariable(args[i].value(), scope, true).printValues(cout);
                 }
               }
               if (current.value() == "printLine") InbuiltFunctions::write(Lexer::toToken("\"\\n\""));
               res = trueToken;
-            }
-            else if (current.value().substr(0, 4) == "read") {  // readInteger, readString, readLine
+            } else if (current.value().substr(0, 4) == "read") {  // readInteger, readString, readLine
               for (__SIZETYPE i = 0; i < args.size(); i++) {
-                if (args[i].type() == LITERAL) InbuiltFunctions::write(args[i]);
-                else if (args[i].subtype() == VARIABLE) {
+                if (args[i].type() == LITERAL) {
+                  InbuiltFunctions::write(args[i]);
+                } else if (args[i].subtype() == VARIABLE) {
                   this->getVariable(args[i].value(), scope, true).printValues(cout);
                 }
               }
               if (current.value() == "readLine") {
                 res = InbuiltFunctions::readLine();
-              }
-              else if (current.value() == "readString") {
+              } else if (current.value() == "readString") {
                 res = InbuiltFunctions::read(STRING);
-              }
-              else if (current.value() == "readNumber") {
+              } else if (current.value() == "readNumber") {
                 res = InbuiltFunctions::read(NUMBER);
               }
-            }
-            // all primary class constructors
-            else if (current.value() == "Array") {
+            } else if (current.value() == "Array") {  // all primary class constructors
               String hash = this->cacheVariable();
               Variable& v = this->getVariable(hash, scope, true);
               v.setType(ARRAY);
@@ -506,14 +492,12 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
               for (__SIZETYPE i = 0; i < asize; i++)
                 v.setValueAt(Lexer::toToken(integerToString(i)), nullvalVariable);
               res = Token(hash, DIRECTIVE, VARIABLE);
-            }
-            else if (current.value() == "Object") {
+            } else if (current.value() == "Object") {
               String hash = this->cacheVariable();
               Variable& v = this->getVariable(hash, scope, true);
               v.setType(OBJECT);
               res = Token(hash, DIRECTIVE, VARIABLE);
-            }
-            else if (current.value() == "String" || current.value() == "Number" || current.value() == "Boolean" || current.value() == "Integer") {
+            } else if (current.value() == "String" || current.value() == "Number" || current.value() == "Boolean" || current.value() == "Integer") {
               tokenType ty = UNKNOWN;
               if (current.value() == "String") ty = STRING;
               else if (current.value() == "Number") ty = NUMBER;
@@ -527,15 +511,13 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
                 }
                 if (val.type() == LITERAL) {
                   res = Operations::typecastToken(val, ty);
-                }
-                else {
+                } else {
                   res = nullvalToken;
                 }
               }
             }
             valuestack.push(res);
-          }
-          else {
+          } else {
             Function func = this->parser->getFunction(current.value());
             if (!!func.id()) {
               Vector<Variable> argVars;
@@ -552,8 +534,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
             valuestack.push(tmp);
           }
         }
-      }
-      else if (current.subtype() == VARIABLE) valuestack.push(current);
+      } else if (current.subtype() == VARIABLE) valuestack.push(current);
     }
   }
 
