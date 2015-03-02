@@ -700,7 +700,7 @@ bool Parser::validateRPN(RPN rpn) {
   bool success = true;
 
   while (rpn.pop(curr)) {
-    if (curr.value() == ";") [
+    if (curr.value() == ";") {
       vals.clear();
     } else if (curr.type() == LITERAL) {
       vals.push(LITERAL);
