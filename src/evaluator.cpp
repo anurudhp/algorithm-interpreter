@@ -43,7 +43,7 @@ bool Evaluator::showErrors(ostream& out, bool clearAfterDisplay) {
 // returns the reference to a variable cached with the hash `id`.
 Variable& Evaluator::getCachedVariable(String id) {
   if (id.substr(0, 2) == "#c") {
-    long index = id.substr(2).toInteger();
+    __SIZETYPE index = id.substr(2).toInteger();
     if (index < 0 || index >= this->cache.size()) return nullVariableRef;
     return *(this->cache[index]);
   }
@@ -66,7 +66,7 @@ String Evaluator::cacheVariable() {
 String Evaluator::cacheVariableRef(Variable *ref) {
   if (ref == NULL) return "";
   this->cache.pushback(ref);
-  long index = this->cache.size() - 1;
+  __SIZETYPE index = this->cache.size() - 1;
   String hash = "#c";
   hash += integerToString(index);
   return hash;
@@ -130,7 +130,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
       if (current.value() == "@init") {
         Token dataSize, res, key, val;
         source.pop(dataSize);
-        long length = dataSize.value().substr(6).toInteger();
+        __SIZETYPE length = dataSize.value().substr(6).toInteger();
 
         if (current.subtype() == ARRAY) {
           String hash = this->cacheVariable();
@@ -183,7 +183,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
         bool valid = false;
         if (a.type() == LITERAL) {
           if (a.subtype() == STRING && b.value().isInteger()) {
-            long ind = b.value().toInteger();
+            __SIZETYPE ind = b.value().toInteger();
             String str = Lexer::tokenToString(a);
             if (ind < 0 || ind >= str.length()) {
               this->sendError("rv4", "", a.lineNumber());  // invalid index
@@ -199,7 +199,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
           if (var.type() == STRING) {
             if (b.value().isInteger()) {
               a = var.value();
-              long ind = b.value().toInteger();
+              __SIZETYPE ind = b.value().toInteger();
               String str = Lexer::tokenToString(a);
               if (ind < 0 || ind >= str.length()) {
                 this->sendError("rv4", "", a.lineNumber());  // invalid index
@@ -404,7 +404,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
         Token argtok, inv, tmp;
         source.pop(argtok); source.pop(inv);
 
-        long numOfArgs = argtok.value().substr(6).toInteger();  // argtok.value(): @args|<int>
+        __SIZETYPE numOfArgs = argtok.value().substr(6).toInteger();  // argtok.value(): @args|<int>
         Vector<Token> args;
         while (numOfArgs--) {
           if (valuestack.pop(tmp)) args.pushfront(tmp);
@@ -483,7 +483,7 @@ Token Evaluator::evaluateRPN(RPN source, VariableScope& scope) {
               v.setType(ARRAY);
 
               Token arrSize;
-              long asize = 0;
+              __SIZETYPE asize = 0;
               if (args.popfront(arrSize)) {
                 if (arrSize.subtype() == VARIABLE) arrSize = this->getVariable(arrSize.value(), scope, true).value();
                 asize = arrSize.value().toInteger();
