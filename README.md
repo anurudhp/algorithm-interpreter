@@ -17,11 +17,6 @@ Usage
 For instructions on how to write code in the interpreter's language, see the [manual][1]
   [1]: https://github.com/codelegend/algorithm-compiler/blob/master/docs/manual.md
 
-Downloads
--------------------------------------------------
-Building not your interest? Then download the [pre-built releases][2]
-  [2]: https://algoflex.herokuapp.com
-
 License
 -------------------------------------------------
 The AlgoFlex Interpreter is distributed under the [MIT License][3]
